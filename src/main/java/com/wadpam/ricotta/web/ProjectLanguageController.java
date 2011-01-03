@@ -21,9 +21,11 @@ import com.google.appengine.api.datastore.Key;
 import com.wadpam.ricotta.dao.LanguageDao;
 import com.wadpam.ricotta.dao.ProjectDao;
 import com.wadpam.ricotta.dao.ProjectLanguageDao;
+import com.wadpam.ricotta.dao.UberDao;
 import com.wadpam.ricotta.domain.Language;
 import com.wadpam.ricotta.domain.Project;
 import com.wadpam.ricotta.domain.ProjectLanguage;
+import com.wadpam.ricotta.model.ProjectLanguageModel;
 
 /**
  * Created by Ola on Nov 12, 2010
@@ -39,6 +41,8 @@ public class ProjectLanguageController {
 
     private ProjectLanguageDao projectLanguageDao;
 
+    private UberDao            uberDao;
+
     @RequestMapping(value = "create.html", method = RequestMethod.GET)
     public String getProjectLanguageForm(Model model, @PathVariable String projectName) {
         // TODO: check project role
@@ -46,13 +50,13 @@ public class ProjectLanguageController {
         model.addAttribute("project", project);
 
         // for parent list
-        List<ProjectLanguage> projectLanguages = projectLanguageDao.findByProject(project.getKey());
-        model.addAttribute("projectLanguages", projectLanguages);
+        List<ProjectLanguageModel> projectLanguages = uberDao.loadProjectLanguages(project.getKey());
+        model.addAttribute("parentLanguages", projectLanguages);
 
         // for new project language list
         Set<Key> languageKeys = new HashSet<Key>();
-        for(ProjectLanguage pl : projectLanguages) {
-            languageKeys.add(pl.getLanguage());
+        for(ProjectLanguageModel plm : projectLanguages) {
+            languageKeys.add(plm.getLanguage().getKey());
         }
 
         List<Language> languages = languageDao.findAll();
@@ -74,7 +78,6 @@ public class ProjectLanguageController {
         // TODO: check project role
 
         Project project = projectDao.findByName(projectName);
-        LOGGER.debug(project.toString());
         projectLanguage.setProject(project.getKey());
         projectLanguageDao.persist(projectLanguage);
 
@@ -91,6 +94,10 @@ public class ProjectLanguageController {
 
     public void setProjectLanguageDao(ProjectLanguageDao projectLanguageDao) {
         this.projectLanguageDao = projectLanguageDao;
+    }
+
+    public void setUberDao(UberDao uberDao) {
+        this.uberDao = uberDao;
     }
 
 }

@@ -6,12 +6,18 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
+	<bean id="uberDao" class="com.wadpam.ricotta.dao.UberDaoBean">
+		<property name="languageDao" ref="languageDao" />
+		<property name="projectLanguageDao" ref="projectLanguageDao"/>
+		<property name="tokenDao" ref="tokenDao" />
+		<property name="translationDao" ref="translationDao" />
+	</bean>
 
 	<!-- As auto-wiring does not work well in GAE, define controllers manually: -->
 	<bean id="projectController" class="com.wadpam.ricotta.web.ProjectController">
 		<property name="projectDao" ref="projectDao" />
 		<property name="tokenDao" ref="tokenDao" />
-		<property name="projectLanguageDao" ref="projectLanguageDao" />
+		<property name="uberDao" ref="uberDao" />
 	</bean>
 
 	<bean id="languageController" class="com.wadpam.ricotta.web.LanguageController">
@@ -22,6 +28,14 @@
 		<property name="projectDao" ref="projectDao" />
 		<property name="languageDao" ref="languageDao" />
 		<property name="projectLanguageDao" ref="projectLanguageDao" />
+		<property name="uberDao" ref="uberDao" />
+	</bean>
+
+	<bean id="translationController" class="com.wadpam.ricotta.web.TranslationController">
+		<property name="projectDao" ref="projectDao" />
+		<property name="languageDao" ref="languageDao" />
+		<property name="projectLanguageDao" ref="projectLanguageDao" />
+		<property name="uberDao" ref="uberDao" />
 	</bean>
 
 	<bean

@@ -18,8 +18,8 @@
 	<tr>
 		<td>Default language:</td>
 		<td><select id="parent" name="parent">
-			<c:forEach items="${projectLanguages}" var="projectLanguage">
-				<option value="${projectLanguage.key}"><c:out value="${projectLanguage.key}" /></option>
+			<c:forEach items="${parentLanguages}" var="parent">
+				<option value="<c:out value='${parent.language.keyString}' />"><c:out value="${parent.language.name}" /> (<c:out value="${parent.language.code}" />)</option>
 			</c:forEach>
 		</select></td>
 	</tr>

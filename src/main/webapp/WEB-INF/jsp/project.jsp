@@ -32,13 +32,15 @@
 		<tr>
 			<th>Code</th>
 			<th>Name</th>
+			<th>Default</th>
 		</tr>
 	</thead>
 	<tbody>
-	<c:forEach items="${languages}" var="language">
+	<c:forEach items="${languages}" var="plm">
 		<tr>
-			<td><c:out value="${language.parent}" /></td>
-			<td><c:out value="${language.language}" /></td>
+			<td><c:out value="${plm.language.code}" /></td>
+			<td><a href="languages/<c:out value='${plm.language.code}' />/translations/" ><c:out value="${plm.language.name}" /></a></td>
+			<td><c:out value="${plm.parentName}" /></td>
 		</tr>
 	</c:forEach>
 	</tbody>

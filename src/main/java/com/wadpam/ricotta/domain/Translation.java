@@ -1,10 +1,10 @@
 package com.wadpam.ricotta.domain;
 
+import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -15,21 +15,25 @@ import com.google.appengine.api.datastore.Key;
 public class Translation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Key      key;
+    Key    key;
 
-    String   local;
+    String local;
 
-    @ManyToOne
-    Token    token;
+    // ManyToOne
+    @Basic
+    Key    token;
 
-    @ManyToOne
-    Language language;
+    // ManyToOne
+    @Basic
+    Key    language;
 
-    @ManyToOne
-    Country  country;
+    // ManyToOne
+    @Basic
+    Key    country;
 
-    @ManyToOne
-    Version  version;
+    // ManyToOne
+    @Basic
+    Key    version;
 
     public Key getKey() {
         return key;
@@ -47,35 +51,35 @@ public class Translation {
         this.local = local;
     }
 
-    public Token getToken() {
+    public Key getToken() {
         return token;
     }
 
-    public void setToken(Token token) {
+    public void setToken(Key token) {
         this.token = token;
     }
 
-    public Language getLanguage() {
+    public Key getLanguage() {
         return language;
     }
 
-    public void setLanguage(Language language) {
+    public void setLanguage(Key language) {
         this.language = language;
     }
 
-    public Country getCountry() {
+    public Key getCountry() {
         return country;
     }
 
-    public void setCountry(Country country) {
+    public void setCountry(Key country) {
         this.country = country;
     }
 
-    public Version getVersion() {
+    public Key getVersion() {
         return version;
     }
 
-    public void setVersion(Version version) {
+    public void setVersion(Key version) {
         this.version = version;
     }
 

@@ -19,7 +19,6 @@ public class RicottaBindingInitializer implements WebBindingInitializer {
         binder.registerCustomEditor(Key.class, new PropertyEditorSupport() {
             @Override
             public void setAsText(String text) throws IllegalArgumentException {
-                LOG.debug("Converting {} to Key", text);
                 setValue(KeyFactory.stringToKey(text));
                 LOG.debug("Converted {} to {}", text, getValue());
             }

@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.wadpam.ricotta.dao.ProjectDao;
-import com.wadpam.ricotta.dao.ProjectLanguageDao;
 import com.wadpam.ricotta.dao.TokenDao;
+import com.wadpam.ricotta.dao.UberDao;
 import com.wadpam.ricotta.domain.Project;
-import com.wadpam.ricotta.domain.ProjectLanguage;
 import com.wadpam.ricotta.domain.Token;
+import com.wadpam.ricotta.model.ProjectLanguageModel;
 
 /**
  * Created by Ola on Nov 12, 2010
@@ -27,13 +27,13 @@ import com.wadpam.ricotta.domain.Token;
 @Controller
 @RequestMapping("/projects/")
 public class ProjectController {
-    static final Logger        LOGGER = LoggerFactory.getLogger(ProjectController.class);
+    static final Logger LOGGER = LoggerFactory.getLogger(ProjectController.class);
 
-    private ProjectDao         projectDao;
+    private ProjectDao  projectDao;
 
-    private ProjectLanguageDao projectLanguageDao;
+    private UberDao     uberDao;
 
-    private TokenDao           tokenDao;
+    private TokenDao    tokenDao;
 
     @RequestMapping(value = "index.html", method = RequestMethod.GET)
     public String getProjects(HttpServletRequest request, Model model) {
@@ -71,7 +71,7 @@ public class ProjectController {
         model.addAttribute("project", project);
 
         // fetch and add languages for this project
-        List<ProjectLanguage> languages = projectLanguageDao.findByProject(project.getKey());
+        List<ProjectLanguageModel> languages = uberDao.loadProjectLanguages(project.getKey());
         model.addAttribute("languages", languages);
 
         // fetch and add tokens for this project
@@ -113,8 +113,8 @@ public class ProjectController {
         this.tokenDao = tokenDao;
     }
 
-    public void setProjectLanguageDao(ProjectLanguageDao projectLanguageDao) {
-        this.projectLanguageDao = projectLanguageDao;
+    public void setUberDao(UberDao uberDao) {
+        this.uberDao = uberDao;
     }
 
 }

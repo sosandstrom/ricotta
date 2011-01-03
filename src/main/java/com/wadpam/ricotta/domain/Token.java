@@ -12,7 +12,7 @@ import com.google.appengine.api.datastore.Key;
 
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "project"})})
-public class Token {
+public class Token extends AbstractPrimaryKeyEntity implements PrimaryKeyEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Key    key;
@@ -60,6 +60,11 @@ public class Token {
 
     public void setProject(Key project) {
         this.project = project;
+    }
+
+    @Override
+    public Object getPrimaryKey() {
+        return key;
     }
 
 }
