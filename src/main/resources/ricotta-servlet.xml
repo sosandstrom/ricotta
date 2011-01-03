@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+
+	<!-- As auto-wiring does not work well in GAE, define controllers manually: -->
+	<bean id="projectController" class="com.wadpam.ricotta.web.ProjectController">
+		<property name="projectDao" ref="projectDao" />
+		<property name="tokenDao" ref="tokenDao" />
+		<property name="projectLanguageDao" ref="projectLanguageDao" />
+	</bean>
+
+	<bean id="languageController" class="com.wadpam.ricotta.web.LanguageController">
+		<property name="languageDao" ref="languageDao" />
+	</bean>
+
+	<bean id="projectLanguageController" class="com.wadpam.ricotta.web.ProjectLanguageController">
+		<property name="projectDao" ref="projectDao" />
+		<property name="languageDao" ref="languageDao" />
+		<property name="projectLanguageDao" ref="projectLanguageDao" />
+	</bean>
+
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+		<!-- <property name="interceptors"> <ref bean="entityManagerFactory"/> 
+			</property> -->
+	</bean>
+
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="webBindingInitializer">
+			<bean
+				class="com.wadpam.ricotta.web.RicottaBindingInitializer" />
+		</property>
+	</bean>
+
+	<bean id="jsonView"
+		class="org.springframework.web.servlet.view.json.MappingJacksonJsonView">
+		<property name="renderedAttributes">
+			<set>
+				<value>test</value>
+			</set>
+		</property>
+	</bean>
+
+	<!-- In GAE, you cannot write multiparts to disk: -->
+	<bean id="multipartResolver" class="is.hax.spring.web.multipart.StreamingMultipartResolver">
+		<!-- the maximum file size in bytes -->
+		<property name="maxUploadSize" value="200000" />
+	</bean>
+
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="/WEB-INF/jsp/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+</beans>
