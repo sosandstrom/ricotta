@@ -37,7 +37,7 @@ public class ProjectController {
 
     @RequestMapping(value = "index.html", method = RequestMethod.GET)
     public String getProjects(HttpServletRequest request, Model model) {
-        LOGGER.debug("get projects list");
+        LOGGER.debug("get projects list {}, {}", projectDao, request.getUserPrincipal());
 
         model.addAttribute("projects", projectDao.findByOwner(request.getUserPrincipal().getName()));
         return "projects";

@@ -14,6 +14,8 @@
 	</bean>
 
 	<!-- As auto-wiring does not work well in GAE, define controllers manually: -->
+	<bean id="indexController" class="com.wadpam.ricotta.web.IndexController" />
+	
 	<bean id="projectController" class="com.wadpam.ricotta.web.ProjectController">
 		<property name="projectDao" ref="projectDao" />
 		<property name="tokenDao" ref="tokenDao" />

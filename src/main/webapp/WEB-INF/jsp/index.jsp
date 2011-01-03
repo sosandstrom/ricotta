@@ -6,21 +6,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <jsp:include page="header.jsp" />
 <body>
-<form id="language" name="language" action="" method="post">
-<table>
-	<tr>
-		<td>Language code:</td>
-		<td><input id="code" name="code" type="text" value="" /></td>
-	</tr>
-	<tr>
-		<td>Language name:</td>
-		<td><input id="name" name="name" type="text" value="" /></td>
-	</tr>
-	<tr>
-		<td></td>
-		<td><input id="create" name="create" type="submit" value="Create language" /></td>
-	</tr>
-</table>
-</form>
+<div class="pageHeading">Home</div>
+<ul>
+	<li><a href="/projects/">Projects</a></li>
+	<li><a href="/languages/">Languages</a></li>
+</ul>
 </body>
 </html>
