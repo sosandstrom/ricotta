@@ -6,7 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <jsp:include page="header.jsp" />
 <body>
-<h3>Project Details</h3>
+<div class="pageHeading">Project Details</div>
 <table>
 		<thead>
 		<tr>

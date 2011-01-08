@@ -7,25 +7,25 @@
 <jsp:include page="header.jsp" />
 <body>
 <a href="/index.html">Home</a>
-<div class="pageHeading">Languages</div>
+<div class="pageHeading">Templates</div>
 <table>
 		<thead>
 		<tr>
 			<th>Key</th>
-			<th>Code</th>
 			<th>Name</th>
+			<th>Description</th>
 		</tr>
 	</thead>
 	<tbody>
-	<c:forEach items="${languages}" var="language">
+	<c:forEach items="${malls}" var="m">
 		<tr>
-			<td><c:out value="${language.key}" /></td>
-			<td><c:out value="${language.code}" /></td>
-			<td><c:out value="${language.name}" /></td>
+			<td><c:out value="${m.key}" /></td>
+			<td><a href="/templates/<c:out value='${m.name}' />/"><c:out value="${m.name}" /></a></td>
+			<td><c:out value="${m.description}" /></td>
 		</tr>
 	</c:forEach>
 	</tbody>
 </table>
-<a href="/languages/create.html">Create language...</a>
+<a href="/templates/create.html">Create template...</a>
 </body>
 </html>

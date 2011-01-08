@@ -18,9 +18,14 @@ import com.wadpam.ricotta.model.TranslationModel;
 
 public class UberDaoBean implements UberDao {
     private LanguageDao        languageDao;
+    private MallDao            mallDao;
     private ProjectLanguageDao projectLanguageDao;
     private TokenDao           tokenDao;
     private TranslationDao     translationDao;
+
+    public void init() {
+        // mallDao.persist("The normal properties file layout", "properties", "#This is the file\n#End-of-file");
+    }
 
     @Override
     public List<ProjectLanguageModel> loadProjectLanguages(Key project) {
@@ -70,12 +75,17 @@ public class UberDaoBean implements UberDao {
 
         // for each token, build a TranslationModel
         TranslationModel tm;
+        Translation local;
         for(Token token : tokens) {
             tm = new TranslationModel();
             returnValue.add(tm);
             tm.setToken(token);
-            tm.setLocal(locals.get(token.getKey()));
+            local = locals.get(token.getKey());
+            tm.setLocal(local);
             tm.setParent(parents.get(token.getKey()));
+
+            // if locally translated, pass translation key, otherwise token key
+            tm.setKey(null != local ? local.getKey() : token.getKey());
         }
 
         Collections.sort(returnValue, new Comparator<TranslationModel>() {
@@ -127,5 +137,9 @@ public class UberDaoBean implements UberDao {
 
     public void setTokenDao(TokenDao tokenDao) {
         this.tokenDao = tokenDao;
+    }
+
+    public void setMallDao(MallDao mallDao) {
+        this.mallDao = mallDao;
     }
 }

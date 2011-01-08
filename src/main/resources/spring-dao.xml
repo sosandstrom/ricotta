@@ -17,11 +17,21 @@
 
 
 	<!-- ============== DaoBeans for entities in package com.wadpam.ricotta.domain ============ -->
-	<bean id="countryDao" class="com.wadpam.ricotta.dao.CountryDaoBean" autowire="constructor">
+	<bean id="translationDao" class="com.wadpam.ricotta.dao.TranslationDaoBean" autowire="constructor">
 		<property name="helper">
          <bean class="com.wadpam.ricotta.dao.GAEHelper" autowire="byName">
             <constructor-arg>
-               <value>com.wadpam.ricotta.domain.Country</value>
+               <value>com.wadpam.ricotta.domain.Translation</value>
+            </constructor-arg>
+         </bean>
+      </property>
+   </bean>
+	
+	<bean id="mallDao" class="com.wadpam.ricotta.dao.MallDaoBean" autowire="constructor">
+		<property name="helper">
+         <bean class="com.wadpam.ricotta.dao.GAEHelper" autowire="byName">
+            <constructor-arg>
+               <value>com.wadpam.ricotta.domain.Mall</value>
             </constructor-arg>
          </bean>
       </property>
@@ -37,21 +47,21 @@
       </property>
    </bean>
 	
-	<bean id="tokenDao" class="com.wadpam.ricotta.dao.TokenDaoBean" autowire="constructor">
-		<property name="helper">
-         <bean class="com.wadpam.ricotta.dao.GAEHelper" autowire="byName">
-            <constructor-arg>
-               <value>com.wadpam.ricotta.domain.Token</value>
-            </constructor-arg>
-         </bean>
-      </property>
-   </bean>
-	
 	<bean id="projectDao" class="com.wadpam.ricotta.dao.ProjectDaoBean" autowire="constructor">
 		<property name="helper">
          <bean class="com.wadpam.ricotta.dao.GAEHelper" autowire="byName">
             <constructor-arg>
                <value>com.wadpam.ricotta.domain.Project</value>
+            </constructor-arg>
+         </bean>
+      </property>
+   </bean>
+	
+	<bean id="tokenDao" class="com.wadpam.ricotta.dao.TokenDaoBean" autowire="constructor">
+		<property name="helper">
+         <bean class="com.wadpam.ricotta.dao.GAEHelper" autowire="byName">
+            <constructor-arg>
+               <value>com.wadpam.ricotta.domain.Token</value>
             </constructor-arg>
          </bean>
       </property>
@@ -67,11 +77,11 @@
       </property>
    </bean>
 	
-	<bean id="translationDao" class="com.wadpam.ricotta.dao.TranslationDaoBean" autowire="constructor">
+	<bean id="countryDao" class="com.wadpam.ricotta.dao.CountryDaoBean" autowire="constructor">
 		<property name="helper">
          <bean class="com.wadpam.ricotta.dao.GAEHelper" autowire="byName">
             <constructor-arg>
-               <value>com.wadpam.ricotta.domain.Translation</value>
+               <value>com.wadpam.ricotta.domain.Country</value>
             </constructor-arg>
          </bean>
       </property>

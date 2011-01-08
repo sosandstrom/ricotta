@@ -25,7 +25,7 @@ import com.wadpam.ricotta.model.ProjectLanguageModel;
  * Created by Ola on Nov 12, 2010
  */
 @Controller
-@RequestMapping("/projects/")
+@RequestMapping("/projects")
 public class ProjectController {
     static final Logger LOGGER = LoggerFactory.getLogger(ProjectController.class);
 
@@ -58,7 +58,7 @@ public class ProjectController {
 
         projectDao.persist(project);
 
-        return "redirect:/projects";
+        return "redirect:/projects/";
     }
 
     @RequestMapping(value = "{projectName}/index.html", method = RequestMethod.GET)
@@ -102,7 +102,7 @@ public class ProjectController {
         LOGGER.debug(token.toString());
         tokenDao.persist(token);
 
-        return "redirect:/projects/" + projectName;
+        return "redirect:/projects/" + projectName + '/';
     }
 
     public void setProjectDao(ProjectDao projectDao) {

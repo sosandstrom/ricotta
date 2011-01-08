@@ -6,23 +6,24 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <jsp:include page="header.jsp" />
 <body>
-<h3>Translations - </h3>
+<div class="pageHeading">Translations - <c:out value="${language.name}" /> (<c:out value="${language.code}" />)</div>
 <form id="translations" name="translations" action="" method="post" >
+<input type="submit" value="Save" />
 <table>
 		<thead>
 		<tr>
-			<th>Name</th>
-			<th>Description</th>
-			<th>Value</th>
-			<th>Default</th>
+			<th width="15%">Name</th>
+			<th width="15%">Description</th>
+			<th width="40%">Value</th>
+			<th width="30%">Default</th>
 		</tr>
 	</thead>
 	<tbody>
 	<c:forEach items="${translations}" var="t">
-		<tr>
+		<tr id="<c:out value='${t.token.keyString}' />" title="<c:out value='${t.key.kind}' />">
 			<td><c:out value="${t.token.name}" /></td>
 			<td><c:out value="${t.token.description}" /></td>
-			<td><input id="<c:out value='${t.token.keyString}' />" 
+			<td><input id="<c:out value='${t.keyString}' />" 
 				name="<c:out value='${t.token.keyString}' />" 
 				type="text" value="<c:out value='${t.local.local}' />" /></td>
 			<td><c:out value="${t.parent.local}" /></td>
@@ -30,6 +31,7 @@
 	</c:forEach>
 	</tbody>
 </table>
+<input type="submit" value="Save" />
 </form>
 </body>
 </html>

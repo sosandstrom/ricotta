@@ -45,7 +45,7 @@ public class LanguageController {
 
         languageDao.persist(language);
 
-        return "redirect:/languages";
+        return "redirect:/languages/";
     }
 
     public void setLanguageDao(LanguageDao languageDao) {

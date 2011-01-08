@@ -10,6 +10,7 @@
 <ul>
 	<li><a href="/projects/">Projects</a></li>
 	<li><a href="/languages/">Languages</a></li>
+	<li><a href="/templates/">Templates</a></li>
 </ul>
 </body>
 </html>
