@@ -7,3 +7,7 @@ syntax: regexp
 ^\.classpath$
 syntax: regexp
 ^\.project$
+syntax: regexp
+^ricotta-webapp/\.settings$
+syntax: regexp
+^ricotta-webapp/target$
