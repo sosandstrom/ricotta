@@ -23,3 +23,9 @@ syntax: regexp
 ^ricotta-maven-plugin/target$
 syntax: regexp
 ^ricotta-plugin-test/target$
+syntax: regexp
+^ricotta-maven-plugin/\.settings$
+syntax: regexp
+^ricotta-maven-plugin/\.classpath$
+syntax: regexp
+^ricotta-maven-plugin/\.project$
