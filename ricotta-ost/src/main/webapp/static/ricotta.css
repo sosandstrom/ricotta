@@ -1,0 +1,17 @@
+@CHARSET "UTF-8";
+
+table {
+	border-style: solid;
+	border-color: gray;
+	border-width: 1px;
+	width: 95%;
+}
+
+thead {
+	background-color: blue;
+}
+
+.pageHeading {
+	font-size: larger;
+	background-color: lightgray;
+}
