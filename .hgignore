@@ -11,3 +11,11 @@ syntax: regexp
 ^ricotta-webapp/\.settings$
 syntax: regexp
 ^ricotta-webapp/target$
+syntax: regexp
+^ricotta-ost/\.settings$
+syntax: regexp
+^ricotta-ost/target$
+syntax: regexp
+^ricotta-ost/\.classpath$
+syntax: regexp
+^ricotta-ost/\.project$
