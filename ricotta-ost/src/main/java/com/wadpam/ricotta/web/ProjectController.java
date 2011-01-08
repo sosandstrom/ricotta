@@ -58,7 +58,7 @@ public class ProjectController {
 
         projectDao.persist(project);
 
-        return "redirect:/projects/";
+        return "redirect:/projects/" + project.getName() + '/';
     }
 
     @RequestMapping(value = "{projectName}/index.html", method = RequestMethod.GET)

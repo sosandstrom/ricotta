@@ -19,3 +19,7 @@ syntax: regexp
 ^ricotta-ost/\.classpath$
 syntax: regexp
 ^ricotta-ost/\.project$
+syntax: regexp
+^ricotta-maven-plugin/target$
+syntax: regexp
+^ricotta-plugin-test/target$

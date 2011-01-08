@@ -56,19 +56,11 @@ public class VelocityController {
         LOG.info("Initializing Velocity");
 
         final Properties p = new Properties();
-        // p.setProperty("resource.loader", "file, class");
         p.setProperty("resource.loader", "dao");
 
-        // p.setProperty("class.resource.loader.description", "Velocity Classpath Resource Loader");
-        // p.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
         p.setProperty("dao.resource.loader.description", "Ricotta DAO Resource Loader");
         p.setProperty("dao.resource.loader.class", "com.wadpam.ricotta.velocity.DaoResourceLoader");
 
-        // p.setProperty("file.resource.loader.description", "Velocity File Resource Loader");
-        // p.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.FileResourceLoader");
-        // p.setProperty("file.resource.loader.path", templateFolder);
-        // p.setProperty("file.resource.loader.cache", "true");
-        // p.setProperty("file.resource.loader.modificationCheckInterval", "0");
         Velocity.init(p);
     }
 
@@ -80,15 +72,27 @@ public class VelocityController {
         // TODO: check project role
         final VelocityContext model = new VelocityContext();
         Project project = projectDao.findByName(projectName);
+        if (null == project) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "No such project " + projectName);
+            return null;
+        }
         model.put("project", project);
 
         Language language = languageDao.findByCode(languageCode);
+        if (null == language) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "No such language " + languageCode);
+            return null;
+        }
         model.put("language", language);
 
         List<TranslationModel> translations = uberDao.loadTranslations(project.getKey(), language.getKey());
         model.put("translations", translations);
 
         Mall mall = mallDao.findByName(templateName);
+        if (null == mall) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "No such template " + templateName);
+            return null;
+        }
         model.put("mall", mall);
 
         response.setContentType(mall.getMimeType());
