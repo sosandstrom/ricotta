@@ -17,6 +17,10 @@
 		<td><input id="description" name="description" type="text" value="<c:out value='${mall.description}' />" /></td>
 	</tr>
 	<tr>
+		<td>Template MIME type:</td>
+		<td><input id="mimeType" name="mimeType" type="text" value="<c:out value='${mall.mimeType}' />" /></td>
+	</tr>
+	<tr>
 		<td>Template body:</td>
 		<td><textarea id="body" name="body" cols="80" rows="30"><c:out value='${mall.body}' /></textarea></td>
 	</tr>

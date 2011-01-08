@@ -91,6 +91,7 @@ public class VelocityController {
         Mall mall = mallDao.findByName(templateName);
         model.put("mall", mall);
 
+        response.setContentType(mall.getMimeType());
         final PrintWriter writer = response.getWriter();
         Template template = Velocity.getTemplate(templateName);
         template.merge(model, writer);

@@ -22,6 +22,8 @@ public class Mall extends AbstractPrimaryKeyEntity implements PrimaryKeyEntity {
 
     String body;
 
+    String mimeType;
+
     @Override
     public String toString() {
         return getClass().getSimpleName() + '{' + name + ',' + description + ',' + key + '}';
@@ -62,6 +64,14 @@ public class Mall extends AbstractPrimaryKeyEntity implements PrimaryKeyEntity {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
 
 }
