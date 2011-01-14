@@ -12,6 +12,7 @@ import com.wadpam.ricotta.domain.Language;
 import com.wadpam.ricotta.domain.PrimaryKeyEntity;
 import com.wadpam.ricotta.domain.ProjectLanguage;
 import com.wadpam.ricotta.domain.Token;
+import com.wadpam.ricotta.domain.TokenArtifact;
 import com.wadpam.ricotta.domain.Translation;
 import com.wadpam.ricotta.model.ProjectLanguageModel;
 import com.wadpam.ricotta.model.TranslationModel;
@@ -21,6 +22,7 @@ public class UberDaoBean implements UberDao {
     private MallDao            mallDao;
     private ProjectLanguageDao projectLanguageDao;
     private TokenDao           tokenDao;
+    private TokenArtifactDao   tokenArtifactDao;
     private TranslationDao     translationDao;
 
     public void init() {
@@ -58,11 +60,21 @@ public class UberDaoBean implements UberDao {
     }
 
     @Override
-    public List<TranslationModel> loadTranslations(Key projectKey, Key languageKey) {
+    public List<TranslationModel> loadTranslations(Key projectKey, Key languageKey, Key artifactKey) {
         final List<TranslationModel> returnValue = new ArrayList<TranslationModel>();
 
         final ProjectLanguage projectLanguage = projectLanguageDao.findByLanguageProject(languageKey, projectKey);
-        final List<Token> tokens = tokenDao.findByProject(projectKey);
+        List<Token> tokens = null;
+        if (null != artifactKey) {
+            List<TokenArtifact> mappings = tokenArtifactDao.findByArtifact(artifactKey);
+            tokens = new ArrayList<Token>();
+            for(TokenArtifact ta : mappings) {
+                tokens.add(tokenDao.findByPrimaryKey(ta.getToken()));
+            }
+        }
+        else {
+            tokens = tokenDao.findByProject(projectKey);
+        }
 
         // this language's tokens
         final Map<Key, Translation> locals = translationDao.findByLanguageKeyTokens(languageKey, tokens);
@@ -141,5 +153,9 @@ public class UberDaoBean implements UberDao {
 
     public void setMallDao(MallDao mallDao) {
         this.mallDao = mallDao;
+    }
+
+    public void setTokenArtifactDao(TokenArtifactDao tokenArtifactDao) {
+        this.tokenArtifactDao = tokenArtifactDao;
     }
 }

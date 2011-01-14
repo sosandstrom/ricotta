@@ -10,6 +10,6 @@ public interface UberDao {
 
     List<ProjectLanguageModel> loadProjectLanguages(Key project);
 
-    List<TranslationModel> loadTranslations(Key project, Key language);
+    List<TranslationModel> loadTranslations(Key project, Key language, Key artifactKey);
 
 }

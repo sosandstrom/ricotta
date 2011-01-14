@@ -19,12 +19,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.google.appengine.api.datastore.Key;
+import com.wadpam.ricotta.dao.ArtifactDao;
 import com.wadpam.ricotta.dao.LanguageDao;
 import com.wadpam.ricotta.dao.MallDao;
 import com.wadpam.ricotta.dao.ProjectDao;
 import com.wadpam.ricotta.dao.ProjectLanguageDao;
 import com.wadpam.ricotta.dao.TranslationDao;
 import com.wadpam.ricotta.dao.UberDao;
+import com.wadpam.ricotta.domain.Artifact;
 import com.wadpam.ricotta.domain.Language;
 import com.wadpam.ricotta.domain.Mall;
 import com.wadpam.ricotta.domain.Project;
@@ -46,6 +49,8 @@ public class VelocityController {
 
     private ProjectLanguageDao projectLanguageDao;
 
+    private ArtifactDao        artifactDao;
+
     private TranslationDao     translationDao;
 
     private UberDao            uberDao;
@@ -65,9 +70,16 @@ public class VelocityController {
     }
 
     @RequestMapping(value = "index.html", method = RequestMethod.GET)
-    public String getProjectLanguageForm(@PathVariable String projectName, @PathVariable String languageCode,
+    public String renderTemplate(@PathVariable String projectName, @PathVariable String languageCode,
             @PathVariable String templateName, HttpServletResponse response) throws ResourceNotFoundException,
             ParseErrorException, Exception {
+        return renderTemplateByArtifact(projectName, languageCode, templateName, null, response);
+    }
+
+    @RequestMapping(value = "/artifacts/{artifactName}/index.html", method = RequestMethod.GET)
+    public String renderTemplateByArtifact(@PathVariable String projectName, @PathVariable String languageCode,
+            @PathVariable String templateName, @PathVariable String artifactName, HttpServletResponse response)
+            throws ResourceNotFoundException, ParseErrorException, Exception {
         LOG.debug("rendering template " + templateName);
         // TODO: check project role
         final VelocityContext model = new VelocityContext();
@@ -85,7 +97,17 @@ public class VelocityController {
         }
         model.put("language", language);
 
-        List<TranslationModel> translations = uberDao.loadTranslations(project.getKey(), language.getKey());
+        Key artifactKey = null;
+        if (null != artifactName) {
+            Artifact artifact = artifactDao.findByNameProject(artifactName, project.getKey());
+            if (null == artifact) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "No such artifact " + artifactName);
+                return null;
+            }
+            artifactKey = artifact.getKey();
+        }
+
+        List<TranslationModel> translations = uberDao.loadTranslations(project.getKey(), language.getKey(), artifactKey);
         model.put("translations", translations);
 
         Mall mall = mallDao.findByName(templateName);
@@ -126,6 +148,10 @@ public class VelocityController {
 
     public void setMallDao(MallDao mallDao) {
         this.mallDao = mallDao;
+    }
+
+    public void setArtifactDao(ArtifactDao artifactDao) {
+        this.artifactDao = artifactDao;
     }
 
 }

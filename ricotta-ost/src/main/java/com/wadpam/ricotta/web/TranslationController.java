@@ -54,7 +54,7 @@ public class TranslationController {
         Language language = languageDao.findByCode(languageCode);
         model.addAttribute("language", language);
 
-        List<TranslationModel> translations = uberDao.loadTranslations(project.getKey(), language.getKey());
+        List<TranslationModel> translations = uberDao.loadTranslations(project.getKey(), language.getKey(), null);
         model.addAttribute("translations", translations);
 
         return "translations";

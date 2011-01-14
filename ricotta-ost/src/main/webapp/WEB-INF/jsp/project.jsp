@@ -6,6 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <jsp:include page="header.jsp" />
 <body>
+<a href="/index.html">Home</a> | <a href="/projects/index.html">Projects</a>
 <div class="pageHeading">Project Details</div>
 <table>
 		<thead>
@@ -43,6 +44,24 @@
 	</tbody>
 </table>
 <a href="/projects/<c:out value="${project.name}"/>/languages/create.html">Add language</a>
+<h3>Project Artifacts</h3>
+<table>
+		<thead>
+		<tr>
+			<th>Name</th>
+			<th>Description</th>
+		</tr>
+	</thead>
+	<tbody>
+	<c:forEach items="${artifacts}" var="a">
+		<tr>
+			<td><c:out value="${a.name}" /></td>
+			<td><c:out value="${a.description}" /></td>
+		</tr>
+	</c:forEach>
+	</tbody>
+</table>
+<a href="/projects/<c:out value="${project.name}"/>/artifacts/create.html">Create artifact</a>
 <h3>Project Tokens</h3>
 <table>
 		<thead>

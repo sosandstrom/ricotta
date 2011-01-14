@@ -6,6 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <jsp:include page="header.jsp" />
 <body>
+<a href="/index.html">Home</a> | <a href="/projects/index.html">Projects</a> | <a href="/projects/<c:out value='${project.name}' />/index.html"><c:out value="${project.name}" /></a>
 <div class="pageHeading">Translations - <c:out value="${language.name}" /> (<c:out value="${language.code}" />)</div>
 <form id="translations" name="translations" action="" method="post" >
 <input type="submit" value="Save" />

@@ -12,6 +12,7 @@
 		<property name="mallDao" ref="mallDao" />
 		<property name="projectLanguageDao" ref="projectLanguageDao"/>
 		<property name="tokenDao" ref="tokenDao" />
+		<property name="tokenArtifactDao" ref="tokenArtifactDao" />
 		<property name="translationDao" ref="translationDao" />
 	</bean>
 
@@ -20,6 +21,7 @@
 	
 	<bean id="projectController" class="com.wadpam.ricotta.web.ProjectController">
 		<property name="projectDao" ref="projectDao" />
+		<property name="artifactDao" ref="artifactDao" />
 		<property name="tokenDao" ref="tokenDao" />
 		<property name="uberDao" ref="uberDao" />
 	</bean>
@@ -30,6 +32,18 @@
 
 	<bean id="mallController" class="com.wadpam.ricotta.web.MallController">
 		<property name="mallDao" ref="mallDao" />
+	</bean>
+
+	<bean id="artifactController" class="com.wadpam.ricotta.web.ArtifactController">
+		<property name="projectDao" ref="projectDao" />
+		<property name="artifactDao" ref="artifactDao" />
+	</bean>
+
+	<bean id="tokenController" class="com.wadpam.ricotta.web.TokenController">
+		<property name="projectDao" ref="projectDao" />
+		<property name="artifactDao" ref="artifactDao" />
+		<property name="tokenDao" ref="tokenDao" />
+		<property name="tokenArtifactDao" ref="tokenArtifactDao" />
 	</bean>
 
 	<bean id="projectLanguageController" class="com.wadpam.ricotta.web.ProjectLanguageController">
@@ -52,6 +66,7 @@
 		<property name="projectDao" ref="projectDao" />
 		<property name="languageDao" ref="languageDao" />
 		<property name="mallDao" ref="mallDao" />
+		<property name="artifactDao" ref="artifactDao" />
 		<property name="projectLanguageDao" ref="projectLanguageDao" />
 		<property name="translationDao" ref="translationDao" />
 		<property name="uberDao" ref="uberDao" />

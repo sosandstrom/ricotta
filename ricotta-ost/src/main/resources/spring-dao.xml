@@ -27,6 +27,26 @@
       </property>
    </bean>
 	
+	<bean id="artifactDao" class="com.wadpam.ricotta.dao.ArtifactDaoBean" autowire="constructor">
+		<property name="helper">
+         <bean class="com.wadpam.ricotta.dao.GAEHelper" autowire="byName">
+            <constructor-arg>
+               <value>com.wadpam.ricotta.domain.Artifact</value>
+            </constructor-arg>
+         </bean>
+      </property>
+   </bean>
+	
+	<bean id="tokenArtifactDao" class="com.wadpam.ricotta.dao.TokenArtifactDaoBean" autowire="constructor">
+		<property name="helper">
+         <bean class="com.wadpam.ricotta.dao.GAEHelper" autowire="byName">
+            <constructor-arg>
+               <value>com.wadpam.ricotta.domain.TokenArtifact</value>
+            </constructor-arg>
+         </bean>
+      </property>
+   </bean>
+	
 	<bean id="mallDao" class="com.wadpam.ricotta.dao.MallDaoBean" autowire="constructor">
 		<property name="helper">
          <bean class="com.wadpam.ricotta.dao.GAEHelper" autowire="byName">

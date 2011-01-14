@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.wadpam.ricotta.dao.ArtifactDao;
 import com.wadpam.ricotta.dao.ProjectDao;
 import com.wadpam.ricotta.dao.TokenDao;
 import com.wadpam.ricotta.dao.UberDao;
@@ -32,6 +33,8 @@ public class ProjectController {
     private ProjectDao  projectDao;
 
     private UberDao     uberDao;
+
+    private ArtifactDao artifactDao;
 
     private TokenDao    tokenDao;
 
@@ -74,35 +77,14 @@ public class ProjectController {
         List<ProjectLanguageModel> languages = uberDao.loadProjectLanguages(project.getKey());
         model.addAttribute("languages", languages);
 
+        // fetch and add artifacts for this project
+        model.addAttribute("artifacts", artifactDao.findByProject(project.getKey()));
+
         // fetch and add tokens for this project
         List<Token> tokens = tokenDao.findByProject(project.getKey());
         model.addAttribute("tokens", tokens);
 
         return "project";
-    }
-
-    @RequestMapping(value = "{projectName}/tokens/create.html", method = RequestMethod.GET)
-    public String createToken(Model model, @PathVariable String projectName) {
-        LOGGER.debug("display create token form");
-        Project project = projectDao.findByName(projectName);
-        // TODO: check project role
-        model.addAttribute("project", project);
-        return "createToken";
-    }
-
-    @RequestMapping(value = "{projectName}/tokens/create.html", method = RequestMethod.POST)
-    public String postToken(HttpServletRequest request, @PathVariable String projectName, @ModelAttribute("token") Token token)
-            throws IOException {
-        LOGGER.debug("create token");
-
-        Project project = projectDao.findByName(projectName);
-        LOGGER.debug(project.toString());
-        // TODO: check project role
-        token.setProject(project.getKey());
-        LOGGER.debug(token.toString());
-        tokenDao.persist(token);
-
-        return "redirect:/projects/" + projectName + '/';
     }
 
     public void setProjectDao(ProjectDao projectDao) {
@@ -115,6 +97,10 @@ public class ProjectController {
 
     public void setUberDao(UberDao uberDao) {
         this.uberDao = uberDao;
+    }
+
+    public void setArtifactDao(ArtifactDao artifactDao) {
+        this.artifactDao = artifactDao;
     }
 
 }
