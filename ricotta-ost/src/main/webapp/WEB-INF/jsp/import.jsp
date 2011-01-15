@@ -12,12 +12,17 @@
 <form id="import" name="import" action="" method="post">
 <table>
 	<tr>
-		<td>Regexp "(tokenName) (languageValue)":</td>
+		<td>Regexp:</td>
 		<td><select id="regexp" name="regexp">
+			<option value="custom">Custom regexp</option>
 			 <option value="([^=^\s]+)[\s]*=[\s]*([^\n^\r]*)[\r\n\s]*" >Java properties file</option>
 			 <!-- name[\s]*=[\s]*"([^"]+)"[\s]*\>([^\<]*)\</string\> -->
 			 <option value='name[\s]*=[\s]*"([^"]+)"[\s]*\>([^\<]*)\&lt;/string\&gt;' >Android strings file</option>
 		</td>
+	</tr>
+	<tr>
+		<td>Custom regexp "(tokenName) (languageValue)":</td>
+		<td><input id="custom" name="custom" type="text" value="" /></td>
 	</tr>
 	<tr>
 		<td>Paste your body text here:</td>

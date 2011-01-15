@@ -51,10 +51,15 @@ public class ImportController {
 
     @RequestMapping(value = "index.html", method = RequestMethod.POST)
     public String postProjectLanguage(HttpServletRequest request, @PathVariable String projectName,
-            @PathVariable String languageCode, @RequestParam String regexp, @RequestParam String body) throws IOException {
+            @PathVariable String languageCode, @RequestParam String regexp, @RequestParam String custom, @RequestParam String body)
+            throws IOException {
         final Project project = (Project) request.getAttribute("project");
 
         final Language language = languageDao.findByCode(languageCode);
+
+        if ("custom".equals(regexp)) {
+            regexp = custom;
+        }
 
         importBody(project, language, regexp, body);
 
