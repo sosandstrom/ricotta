@@ -117,6 +117,16 @@
       </property>
    </bean>
 	
+	<bean id="projectUserDao" class="com.wadpam.ricotta.dao.ProjectUserDaoBean" autowire="constructor">
+		<property name="helper">
+         <bean class="com.wadpam.ricotta.dao.GAEHelper" autowire="byName">
+            <constructor-arg>
+               <value>com.wadpam.ricotta.domain.ProjectUser</value>
+            </constructor-arg>
+         </bean>
+      </property>
+   </bean>
+	
 	<bean id="projectLanguageDao" class="com.wadpam.ricotta.dao.ProjectLanguageDaoBean" autowire="constructor">
 		<property name="helper">
          <bean class="com.wadpam.ricotta.dao.GAEHelper" autowire="byName">

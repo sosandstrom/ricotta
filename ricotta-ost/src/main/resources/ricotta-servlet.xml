@@ -6,22 +6,28 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-	<bean id="uberDao" class="com.wadpam.ricotta.dao.UberDaoBean" 
+	<bean id="uberDao" class="com.wadpam.ricotta.dao.UberDaoBean"
 		init-method="init" depends-on="dataResourceLoader">
 		<property name="languageDao" ref="languageDao" />
 		<property name="mallDao" ref="mallDao" />
-		<property name="projectLanguageDao" ref="projectLanguageDao"/>
+		<property name="projectLanguageDao" ref="projectLanguageDao" />
 		<property name="tokenDao" ref="tokenDao" />
 		<property name="tokenArtifactDao" ref="tokenArtifactDao" />
 		<property name="translationDao" ref="translationDao" />
 	</bean>
 
+	<bean id="projectHandlerInterceptor" class="com.wadpam.ricotta.web.ProjectHandlerInterceptor">
+		<property name="projectDao" ref="projectDao" />
+		<property name="projectUserDao" ref="projectUserDao" />
+	</bean>
+
 	<!-- As auto-wiring does not work well in GAE, define controllers manually: -->
 	<bean id="indexController" class="com.wadpam.ricotta.web.IndexController" />
-	
+
 	<bean id="projectController" class="com.wadpam.ricotta.web.ProjectController">
 		<property name="projectDao" ref="projectDao" />
 		<property name="artifactDao" ref="artifactDao" />
+		<property name="projectUserDao" ref="projectUserDao" />
 		<property name="tokenDao" ref="tokenDao" />
 		<property name="uberDao" ref="uberDao" />
 	</bean>
@@ -37,6 +43,10 @@
 	<bean id="artifactController" class="com.wadpam.ricotta.web.ArtifactController">
 		<property name="projectDao" ref="projectDao" />
 		<property name="artifactDao" ref="artifactDao" />
+	</bean>
+
+	<bean id="userController" class="com.wadpam.ricotta.web.UserController">
+		<property name="projectUserDao" ref="projectUserDao" />
 	</bean>
 
 	<bean id="tokenController" class="com.wadpam.ricotta.web.TokenController">
@@ -61,7 +71,7 @@
 		<property name="uberDao" ref="uberDao" />
 	</bean>
 
-	<bean id="velocityController" class="com.wadpam.ricotta.web.VelocityController" 
+	<bean id="velocityController" class="com.wadpam.ricotta.web.VelocityController"
 		init-method="init" depends-on="dataResourceLoader">
 		<property name="projectDao" ref="projectDao" />
 		<property name="languageDao" ref="languageDao" />
@@ -71,22 +81,22 @@
 		<property name="translationDao" ref="translationDao" />
 		<property name="uberDao" ref="uberDao" />
 	</bean>
-	
+
 	<bean id="dataResourceLoader" class="com.wadpam.ricotta.velocity.DaoResourceLoader">
 		<property name="mallDao" ref="mallDao" />
 	</bean>
- 
+
 	<bean
 		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
-		<!-- <property name="interceptors"> <ref bean="entityManagerFactory"/> 
-			</property> -->
+		<property name="interceptors">
+			<ref bean="projectHandlerInterceptor" />
+		</property>
 	</bean>
 
 	<bean
 		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
 		<property name="webBindingInitializer">
-			<bean
-				class="com.wadpam.ricotta.web.RicottaBindingInitializer" />
+			<bean class="com.wadpam.ricotta.web.RicottaBindingInitializer" />
 		</property>
 	</bean>
 

@@ -62,6 +62,24 @@
 	</tbody>
 </table>
 <a href="/projects/<c:out value="${project.name}"/>/artifacts/create.html">Create artifact</a>
+<h3>Project Users</h3>
+<table>
+		<thead>
+		<tr>
+			<th>Delete</th>
+			<th>Email</th>
+		</tr>
+	</thead>
+	<tbody>
+	<c:forEach items="${users}" var="u">
+		<tr>
+			<td><input type="checkbox" name="users" id="users" value="<c:out value='${u.keyString}' />" /></td>
+			<td><c:out value="${u.user}" /></td>
+		</tr>
+	</c:forEach>
+	</tbody>
+</table>
+<a href="/projects/<c:out value="${project.name}"/>/users/create.html">Add user</a>
 <h3>Project Tokens</h3>
 <table>
 		<thead>

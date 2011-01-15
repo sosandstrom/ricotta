@@ -1,6 +1,7 @@
 package com.wadpam.ricotta.web;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,9 +17,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.wadpam.ricotta.dao.ArtifactDao;
 import com.wadpam.ricotta.dao.ProjectDao;
+import com.wadpam.ricotta.dao.ProjectUserDao;
 import com.wadpam.ricotta.dao.TokenDao;
 import com.wadpam.ricotta.dao.UberDao;
 import com.wadpam.ricotta.domain.Project;
+import com.wadpam.ricotta.domain.ProjectUser;
 import com.wadpam.ricotta.domain.Token;
 import com.wadpam.ricotta.model.ProjectLanguageModel;
 
@@ -28,21 +31,28 @@ import com.wadpam.ricotta.model.ProjectLanguageModel;
 @Controller
 @RequestMapping("/projects")
 public class ProjectController {
-    static final Logger LOGGER = LoggerFactory.getLogger(ProjectController.class);
+    static final Logger    LOGGER = LoggerFactory.getLogger(ProjectController.class);
 
-    private ProjectDao  projectDao;
+    private ProjectDao     projectDao;
 
-    private UberDao     uberDao;
+    private ProjectUserDao projectUserDao;
 
-    private ArtifactDao artifactDao;
+    private UberDao        uberDao;
 
-    private TokenDao    tokenDao;
+    private ArtifactDao    artifactDao;
+
+    private TokenDao       tokenDao;
 
     @RequestMapping(value = "index.html", method = RequestMethod.GET)
     public String getProjects(HttpServletRequest request, Model model) {
         LOGGER.debug("get projects list {}, {}", projectDao, request.getUserPrincipal());
 
-        model.addAttribute("projects", projectDao.findByOwner(request.getUserPrincipal().getName()));
+        final String user = request.getUserPrincipal().getName();
+        List<Project> projects = new ArrayList<Project>(projectDao.findByOwner(user));
+        for(ProjectUser pu : projectUserDao.findByUser(user)) {
+            projects.add(projectDao.findByPrimaryKey(pu.getProject()));
+        }
+        model.addAttribute("projects", projects);
         return "projects";
     }
 
@@ -80,6 +90,9 @@ public class ProjectController {
         // fetch and add artifacts for this project
         model.addAttribute("artifacts", artifactDao.findByProject(project.getKey()));
 
+        // fetch and add users for this project
+        model.addAttribute("users", projectUserDao.findByProject(project.getKey()));
+
         // fetch and add tokens for this project
         List<Token> tokens = tokenDao.findByProject(project.getKey());
         model.addAttribute("tokens", tokens);
@@ -101,6 +114,14 @@ public class ProjectController {
 
     public void setArtifactDao(ArtifactDao artifactDao) {
         this.artifactDao = artifactDao;
+    }
+
+    public void setProjectUserDao(ProjectUserDao projectUserDao) {
+        this.projectUserDao = projectUserDao;
+    }
+
+    public ProjectUserDao getProjectUserDao() {
+        return projectUserDao;
     }
 
 }
