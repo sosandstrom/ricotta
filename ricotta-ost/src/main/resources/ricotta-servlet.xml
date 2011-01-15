@@ -49,6 +49,12 @@
 		<property name="projectUserDao" ref="projectUserDao" />
 	</bean>
 
+	<bean id="importController" class="com.wadpam.ricotta.web.ImportController">
+		<property name="tokenDao" ref="tokenDao" />
+		<property name="languageDao" ref="languageDao" />
+		<property name="translationDao" ref="translationDao" />
+	</bean>
+
 	<bean id="tokenController" class="com.wadpam.ricotta.web.TokenController">
 		<property name="projectDao" ref="projectDao" />
 		<property name="artifactDao" ref="artifactDao" />

@@ -34,5 +34,7 @@
 </table>
 <input type="submit" value="Save" />
 </form>
+<h3>Import</h3>
+<a href="/projects/<c:out value="${project.name}"/>/languages/<c:out value="${language.code}" />/import/index.html">Import tokens and translations</a>
 </body>
 </html>
