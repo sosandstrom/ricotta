@@ -29,3 +29,7 @@ syntax: regexp
 ^ricotta-maven-plugin/\.classpath$
 syntax: regexp
 ^ricotta-maven-plugin/\.project$
+syntax: regexp
+^ricotta-plugin-test/\.classpath$
+syntax: regexp
+^ricotta-plugin-test/\.project$
