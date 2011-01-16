@@ -11,6 +11,8 @@ public class ResourceItem {
      */
     private String templateName;
 
+    private String artifactName;
+
     /**
      * @parameter expression="${download.filePath}" required
      */
@@ -38,6 +40,14 @@ public class ResourceItem {
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
+    }
+
+    public void setArtifactName(String artifactName) {
+        this.artifactName = artifactName;
+    }
+
+    public String getArtifactName() {
+        return artifactName;
     }
 
 }

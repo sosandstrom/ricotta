@@ -16,9 +16,10 @@ import com.wadpam.ricotta.domain.Project;
 import com.wadpam.ricotta.domain.ProjectUser;
 
 public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
-    static final Logger    LOG            = LoggerFactory.getLogger(ProjectHandlerInterceptor.class);
+    static final Logger    LOG                = LoggerFactory.getLogger(ProjectHandlerInterceptor.class);
 
-    static final Pattern   REGEXP_PROJECT = Pattern.compile("\\A/projects/([^/]+)/");
+    static final Pattern   REGEXP_PROJECT     = Pattern.compile("\\A/projects/([^/]+)/");
+    static final Pattern   REGEXP_TRANSLATION = Pattern.compile("\\A/projects/([^/]+)/languages/[^/]+/templates/[^/]+/");
 
     private ProjectDao     projectDao;
 
@@ -36,6 +37,12 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
                 return false;
             }
             request.setAttribute("project", project);
+
+            // template request?
+            matcher = REGEXP_TRANSLATION.matcher(request.getRequestURI());
+            if (matcher.find()) {
+                return true;
+            }
 
             // owner?
             String user = request.getUserPrincipal().getName();

@@ -17,5 +17,9 @@ Ricotta is a translation management tool, with complimentary build tools, to eff
 <div><img src="/static/RicottaOverview.1.png" alt="Ricotta Overview" /></div>
 <div>Source repository: <a href="https://bitbucket.org/f94os/ricotta-ost">https://bitbucket.org/f94os/ricotta-ost</a></div>
 <div>Contact: <a href="mailto:s.o.sandstrom@gmail.com">s.o.sandstrom@gmail.com</a</div>
+<h3>Downloads</h3>
+<div><a href="/static/ricotta-maven-plugin-1.0.zip">command line tool</a></div>
+<div><a href="/static/ricotta-maven-plugin-1.0.jar">ricotta-maven-plugin</a></div>
+<div><a href="/static/pom.xml">Example maven pom.xml</a></div>
 </body>
 </html>

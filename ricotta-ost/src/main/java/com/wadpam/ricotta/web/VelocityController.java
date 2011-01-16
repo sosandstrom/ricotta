@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Properties;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections.ExtendedProperties;
@@ -23,7 +24,6 @@ import com.google.appengine.api.datastore.Key;
 import com.wadpam.ricotta.dao.ArtifactDao;
 import com.wadpam.ricotta.dao.LanguageDao;
 import com.wadpam.ricotta.dao.MallDao;
-import com.wadpam.ricotta.dao.ProjectDao;
 import com.wadpam.ricotta.dao.ProjectLanguageDao;
 import com.wadpam.ricotta.dao.TranslationDao;
 import com.wadpam.ricotta.dao.UberDao;
@@ -40,8 +40,6 @@ import com.wadpam.ricotta.model.TranslationModel;
 @RequestMapping("/projects/{projectName}/languages/{languageCode}/templates/{templateName}")
 public class VelocityController {
     static final Logger        LOG = LoggerFactory.getLogger(VelocityController.class);
-
-    private ProjectDao         projectDao;
 
     private LanguageDao        languageDao;
 
@@ -70,24 +68,19 @@ public class VelocityController {
     }
 
     @RequestMapping(value = "index.html", method = RequestMethod.GET)
-    public String renderTemplate(@PathVariable String projectName, @PathVariable String languageCode,
+    public String renderTemplate(HttpServletRequest request, @PathVariable String projectName, @PathVariable String languageCode,
             @PathVariable String templateName, HttpServletResponse response) throws ResourceNotFoundException,
             ParseErrorException, Exception {
-        return renderTemplateByArtifact(projectName, languageCode, templateName, null, response);
+        return renderTemplateByArtifact(request, projectName, languageCode, templateName, null, response);
     }
 
     @RequestMapping(value = "/artifacts/{artifactName}/index.html", method = RequestMethod.GET)
-    public String renderTemplateByArtifact(@PathVariable String projectName, @PathVariable String languageCode,
-            @PathVariable String templateName, @PathVariable String artifactName, HttpServletResponse response)
-            throws ResourceNotFoundException, ParseErrorException, Exception {
+    public String renderTemplateByArtifact(HttpServletRequest request, @PathVariable String projectName,
+            @PathVariable String languageCode, @PathVariable String templateName, @PathVariable String artifactName,
+            HttpServletResponse response) throws ResourceNotFoundException, ParseErrorException, Exception {
         LOG.debug("rendering template " + templateName);
-        // TODO: check project role
         final VelocityContext model = new VelocityContext();
-        Project project = projectDao.findByName(projectName);
-        if (null == project) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "No such project " + projectName);
-            return null;
-        }
+        final Project project = (Project) request.getAttribute("project");
         model.put("project", project);
 
         Language language = languageDao.findByCode(languageCode);
@@ -124,10 +117,6 @@ public class VelocityController {
         writer.close();
         response.setStatus(HttpServletResponse.SC_OK);
         return null;
-    }
-
-    public void setProjectDao(ProjectDao projectDao) {
-        this.projectDao = projectDao;
     }
 
     public void setLanguageDao(LanguageDao languageDao) {

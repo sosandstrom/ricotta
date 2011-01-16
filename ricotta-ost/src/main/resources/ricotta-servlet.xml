@@ -79,7 +79,6 @@
 
 	<bean id="velocityController" class="com.wadpam.ricotta.web.VelocityController"
 		init-method="init" depends-on="dataResourceLoader">
-		<property name="projectDao" ref="projectDao" />
 		<property name="languageDao" ref="languageDao" />
 		<property name="mallDao" ref="mallDao" />
 		<property name="artifactDao" ref="artifactDao" />

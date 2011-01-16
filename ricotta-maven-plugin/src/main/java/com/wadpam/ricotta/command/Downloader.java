@@ -30,24 +30,33 @@ public class Downloader {
         }
     }
 
-    public static void download(String projectName, String languageCode, String templateName, File destination)
-            throws ClientProtocolException, IOException {
+    public static void download(String projectName, String languageCode, String templateName, String artifactName,
+            File destination) throws ClientProtocolException, IOException {
         File folder = destination.getParentFile();
         if (false == folder.exists()) {
             folder.mkdirs();
         }
         FileOutputStream fos = new FileOutputStream(destination);
         PrintStream ps = new PrintStream(fos);
-        download(projectName, languageCode, templateName, ps);
+        download(projectName, languageCode, templateName, artifactName, ps);
         ps.close();
     }
 
-    public static void download(String projectName, String languageCode, String templateName, PrintStream fos)
+    public static void download(String projectName, String languageCode, String templateName, String artifactName, PrintStream fos)
             throws ClientProtocolException, IOException {
-        String url = "http://ricotta-ost.appspot.com/projects/" + projectName + "/languages/" + languageCode + "/templates/"
-                + templateName + '/';
-        info("Download URL " + url);
-        HttpGet method = new HttpGet(url);
+        StringBuffer url = new StringBuffer("http://ricotta-ost.appspot.com/projects/");
+        url.append(projectName);
+        url.append("/languages/");
+        url.append(languageCode);
+        url.append("/templates/");
+        url.append(templateName);
+        if (null != artifactName) {
+            url.append("/artifacts/");
+            url.append(artifactName);
+        }
+        url.append('/');
+        info("Download URL " + url.toString());
+        HttpGet method = new HttpGet(url.toString());
 
         // TODO: add authentication
 
@@ -80,7 +89,16 @@ public class Downloader {
      * @throws ClientProtocolException
      */
     public static void main(String[] args) throws ClientProtocolException, IOException {
-        download(args[0], args[1], args[2], System.out);
+        switch (args.length) {
+            case 3:
+                download(args[0], args[1], args[2], null, System.out);
+                break;
+            case 4:
+                download(args[0], args[1], args[2], args[3], System.out);
+                break;
+            default:
+                throw new IOException("Usage: <projectName> <languageCode> <templateName> [<artifactName>]");
+        }
     }
 
     public static void setLog(Log log) {
