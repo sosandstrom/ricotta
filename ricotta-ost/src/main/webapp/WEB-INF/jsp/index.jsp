@@ -12,5 +12,10 @@
 	<li><a href="/languages/">Languages</a></li>
 	<li><a href="/templates/">Templates</a></li>
 </ul>
+<h3>Ricotta Overview</h3>
+Ricotta is a translation management tool, with complimentary build tools, to efficiently manage localised resources in your software project.
+<div><img src="/static/RicottaOverview.1.png" alt="Ricotta Overview" /></div>
+<div>Source repository: <a href="https://bitbucket.org/f94os/ricotta-ost">https://bitbucket.org/f94os/ricotta-ost</a></div>
+<div>Contact: <a href="mailto:s.o.sandstrom@gmail.com">s.o.sandstrom@gmail.com</a</div>
 </body>
 </html>
