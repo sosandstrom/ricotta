@@ -1,6 +1,7 @@
 package com.wadpam.ricotta.web;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,30 +77,36 @@ public class ImportController {
             LOGGER.info("found {}={}", tokenName, value);
 
             // create new token?
-            Token token = tokenDao.findByNameProject(tokenName, project.getKey());
-            if (null == token) {
+            Token token = null;
+            List<Token> tokens = tokenDao.findByNameProject(tokenName, project.getKey());
+            if (tokens.isEmpty()) {
                 LOGGER.info("Creating token {}", tokenName);
                 token = new Token();
                 token.setName(tokenName);
                 token.setProject(project.getKey());
                 tokenDao.persist(token);
             }
+            else {
+                token = tokens.get(0);
+            }
 
             // create or update translation?
-            boolean found = false;
-            for(Translation t : translationDao.findByToken(token.getKey())) {
-                if (t.getLanguage().equals(language.getKey())) {
-                    found = true;
-                    break;
+            if (null != value && 0 < value.length()) {
+                boolean found = false;
+                for(Translation t : translationDao.findByToken(token.getKey())) {
+                    if (t.getLanguage().equals(language.getKey())) {
+                        found = true;
+                        break;
+                    }
                 }
-            }
-            if (false == found) {
-                LOGGER.info("Creating translation {}={}", tokenName, value);
-                Translation t = new Translation();
-                t.setLanguage(language.getKey());
-                t.setLocal(value);
-                t.setToken(token.getKey());
-                translationDao.persist(t);
+                if (false == found) {
+                    LOGGER.info("Creating translation {}={}", tokenName, value);
+                    Translation t = new Translation();
+                    t.setLanguage(language.getKey());
+                    t.setLocal(value);
+                    t.setToken(token.getKey());
+                    translationDao.persist(t);
+                }
             }
         }
     }

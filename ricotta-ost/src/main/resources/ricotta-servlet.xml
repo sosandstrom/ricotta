@@ -73,6 +73,7 @@
 		<property name="projectDao" ref="projectDao" />
 		<property name="languageDao" ref="languageDao" />
 		<property name="projectLanguageDao" ref="projectLanguageDao" />
+		<property name="tokenDao" ref="tokenDao" />
 		<property name="translationDao" ref="translationDao" />
 		<property name="uberDao" ref="uberDao" />
 	</bean>

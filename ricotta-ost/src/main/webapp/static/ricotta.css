@@ -11,6 +11,10 @@ thead {
 	background-color: #E0E0FF;
 }
 
+th {
+	text-align: left;
+}
+
 .pageHeading {
 	font-size: larger;
 	background-color: lightgray;

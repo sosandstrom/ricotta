@@ -1,5 +1,7 @@
 package com.wadpam.ricotta.domain;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -11,14 +13,19 @@ import com.google.appengine.api.datastore.Key;
 
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"userId"})})
-public class AppUser {
+public class AppUser implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6008959981553934307L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Key    key;
+    Key                       key;
 
-    String userId;
+    String                    userId;
 
-    String email;
+    String                    email;
 
     @Override
     public String toString() {

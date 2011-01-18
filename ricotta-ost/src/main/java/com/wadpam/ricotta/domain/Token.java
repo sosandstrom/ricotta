@@ -5,13 +5,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 import com.google.appengine.api.datastore.Key;
 
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "project"})})
 public class Token extends AbstractPrimaryKeyEntity implements PrimaryKeyEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +24,7 @@ public class Token extends AbstractPrimaryKeyEntity implements PrimaryKeyEntity 
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '{' + name + ',' + project + ',' + key + '}';
+        return getClass().getSimpleName() + '{' + name + ',' + description + ',' + key + '}';
     }
 
     public Key getKey() {

@@ -19,14 +19,15 @@ public class TranslationDaoBean extends AbstractTranslationDao implements Transl
     @Override
     public Map<Key, Translation> findByLanguageKeyTokens(Key languageKey, List<Token> tokens) {
         final Map<Key, Translation> returnValue = new HashMap<Key, Translation>();
-        final Expression eqLang = new Expression(COLUMN_NAME_LANGUAGE, "=", languageKey);
-        final Expression inTokens = new Expression.IN(COLUMN_NAME_TOKEN, UberDaoBean.getKeys(tokens));
+        if (false == tokens.isEmpty()) {
+            final Expression eqLang = new Expression(COLUMN_NAME_LANGUAGE, "=", languageKey);
+            final Expression inTokens = new Expression.IN(COLUMN_NAME_TOKEN, UberDaoBean.getKeys(tokens));
 
-        final List<Translation> translations = findBy(null, false, -1, eqLang, inTokens);
-        for(Translation t : translations) {
-            returnValue.put(t.getToken(), t);
+            final List<Translation> translations = findBy(null, false, -1, eqLang, inTokens);
+            for(Translation t : translations) {
+                returnValue.put(t.getToken(), t);
+            }
         }
-
         return returnValue;
     }
 }

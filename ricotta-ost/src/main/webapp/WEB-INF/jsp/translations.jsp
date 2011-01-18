@@ -23,10 +23,10 @@
 	<c:forEach items="${translations}" var="t">
 		<tr id="<c:out value='${t.token.keyString}' />" title="<c:out value='${t.key.kind}' />">
 			<td><c:out value="${t.token.name}" /></td>
-			<td><c:out value="${t.token.description}" /></td>
-			<td><input id="<c:out value='${t.keyString}' />" 
-				name="<c:out value='${t.token.keyString}' />" 
-				type="text" value="<c:out value='${t.local.local}' />" /></td>
+			<td><input id="description.<c:out value='${t.token.keyString}' />" name="description.<c:out value='${t.token.keyString}' />" 
+				type="text" value="<c:out value='${t.token.description}' />" /></td>
+			<td><textarea id="<c:out value='${t.keyString}' />"	name="<c:out value='${t.token.keyString}' />"
+				cols="80" rows="2" ><c:out value='${t.local.local}' /></textarea></td>
 			<td><c:out value="${t.parent.local}" /></td>
 		</tr>
 	</c:forEach>

@@ -32,7 +32,7 @@ public class TokenArtifact extends AbstractPrimaryKeyEntity {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '{' + token + '-' + artifact + ',' + key + '}';
+        return getClass().getSimpleName() + '{' + token + '.' + artifact + ',' + key + '}';
     }
 
     public Key getKey() {
@@ -66,7 +66,7 @@ public class TokenArtifact extends AbstractPrimaryKeyEntity {
 
     @Override
     public String getKeyString() {
-        return (null != token && null != artifact) ? KeyFactory.keyToString(token) + '-' + KeyFactory.keyToString(artifact)
+        return (null != token && null != artifact) ? KeyFactory.keyToString(token) + '.' + KeyFactory.keyToString(artifact)
                 : null;
     }
 

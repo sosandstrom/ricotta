@@ -94,7 +94,7 @@ public class ProjectController {
         model.addAttribute("users", projectUserDao.findByProject(project.getKey()));
 
         // fetch and add tokens for this project
-        List<Token> tokens = tokenDao.findByProject(project.getKey());
+        List<Token> tokens = tokenDao.findByProject(project.getKey(), true);
         model.addAttribute("tokens", tokens);
 
         return "project";

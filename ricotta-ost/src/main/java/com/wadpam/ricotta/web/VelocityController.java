@@ -32,6 +32,7 @@ import com.wadpam.ricotta.domain.Language;
 import com.wadpam.ricotta.domain.Mall;
 import com.wadpam.ricotta.domain.Project;
 import com.wadpam.ricotta.model.TranslationModel;
+import com.wadpam.ricotta.velocity.Encoder;
 
 /**
  * Created by Ola on Nov 12, 2010
@@ -80,6 +81,8 @@ public class VelocityController {
             HttpServletResponse response) throws ResourceNotFoundException, ParseErrorException, Exception {
         LOG.debug("rendering template " + templateName);
         final VelocityContext model = new VelocityContext();
+        model.put("encoder", new Encoder());
+
         final Project project = (Project) request.getAttribute("project");
         model.put("project", project);
 
@@ -97,6 +100,7 @@ public class VelocityController {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "No such artifact " + artifactName);
                 return null;
             }
+            model.put("artifact", artifact);
             artifactKey = artifact.getKey();
         }
 
@@ -110,7 +114,8 @@ public class VelocityController {
         }
         model.put("mall", mall);
 
-        response.setContentType(mall.getMimeType());
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/plain; charset=UTF-8"); // mall.getMimeType());
         final PrintWriter writer = response.getWriter();
         Template template = Velocity.getTemplate(templateName);
         template.merge(model, writer);

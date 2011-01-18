@@ -81,7 +81,7 @@ public class ProjectLanguageController {
         projectLanguage.setProject(project.getKey());
         projectLanguageDao.persist(projectLanguage);
 
-        return "redirect:/projects/" + projectName + '/';
+        return "redirect:/projects/" + projectName + "/index.html";
     }
 
     public void setProjectDao(ProjectDao projectDao) {

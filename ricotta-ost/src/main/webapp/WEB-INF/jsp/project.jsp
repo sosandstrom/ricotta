@@ -55,7 +55,7 @@
 	<tbody>
 	<c:forEach items="${artifacts}" var="a">
 		<tr>
-			<td><c:out value="${a.name}" /></td>
+			<td><a href="/projects/<c:out value='${project.name}'/>/tokens/"><c:out value="${a.name}" /></a></td>
 			<td><c:out value="${a.description}" /></td>
 		</tr>
 	</c:forEach>

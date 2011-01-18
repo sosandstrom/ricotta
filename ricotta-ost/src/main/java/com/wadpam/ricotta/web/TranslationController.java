@@ -19,6 +19,7 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.wadpam.ricotta.dao.LanguageDao;
 import com.wadpam.ricotta.dao.ProjectDao;
 import com.wadpam.ricotta.dao.ProjectLanguageDao;
+import com.wadpam.ricotta.dao.TokenDao;
 import com.wadpam.ricotta.dao.TranslationDao;
 import com.wadpam.ricotta.dao.UberDao;
 import com.wadpam.ricotta.domain.Language;
@@ -33,13 +34,17 @@ import com.wadpam.ricotta.model.TranslationModel;
 @Controller
 @RequestMapping("/projects/{projectName}/languages/{languageCode}/translations")
 public class TranslationController {
-    static final Logger        LOG = LoggerFactory.getLogger(TranslationController.class);
+    static final Logger        LOG                = LoggerFactory.getLogger(TranslationController.class);
+
+    static final String        PREFIX_DESCRIPTION = "description.";
 
     private ProjectDao         projectDao;
 
     private LanguageDao        languageDao;
 
     private ProjectLanguageDao projectLanguageDao;
+
+    private TokenDao           tokenDao;
 
     private TranslationDao     translationDao;
 
@@ -77,29 +82,39 @@ public class TranslationController {
         Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
             name = e.nextElement();
             value = request.getParameter(name);
-            key = KeyFactory.stringToKey(name);
-            t = null;
-            LOG.debug("field key kind for {} is {}", key.toString(), key.getKind());
-            if (Translation.class.getSimpleName().equals(key.getKind())) {
-                // update or delete existing translation
-                t = translationDao.findByPrimaryKey(key);
-                if (null != value && 0 < value.length()) {
-                    t.setLocal(value);
-                    translationDao.update(t);
-                }
-                else {
-                    translationDao.delete(t);
+            if (name.startsWith(PREFIX_DESCRIPTION)) {
+                key = KeyFactory.stringToKey(name.substring(PREFIX_DESCRIPTION.length()));
+                token = tokenDao.findByPrimaryKey(key);
+                if (false == value.equals(token.getDescription())) {
+                    token.setDescription(value);
+                    tokenDao.update(token);
                 }
             }
             else {
-                // create new translation for token?
-                if (null != value && 0 < value.length()) {
-                    t = new Translation();
-                    t.setToken(key);
-                    t.setLanguage(language.getKey());
-                    t.setLocal(value);
-                    // TODO: set version
-                    translationDao.persist(t);
+                key = KeyFactory.stringToKey(name);
+                t = null;
+                LOG.debug("field key kind for {} is {}", key.toString(), key.getKind());
+                if (Translation.class.getSimpleName().equals(key.getKind())) {
+                    // update or delete existing translation
+                    t = translationDao.findByPrimaryKey(key);
+                    if (null != value && 0 < value.length()) {
+                        t.setLocal(value);
+                        translationDao.update(t);
+                    }
+                    else {
+                        translationDao.delete(t);
+                    }
+                }
+                else {
+                    // create new translation for token?
+                    if (null != value && 0 < value.length()) {
+                        t = new Translation();
+                        t.setToken(key);
+                        t.setLanguage(language.getKey());
+                        t.setLocal(value);
+                        // TODO: set version
+                        translationDao.persist(t);
+                    }
                 }
             }
         }
@@ -125,6 +140,10 @@ public class TranslationController {
 
     public void setTranslationDao(TranslationDao translationDao) {
         this.translationDao = translationDao;
+    }
+
+    public void setTokenDao(TokenDao tokenDao) {
+        this.tokenDao = tokenDao;
     }
 
 }

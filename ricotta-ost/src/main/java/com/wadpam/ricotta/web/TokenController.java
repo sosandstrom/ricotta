@@ -73,7 +73,7 @@ public class TokenController {
             updateArtifactTokens(request, project, null, null);
         }
 
-        return "redirect:/projects/" + projectName + "/tokens/";
+        return "redirect:/projects/" + projectName + "/tokens/index.html";
     }
 
     @RequestMapping(value = "index.html", method = RequestMethod.GET)
@@ -83,8 +83,8 @@ public class TokenController {
         Project project = projectDao.findByName(projectName);
         model.addAttribute("project", project);
 
-        // fetch and add artifacts for this project
-        model.addAttribute("tokens", tokenDao.findByProject(project.getKey()));
+        // fetch and add tokens for this project
+        model.addAttribute("tokens", tokenDao.findByProject(project.getKey(), true));
 
         // fetch and add artifacts for this project
         model.addAttribute("artifacts", artifactDao.findByProject(project.getKey()));
@@ -100,7 +100,7 @@ public class TokenController {
     }
 
     protected void updateArtifactTokens(HttpServletRequest request, Project project, Token token, Artifact artifact) {
-        // <input type="checkbox" name="mappings" value="tokenKey-artifactKey" />
+        // <input type="checkbox" name="mappings" value="tokenKey.artifactKey" />
         List<TokenArtifact> mappings;
         if (null != token) {
             mappings = tokenArtifactDao.findByToken(token.getKey());
@@ -124,13 +124,18 @@ public class TokenController {
             // find existing
             ta = current.remove(value);
             if (null == ta) {
-                int beginIndex = value.indexOf('-');
+                try {
+                    int beginIndex = value.indexOf('.');
 
-                ta = new TokenArtifact();
-                ta.setProject(project.getKey());
-                ta.setToken(KeyFactory.stringToKey(value.substring(0, beginIndex)));
-                ta.setArtifact(KeyFactory.stringToKey(value.substring(beginIndex + 1)));
-                tokenArtifactDao.persist(ta);
+                    ta = new TokenArtifact();
+                    ta.setProject(project.getKey());
+                    ta.setToken(KeyFactory.stringToKey(value.substring(0, beginIndex)));
+                    ta.setArtifact(KeyFactory.stringToKey(value.substring(beginIndex + 1)));
+                    tokenArtifactDao.persist(ta);
+                }
+                catch (IllegalArgumentException log) {
+                    LOGGER.warn("No such tokenArtifact " + value);
+                }
             }
         }
 
