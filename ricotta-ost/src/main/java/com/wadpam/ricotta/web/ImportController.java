@@ -76,37 +76,48 @@ public class ImportController {
             final String value = matcher.group(2);
             LOGGER.info("found {}={}", tokenName, value);
 
-            // create new token?
-            Token token = null;
-            List<Token> tokens = tokenDao.findByNameProject(tokenName, project.getKey());
-            if (tokens.isEmpty()) {
-                LOGGER.info("Creating token {}", tokenName);
-                token = new Token();
-                token.setName(tokenName);
-                token.setProject(project.getKey());
-                tokenDao.persist(token);
-            }
-            else {
-                token = tokens.get(0);
-            }
+            try {
 
-            // create or update translation?
-            if (null != value && 0 < value.length()) {
-                boolean found = false;
-                for(Translation t : translationDao.findByToken(token.getKey())) {
-                    if (t.getLanguage().equals(language.getKey())) {
-                        found = true;
-                        break;
+                // create new token?
+                Token token = null;
+                List<Token> tokens = tokenDao.findByNameProject(tokenName, project.getKey());
+                if (tokens.isEmpty()) {
+                    LOGGER.info("Creating token {}", tokenName);
+                    token = new Token();
+                    token.setName(tokenName);
+                    token.setProject(project.getKey());
+                    tokenDao.persist(token);
+                }
+                else {
+                    token = tokens.get(0);
+                }
+
+                // create or update translation?
+                if (null != value && 0 < value.length()) {
+                    Translation translation = null;
+                    for(Translation t : translationDao.findByToken(token.getKey())) {
+                        if (t.getLanguage().equals(language.getKey())) {
+                            translation = t;
+                            break;
+                        }
+                    }
+                    if (null == translation) {
+                        LOGGER.info("Creating translation {}={}", tokenName, value);
+                        Translation t = new Translation();
+                        t.setLanguage(language.getKey());
+                        t.setLocal(value);
+                        t.setToken(token.getKey());
+                        translationDao.persist(t);
+                    }
+                    else if (false == value.equals(translation.getLocal())) {
+                        LOGGER.info("Updating translation {}={}", tokenName, value);
+                        translation.setLocal(value);
+                        translationDao.update(translation);
                     }
                 }
-                if (false == found) {
-                    LOGGER.info("Creating translation {}={}", tokenName, value);
-                    Translation t = new Translation();
-                    t.setLanguage(language.getKey());
-                    t.setLocal(value);
-                    t.setToken(token.getKey());
-                    translationDao.persist(t);
-                }
+            }
+            catch (RuntimeException e) {
+                LOGGER.error("Problems importing translation " + value + " for token " + tokenName, e);
             }
         }
     }

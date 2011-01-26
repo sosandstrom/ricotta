@@ -319,7 +319,7 @@
 			<plugin>
 				<groupId>net.sf.mardao</groupId>
 				<artifactId>maven-mardao-plugin</artifactId>
-				<version>1.7-SNAPSHOT</version>
+				<version>1.7</version>
 				<executions>
 					<execution>
 						<id>generate-generics</id>

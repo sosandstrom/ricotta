@@ -108,7 +108,7 @@ public class TranslationController {
                         }
                         else {
                             translationDao.delete(t);
-                            LOG.debug("deleted translation for {} to {}", key, t);
+                            LOG.debug("deleted translation for {} value={}", t.getToken(), t.getLocal());
                         }
                     }
                     else {
