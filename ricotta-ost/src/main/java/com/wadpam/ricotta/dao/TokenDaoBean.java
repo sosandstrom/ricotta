@@ -9,7 +9,7 @@ import com.wadpam.ricotta.domain.Token;
 /**
  * Implementation of Business Methods related to entity Token.
  */
-public class TokenDaoBean extends AbstractTokenDao implements TokenDao {
+public class TokenDaoBean extends GeneratedTokenDaoImpl implements TokenDao {
 
     @Override
     public List<Token> findByNameProject(String tokenName, Key projectKey) {

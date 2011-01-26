@@ -7,9 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.mardao.api.domain.PrimaryKeyEntity;
+
 import com.google.appengine.api.datastore.Key;
 import com.wadpam.ricotta.domain.Language;
-import com.wadpam.ricotta.domain.PrimaryKeyEntity;
 import com.wadpam.ricotta.domain.ProjectLanguage;
 import com.wadpam.ricotta.domain.Token;
 import com.wadpam.ricotta.domain.TokenArtifact;

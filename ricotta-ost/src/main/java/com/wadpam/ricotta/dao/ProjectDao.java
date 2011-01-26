@@ -3,8 +3,8 @@ package com.wadpam.ricotta.dao;
 /**
  * Business Methods interface for entity Project.
  */
-public interface ProjectDao extends AbstractProjectDaoInterface {
+public interface ProjectDao extends GeneratedProjectDao {
 
-	// TODO: declare your Business Methods here
-	
+    // TODO: declare your Business Methods here
+
 }

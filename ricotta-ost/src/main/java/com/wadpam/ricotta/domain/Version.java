@@ -1,10 +1,10 @@
 package com.wadpam.ricotta.domain;
 
+import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -15,14 +15,15 @@ import com.google.appengine.api.datastore.Key;
 public class Version {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Key     key;
+    Key    key;
 
-    String  name;
+    String name;
 
-    String  description;
+    String description;
 
-    @ManyToOne
-    Project project;
+    // @ManyToOne
+    @Basic
+    Key    project;
 
     public Key getKey() {
         return key;
@@ -48,11 +49,11 @@ public class Version {
         this.description = description;
     }
 
-    public Project getProject() {
+    public Key getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(Key project) {
         this.project = project;
     }
 

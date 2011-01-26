@@ -6,10 +6,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
+import net.sf.mardao.api.domain.PrimaryKeyEntity;
+
 import com.google.appengine.api.datastore.Key;
 
 @Entity
-public class Token extends AbstractPrimaryKeyEntity implements PrimaryKeyEntity {
+public class Token extends AEDPrimaryKeyEntity implements PrimaryKeyEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Key    key;

@@ -115,12 +115,6 @@
 		</property>
 	</bean>
 
-	<!-- In GAE, you cannot write multiparts to disk: -->
-	<bean id="multipartResolver" class="is.hax.spring.web.multipart.StreamingMultipartResolver">
-		<!-- the maximum file size in bytes -->
-		<property name="maxUploadSize" value="200000" />
-	</bean>
-
 	<bean id="viewResolver"
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="viewClass"

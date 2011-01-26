@@ -10,7 +10,7 @@ import com.wadpam.ricotta.domain.Translation;
 /**
  * Business Methods interface for entity Translation.
  */
-public interface TranslationDao extends AbstractTranslationDaoInterface {
+public interface TranslationDao extends GeneratedTranslationDao {
 
     /**
      * @return a <tokenKey, Translation> Map

@@ -8,7 +8,7 @@ import com.wadpam.ricotta.domain.Token;
 /**
  * Business Methods interface for entity Token.
  */
-public interface TokenDao extends AbstractTokenDaoInterface {
+public interface TokenDao extends GeneratedTokenDao {
 
     List<Token> findByNameProject(String tokenName, Key key);
 

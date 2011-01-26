@@ -8,11 +8,13 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
+
 import com.google.appengine.api.datastore.Key;
 
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"project", "user"})})
-public class ProjectUser extends AbstractPrimaryKeyEntity {
+public class ProjectUser extends AEDPrimaryKeyEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Key    key;

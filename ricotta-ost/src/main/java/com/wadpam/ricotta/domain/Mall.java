@@ -7,11 +7,14 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
+import net.sf.mardao.api.domain.PrimaryKeyEntity;
+
 import com.google.appengine.api.datastore.Key;
 
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"name"})})
-public class Mall extends AbstractPrimaryKeyEntity implements PrimaryKeyEntity {
+public class Mall extends AEDPrimaryKeyEntity implements PrimaryKeyEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Key    key;

@@ -8,12 +8,14 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
+
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"token", "artifact"})})
-public class TokenArtifact extends AbstractPrimaryKeyEntity {
+public class TokenArtifact extends AEDPrimaryKeyEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Key key;

@@ -3,11 +3,8 @@ package com.wadpam.ricotta.dao;
 /**
  * Implementation of Business Methods related to entity Country.
  */
-public class CountryDaoBean 
-	extends AbstractCountryDao
-		implements CountryDao 
-{
+public class CountryDaoBean extends GeneratedCountryDaoImpl implements CountryDao {
 
-	// TODO: implement your Business Methods here
+    // TODO: implement your Business Methods here
 
 }
