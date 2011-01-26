@@ -54,7 +54,7 @@
 			</activation>
 
 			<properties>
-				<gae.application.version>1</gae.application.version>
+				<gae.application.version>2</gae.application.version>
 				<logging.level>ALL</logging.level>
 			</properties>
 		</profile>
