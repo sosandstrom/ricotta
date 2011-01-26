@@ -67,7 +67,8 @@ public class TokenController {
             token.setProject(project.getKey());
             LOGGER.debug(token.toString());
             tokenDao.persist(token);
-            updateArtifactTokens(request, project, token, null);
+            // in createToken, there are no mappings
+            // updateArtifactTokens(request, project, token, null);
         }
         else {
             updateArtifactTokens(request, project, null, null);

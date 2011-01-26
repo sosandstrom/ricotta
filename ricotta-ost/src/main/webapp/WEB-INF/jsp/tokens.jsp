@@ -25,6 +25,7 @@ function all_checkboxes(id, checked, artifactKey) {
 <table>
 		<thead>
 		<tr>
+			<th>Delete</th>
 			<th>Name</th>
 			<th>Description</th>
 			<th>Context</th>
@@ -37,6 +38,7 @@ function all_checkboxes(id, checked, artifactKey) {
 	<tbody>
 	<c:forEach items="${tokens}" var="token">
 		<tr>
+			<td><input type="checkbox" id="delete" name="delete" value="<c:out value='${token.keyString}' />" /></td>
 			<td><c:out value="${token.name}" /></td>
 			<td><c:out value="${token.description}" /></td>
 			<td>TODO</td>

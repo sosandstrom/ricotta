@@ -18,6 +18,7 @@
 			 <option value="([^=^\s]+)[\s]*=[\s]*([^\n^\r]*)[\r\n\s]*" >Java properties file</option>
 			 <!-- name[\s]*=[\s]*"([^"]+)"[\s]*\>([^\<]*)\</string\> -->
 			 <option value='name[\s]*=[\s]*"([^"]+)"[\s]*\>([^\<]*)\&lt;/string\&gt;' >Android strings file</option>
+			 <option value='([^=^\s]+)=\"([^\"]*)\"\;' >iPhone Localizeable.strings file</option>
 		</td>
 	</tr>
 	<tr>

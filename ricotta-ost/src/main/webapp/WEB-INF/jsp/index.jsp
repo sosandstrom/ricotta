@@ -6,11 +6,21 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <jsp:include page="header.jsp" />
 <body>
+<c:if test="${null != pageContext.request.userPrincipal}">
+	<a href="/logout.html">Logout</a> <c:out value="${pageContext.request.userPrincipal.name}" />
+</c:if>
 <div class="pageHeading">Home</div>
 <ul>
+<c:choose>
+<c:when test="${null != pageContext.request.userPrincipal}">
 	<li><a href="/projects/">Projects</a></li>
 	<li><a href="/languages/">Languages</a></li>
 	<li><a href="/templates/">Templates</a></li>
+</c:when>
+<c:otherwise>
+	<li><a href="<c:out value='${loginURL}' />">Login</a></li>
+</c:otherwise>
+</c:choose>
 </ul>
 <h3>Ricotta Overview</h3>
 Ricotta is a translation management tool, with complimentary build tools, to efficiently manage localised resources in your software project.

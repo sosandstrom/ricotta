@@ -57,10 +57,10 @@
 			<properties>
 				<!-- During release, set application version in appengine-web.xml to 
 					2 -->
-				<gae.application.version>2</gae.application.version>
+				<gae.application.version>1</gae.application.version>
 
 				<!-- logging level -->
-				<logging.level>INFO</logging.level>
+				<logging.level>ALL</logging.level>
 			</properties>
 		</profile>
 	</profiles>

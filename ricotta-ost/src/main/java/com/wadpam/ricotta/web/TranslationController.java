@@ -38,6 +38,8 @@ public class TranslationController {
 
     static final String        PREFIX_DESCRIPTION = "description.";
 
+    static final String        PREFIX_TOKEN       = "token.";
+
     private ProjectDao         projectDao;
 
     private LanguageDao        languageDao;
@@ -51,9 +53,9 @@ public class TranslationController {
     private UberDao            uberDao;
 
     @RequestMapping(value = "index.html", method = RequestMethod.GET)
-    public String getProjectLanguageForm(Model model, @PathVariable String projectName, @PathVariable String languageCode) {
-        // TODO: check project role
-        Project project = projectDao.findByName(projectName);
+    public String getProjectLanguageForm(HttpServletRequest request, Model model, @PathVariable String projectName,
+            @PathVariable String languageCode) {
+        final Project project = (Project) request.getAttribute("project");
         model.addAttribute("project", project);
 
         Language language = languageDao.findByCode(languageCode);
@@ -69,54 +71,64 @@ public class TranslationController {
     public String postProjectLanguage(HttpServletRequest request, @PathVariable String projectName,
             @PathVariable String languageCode) throws IOException {
         LOG.debug("post translations");
-        // TODO: check project role
-
-        Project project = projectDao.findByName(projectName);
+        final Project project = (Project) request.getAttribute("project");
         Language language = languageDao.findByCode(languageCode);
 
         String name, value;
         Key key;
         Translation t;
         Token token;
+        // iterate all posted parameters (descriptions and translations)
         for(@SuppressWarnings("unchecked")
         Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
             name = e.nextElement();
             value = request.getParameter(name);
-            if (name.startsWith(PREFIX_DESCRIPTION)) {
-                key = KeyFactory.stringToKey(name.substring(PREFIX_DESCRIPTION.length()));
-                token = tokenDao.findByPrimaryKey(key);
-                if (false == value.equals(token.getDescription())) {
-                    token.setDescription(value);
-                    tokenDao.update(token);
-                }
-            }
-            else {
-                key = KeyFactory.stringToKey(name);
-                t = null;
-                LOG.debug("field key kind for {} is {}", key.toString(), key.getKind());
-                if (Translation.class.getSimpleName().equals(key.getKind())) {
-                    // update or delete existing translation
-                    t = translationDao.findByPrimaryKey(key);
-                    if (null != value && 0 < value.length()) {
-                        t.setLocal(value);
-                        translationDao.update(t);
-                    }
-                    else {
-                        translationDao.delete(t);
+            LOG.debug("{} = {}", name, value);
+            try {
+                if (name.startsWith(PREFIX_DESCRIPTION)) {
+                    key = KeyFactory.stringToKey(name.substring(PREFIX_DESCRIPTION.length()));
+                    token = tokenDao.findByPrimaryKey(key);
+                    if (false == value.equals(token.getDescription())) {
+                        token.setDescription(value);
+                        tokenDao.update(token);
+                        LOG.debug("updated description for {} to {}", token.getName(), value);
                     }
                 }
                 else {
-                    // create new translation for token?
-                    if (null != value && 0 < value.length()) {
-                        t = new Translation();
-                        t.setToken(key);
-                        t.setLanguage(language.getKey());
-                        t.setLocal(value);
-                        // TODO: set version
-                        translationDao.persist(t);
+                    key = KeyFactory.stringToKey(name);
+                    t = null;
+                    LOG.debug("field key kind for {} is {}", key.toString(), key.getKind());
+                    if (Translation.class.getSimpleName().equals(key.getKind())) {
+                        // update or delete existing translation
+                        t = translationDao.findByPrimaryKey(key);
+                        if (null != value && 0 < value.length()) {
+                            t.setLocal(value);
+                            translationDao.update(t);
+                            LOG.debug("updated translation for {} to {}", key, value);
+                        }
+                        else {
+                            translationDao.delete(t);
+                            LOG.debug("deleted translation for {} to {}", key, t);
+                        }
+                    }
+                    else {
+                        // create new translation for token?
+                        if (null != value && 0 < value.length()) {
+                            t = new Translation();
+                            t.setToken(key);
+                            t.setLanguage(language.getKey());
+                            t.setLocal(value);
+                            // TODO: set version
+                            translationDao.persist(t);
+                            LOG.debug("persisted new translation for {}: {}", key, value);
+                        }
                     }
                 }
             }
+            catch (javax.persistence.PersistenceException pe) {
+                LOG.warn(name, pe);
+            }
+
         }
 
         return "redirect:index.html";

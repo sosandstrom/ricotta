@@ -30,9 +30,9 @@ public class Encoder {
     public String android(String s) {
         final String amp = amp(s);
         final String quot = amp.replaceAll("\\\"", "&quot;");
-        final String apostrophy = quot.replaceAll("\\'", "\\'");
-        final String lt = apostrophy.replaceAll("<", "&lt;");
-        final String gt = lt.replaceAll(">", "&gt;");
+        final String apostrophy = quot.replace("'", "\\'");
+        final String lt = apostrophy.replace("<", "&lt;");
+        final String gt = lt.replace(">", "&gt;");
         return gt;
     }
 }

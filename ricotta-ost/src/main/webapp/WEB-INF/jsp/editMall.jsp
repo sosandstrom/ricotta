@@ -6,6 +6,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <jsp:include page="header.jsp" />
 <body>
+<a href="/index.html">Home</a> | <a href="/templates/index.html">Templates</a>
+<div class="pageHeading">Edit template</div>
 <form id="mall" name="mall" action="" method="post">
 <table>
 	<tr>

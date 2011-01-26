@@ -9,13 +9,18 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
 	<security:http use-expressions="true" entry-point-ref="gaeEntryPoint">
+		<security:intercept-url pattern="/index.html" filters="none" />
+		<security:intercept-url pattern="/logout.html" filters="none" />
+		<security:intercept-url pattern="/loggedout.html" filters="none" />
 		<security:intercept-url pattern="/**"
 			access="hasRole('USER')" />
 		<security:custom-filter position="PRE_AUTH_FILTER"
 			ref="gaeFilter" />
 	</security:http>
+
 	<bean id="gaeEntryPoint"
 		class="com.wadpam.ricotta.gae.GoogleAccountsAuthenticationEntryPoint" />
+
 	<bean id="gaeFilter" class="com.wadpam.ricotta.gae.GaeAuthenticationFilter">
 		<property name="authenticationManager" ref="authenticationManager" />
 	</bean>
@@ -24,11 +29,9 @@
 		<security:authentication-provider
 			ref="gaeAuthenticationProvider" />
 	</security:authentication-manager>
+
 	<bean id="gaeAuthenticationProvider"
 		class="com.wadpam.ricotta.gae.GoogleAccountsAuthenticationProvider">
 		<property name="appUserDao" ref="appUserDao" />
-		<!-- 
-		<property name="handlerInterceptor" ref="entityManagerFactory" />
-		 -->
 	</bean>
 </beans>

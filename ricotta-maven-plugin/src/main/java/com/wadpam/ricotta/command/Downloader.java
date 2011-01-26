@@ -63,7 +63,20 @@ public class Downloader {
         HttpClient client = new DefaultHttpClient();
         HttpResponse response = client.execute(method);
 
-        final StatusLine status = response.getStatusLine();
+        StatusLine status = response.getStatusLine();
+
+        // warming request?
+        if (status.getStatusCode() == 500) {
+            warn("Retrying as HTTP " + status.getStatusCode() + " " + status.getReasonPhrase());
+            method.abort();
+            // retry once!
+            info("Download URL " + url.toString());
+            method = new HttpGet(url.toString());
+            // TODO: add authentication
+            response = client.execute(method);
+            status = response.getStatusLine();
+        }
+
         if (status.getStatusCode() == 200) {
             InputStream is = response.getEntity().getContent();
 
