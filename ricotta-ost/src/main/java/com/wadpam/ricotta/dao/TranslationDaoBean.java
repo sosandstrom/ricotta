@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.mardao.api.dao.Expression;
+import net.sf.mardao.api.dao.FilterEqual;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Query.FilterOperator;
@@ -32,5 +33,11 @@ public class TranslationDaoBean extends GeneratedTranslationDaoImpl implements T
             }
         }
         return returnValue;
+    }
+
+    @Override
+    public List<Key> findKeysByTokenLanguageVersion(Key token, Key language, Key version) {
+        return findKeysBy(null, false, -1, 0, new FilterEqual(COLUMN_NAME_TOKEN, token), new FilterEqual(COLUMN_NAME_LANGUAGE,
+                language));
     }
 }

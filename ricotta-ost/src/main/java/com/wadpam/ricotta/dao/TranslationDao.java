@@ -17,4 +17,6 @@ public interface TranslationDao extends GeneratedTranslationDao {
      */
     Map<Key, Translation> findByLanguageKeyTokens(Key languageKey, List<Token> tokens);
 
+    List<Key> findKeysByTokenLanguageVersion(Key token, Key language, Key version);
+
 }

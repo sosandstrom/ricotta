@@ -9,6 +9,9 @@ import java.util.Map;
 
 import net.sf.mardao.api.domain.PrimaryKeyEntity;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.appengine.api.datastore.Key;
 import com.wadpam.ricotta.domain.Language;
 import com.wadpam.ricotta.domain.ProjectLanguage;
@@ -19,6 +22,8 @@ import com.wadpam.ricotta.model.ProjectLanguageModel;
 import com.wadpam.ricotta.model.TranslationModel;
 
 public class UberDaoBean implements UberDao {
+    static final Logger        LOG = LoggerFactory.getLogger(UberDaoBean.class);
+
     private LanguageDao        languageDao;
     private MallDao            mallDao;
     private ProjectLanguageDao projectLanguageDao;
@@ -28,6 +33,22 @@ public class UberDaoBean implements UberDao {
 
     public void init() {
         // mallDao.persist("The normal properties file layout", "properties", "#This is the file\n#End-of-file");
+    }
+
+    @Override
+    public void deleteTokens(List<Key> keys) {
+        List<Key> taKeys;
+        for(Key tokenKey : keys) {
+            // delete associated TokenArtifacts:
+            taKeys = tokenArtifactDao.findKeysByToken(tokenKey);
+            tokenArtifactDao.delete(taKeys);
+
+            // delete associated translations:
+            taKeys = translationDao.findKeysByToken(tokenKey);
+            translationDao.delete(taKeys);
+        }
+
+        tokenDao.delete(keys);
     }
 
     @Override
@@ -69,8 +90,18 @@ public class UberDaoBean implements UberDao {
         if (null != artifactKey) {
             List<TokenArtifact> mappings = tokenArtifactDao.findByArtifact(artifactKey);
             tokens = new ArrayList<Token>();
+            Token token;
             for(TokenArtifact ta : mappings) {
-                tokens.add(tokenDao.findByPrimaryKey(ta.getToken()));
+                token = tokenDao.findByPrimaryKey(ta.getToken());
+                // if you have deleted tokens using the admin console...
+                if (null != token) {
+                    tokens.add(token);
+                }
+                else {
+                    // cleanup
+                    LOG.warn("Removing orphaned {}", ta);
+                    tokenArtifactDao.delete(ta);
+                }
             }
         }
         else {

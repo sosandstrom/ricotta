@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.wadpam.ricotta.dao.ArtifactDao;
 import com.wadpam.ricotta.dao.ProjectDao;
 import com.wadpam.ricotta.dao.ProjectUserDao;
@@ -74,13 +76,42 @@ public class ProjectController {
         return "redirect:/projects/" + project.getName() + '/';
     }
 
+    @RequestMapping(value = "{projectName}/index.html", method = RequestMethod.POST)
+    public String deleteUsersTokens(HttpServletRequest request) throws IOException {
+        LOGGER.debug("delete from project");
+        final Project project = (Project) request.getAttribute("project");
+
+        // delete selected project users:
+        final List<Key> keys = new ArrayList<Key>();
+        String values[] = request.getParameterValues("users");
+        if (null != values) {
+            for(String keyString : values) {
+                keys.add(KeyFactory.stringToKey(keyString));
+            }
+            projectUserDao.delete(keys);
+        }
+
+        // delete selected project tokens:
+        keys.clear();
+        Key key;
+        values = request.getParameterValues("tokens");
+        if (null != values) {
+            for(String keyString : values) {
+                key = KeyFactory.stringToKey(keyString);
+                keys.add(key);
+            }
+            uberDao.deleteTokens(keys);
+        }
+
+        return "redirect:/projects/" + project.getName() + '/';
+    }
+
     @RequestMapping(value = "{projectName}/index.html", method = RequestMethod.GET)
     public String getProject(HttpServletRequest request, Model model, @PathVariable String projectName) {
         LOGGER.debug("get project");
-        // TODO: check project role
 
         // fetch and add project details
-        Project project = projectDao.findByName(projectName);
+        final Project project = (Project) request.getAttribute("project");
         model.addAttribute("project", project);
 
         // fetch and add languages for this project

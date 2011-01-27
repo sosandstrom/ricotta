@@ -55,7 +55,7 @@
 
 			<properties>
 				<gae.application.version>2</gae.application.version>
-				<logging.level>ALL</logging.level>
+				<logging.level>INFO</logging.level>
 			</properties>
 		</profile>
 	</profiles>
@@ -382,6 +382,7 @@
 				<version>0.7.2</version>
 				<configuration>
 					<serverId>ricotta</serverId>
+					<disableUpdateCheck>true</disableUpdateCheck>
 				</configuration>
 				<dependencies>
 					<dependency>

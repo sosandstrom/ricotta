@@ -12,4 +12,6 @@ public interface UberDao {
 
     List<TranslationModel> loadTranslations(Key project, Key language, Key artifactKey);
 
+    void deleteTokens(List<Key> keys);
+
 }

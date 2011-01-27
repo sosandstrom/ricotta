@@ -62,7 +62,9 @@
 	</tbody>
 </table>
 <a href="/projects/<c:out value="${project.name}"/>/artifacts/create.html">Create artifact</a>
+<form action="" method="post" name="deleteForm" id="deleteForm">
 <h3>Project Users</h3>
+<input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected users and tokens" />
 <table>
 		<thead>
 		<tr>
@@ -79,11 +81,14 @@
 	</c:forEach>
 	</tbody>
 </table>
+<input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected users and tokens" /><br />
 <a href="/projects/<c:out value="${project.name}"/>/users/create.html">Add user</a>
 <h3>Project Tokens</h3>
+<input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected users and tokens" />
 <table>
 		<thead>
 		<tr>
+			<th>Delete</th>
 			<th>Name</th>
 			<th>Description</th>
 		</tr>
@@ -91,12 +96,15 @@
 	<tbody>
 	<c:forEach items="${tokens}" var="token">
 		<tr>
+			<td><input type="checkbox" id="tokens" name="tokens" value="<c:out value='${token.keyString}' />" /></td>
 			<td><c:out value="${token.name}" /></td>
 			<td><c:out value="${token.description}" /></td>
 		</tr>
 	</c:forEach>
 	</tbody>
 </table>
+<input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected users and tokens" />
+</form>
 <a href="/projects/<c:out value="${project.name}"/>/tokens/create.html">Create token</a>
 </body>
 </html>

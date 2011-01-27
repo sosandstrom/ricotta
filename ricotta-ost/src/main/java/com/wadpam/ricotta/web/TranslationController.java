@@ -102,12 +102,16 @@ public class TranslationController {
                         // update or delete existing translation
                         t = translationDao.findByPrimaryKey(key);
                         if (null != value && 0 < value.length()) {
-                            t.setLocal(value);
-                            translationDao.update(t);
-                            LOG.debug("updated translation for {} to {}", key, value);
+                            if (false == value.equals(t.getLocal())) {
+                                t.setLocal(value);
+                                translationDao.update(t);
+                                LOG.debug("updated translation for {} to {}", key, value);
+                            }
                         }
                         else {
-                            translationDao.delete(t);
+                            final List<Key> ts = translationDao.findKeysByTokenLanguageVersion(t.getToken(), t.getLanguage(),
+                                    t.getVersion());
+                            translationDao.delete(ts);
                             LOG.debug("deleted translation for {} value={}", t.getToken(), t.getLocal());
                         }
                     }
