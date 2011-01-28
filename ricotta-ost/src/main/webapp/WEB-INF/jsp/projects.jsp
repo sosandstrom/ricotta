@@ -17,8 +17,10 @@
 		</tr>
 	</thead>
 	<tbody>
+	<c:set var="even" scope="page" value="${true}" />
 	<c:forEach items="${projects}" var="project">
-		<tr>
+		<c:set var="even" scope="page" value="${!even}" />
+		<tr class="evenRow<c:out value='${even}' />">
 			<td><c:out value="${project.key.name}" /></td>
 			<td><a href="/projects/<c:out value="${project.name}" />/index.html"><c:out value="${project.name}" /></a></td>
 			<td><c:out value="${project.owner}" /></td>

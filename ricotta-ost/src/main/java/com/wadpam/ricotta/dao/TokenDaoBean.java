@@ -26,4 +26,18 @@ public class TokenDaoBean extends GeneratedTokenDaoImpl implements TokenDao {
         return findBy(args, COLUMN_NAME_NAME, ascending);
     }
 
+    @Override
+    public Token persist(Key projectKey, String name, String description) {
+        List<Token> ts = findByNameProject(name, projectKey);
+        if (ts.isEmpty()) {
+            Token t = new Token();
+            t.setProject(projectKey);
+            t.setName(name);
+            t.setDescription(description);
+            persist(t);
+            return t;
+        }
+        return ts.get(0);
+    }
+
 }

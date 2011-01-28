@@ -36,8 +36,10 @@ function all_checkboxes(id, checked, artifactKey) {
 		</tr>
 	</thead>
 	<tbody>
+	<c:set var="even" scope="page" value="${true}" />
 	<c:forEach items="${tokens}" var="token">
-		<tr>
+		<c:set var="even" scope="page" value="${!even}" />
+		<tr class="evenRow<c:out value='${even}' />">
 			<td><input type="checkbox" id="delete" name="delete" value="<c:out value='${token.keyString}' />" /></td>
 			<td><c:out value="${token.name}" /></td>
 			<td><c:out value="${token.description}" /></td>

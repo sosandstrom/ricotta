@@ -19,3 +19,11 @@ th {
 	font-size: larger;
 	background-color: lightgray;
 }
+
+.evenRowtrue {
+	background-color: #F0F0F0;
+}
+
+.evenRowfalse {
+	background-color: #FCFCFC;
+}

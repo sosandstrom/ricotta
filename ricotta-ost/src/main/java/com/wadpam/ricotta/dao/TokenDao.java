@@ -14,4 +14,6 @@ public interface TokenDao extends GeneratedTokenDao {
 
     List<Token> findByProject(Key projectKey, boolean ascending);
 
+    Token persist(Key projectKey, String name, String description);
+
 }

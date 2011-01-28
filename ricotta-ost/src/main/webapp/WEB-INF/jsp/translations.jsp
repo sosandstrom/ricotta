@@ -20,8 +20,10 @@
 		</tr>
 	</thead>
 	<tbody>
+	<c:set var="even" scope="page" value="${true}" />
 	<c:forEach items="${translations}" var="t">
-		<tr id="<c:out value='${t.token.keyString}' />" title="<c:out value='${t.key.kind}' />">
+		<c:set var="even" scope="page" value="${!even}" />
+		<tr id="<c:out value='${t.token.keyString}' />" class="evenRow<c:out value='${even}' />" title="<c:out value='${t.key.kind}' />">
 			<td><c:out value="${t.token.name}" /></td>
 			<td><input id="description.<c:out value='${t.token.keyString}' />" name="description.<c:out value='${t.token.keyString}' />" 
 				type="text" value="<c:out value='${t.token.description}' />" /></td>

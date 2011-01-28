@@ -8,9 +8,12 @@
 
 	<bean id="uberDao" class="com.wadpam.ricotta.dao.UberDaoBean"
 		init-method="init" depends-on="dataResourceLoader">
+		<property name="artifactDao" ref="artifactDao" />
 		<property name="languageDao" ref="languageDao" />
 		<property name="mallDao" ref="mallDao" />
+		<property name="projectDao" ref="projectDao" />
 		<property name="projectLanguageDao" ref="projectLanguageDao" />
+		<property name="projectUserDao" ref="projectUserDao" />
 		<property name="tokenDao" ref="tokenDao" />
 		<property name="tokenArtifactDao" ref="tokenArtifactDao" />
 		<property name="translationDao" ref="translationDao" />

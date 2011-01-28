@@ -34,8 +34,10 @@
 		</tr>
 	</thead>
 	<tbody>
+	<c:set var="even" scope="page" value="${true}" />
 	<c:forEach items="${languages}" var="plm">
-		<tr>
+		<c:set var="even" scope="page" value="${!even}" />
+		<tr class="evenRow<c:out value='${even}' />">
 			<td><c:out value="${plm.language.code}" /></td>
 			<td><a href="languages/<c:out value='${plm.language.code}' />/translations/" ><c:out value="${plm.language.name}" /></a></td>
 			<td><c:out value="${plm.parentName}" /></td>
@@ -53,8 +55,10 @@
 		</tr>
 	</thead>
 	<tbody>
+	<c:set var="even" scope="page" value="${true}" />
 	<c:forEach items="${artifacts}" var="a">
-		<tr>
+		<c:set var="even" scope="page" value="${!even}" />
+		<tr class="evenRow<c:out value='${even}' />">
 			<td><a href="/projects/<c:out value='${project.name}'/>/tokens/"><c:out value="${a.name}" /></a></td>
 			<td><c:out value="${a.description}" /></td>
 		</tr>
@@ -73,8 +77,10 @@
 		</tr>
 	</thead>
 	<tbody>
+	<c:set var="even" scope="page" value="${true}" />
 	<c:forEach items="${users}" var="u">
-		<tr>
+		<c:set var="even" scope="page" value="${!even}" />
+		<tr class="evenRow<c:out value='${even}' />">
 			<td><input type="checkbox" name="users" id="users" value="<c:out value='${u.keyString}' />" /></td>
 			<td><c:out value="${u.user}" /></td>
 		</tr>
@@ -94,8 +100,10 @@
 		</tr>
 	</thead>
 	<tbody>
+	<c:set var="even" scope="page" value="${true}" />
 	<c:forEach items="${tokens}" var="token">
-		<tr>
+		<c:set var="even" scope="page" value="${!even}" />
+		<tr class="evenRow<c:out value='${even}' />">
 			<td><input type="checkbox" id="tokens" name="tokens" value="<c:out value='${token.keyString}' />" /></td>
 			<td><c:out value="${token.name}" /></td>
 			<td><c:out value="${token.description}" /></td>

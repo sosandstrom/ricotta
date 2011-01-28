@@ -13,7 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.appengine.api.datastore.Key;
+import com.wadpam.ricotta.domain.Artifact;
 import com.wadpam.ricotta.domain.Language;
+import com.wadpam.ricotta.domain.Mall;
+import com.wadpam.ricotta.domain.Project;
 import com.wadpam.ricotta.domain.ProjectLanguage;
 import com.wadpam.ricotta.domain.Token;
 import com.wadpam.ricotta.domain.TokenArtifact;
@@ -22,17 +25,32 @@ import com.wadpam.ricotta.model.ProjectLanguageModel;
 import com.wadpam.ricotta.model.TranslationModel;
 
 public class UberDaoBean implements UberDao {
-    static final Logger        LOG = LoggerFactory.getLogger(UberDaoBean.class);
+    static final Logger        LOG               = LoggerFactory.getLogger(UberDaoBean.class);
 
+    public static final String MALL_BODY_ANDROID = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+                                                         + "<!-- Project: ${project.name} -->\n"
+                                                         + "<!-- Language: ${language.name} (${language.code}) -->\n"
+                                                         + "<!-- Template name: ${mall.name} -->\n"
+                                                         + "<!-- Artifact name: ${artifact.name} -->\n\n"
+                                                         + "<resources>\n"
+                                                         + "#foreach( $t in $translations )#if( $t.local )\n"
+                                                         + "        <string name=\"${t.token.name}\">${encoder.android($t.local.local)}</string>\n"
+                                                         + "#elseif( $t.parent )\n"
+                                                         + "        <string name=\"${t.token.name}\">${encoder.android($t.parent.local)}</string>\n"
+                                                         + "#end#end\n" + "</resources>";
+
+    private ArtifactDao        artifactDao;
     private LanguageDao        languageDao;
     private MallDao            mallDao;
+    private ProjectDao         projectDao;
     private ProjectLanguageDao projectLanguageDao;
+    private ProjectUserDao     projectUserDao;
     private TokenDao           tokenDao;
     private TokenArtifactDao   tokenArtifactDao;
     private TranslationDao     translationDao;
 
     public void init() {
-        // mallDao.persist("The normal properties file layout", "properties", "#This is the file\n#End-of-file");
+        populate();
     }
 
     @Override
@@ -135,7 +153,6 @@ public class UberDaoBean implements UberDao {
         Collections.sort(returnValue, new Comparator<TranslationModel>() {
             @Override
             public int compare(TranslationModel arg0, TranslationModel arg1) {
-                // TODO Auto-generated method stub
                 return arg0.getToken().getName().compareToIgnoreCase(arg1.getToken().getName());
             }
         });
@@ -149,6 +166,34 @@ public class UberDaoBean implements UberDao {
             returnValue.add(((PrimaryKeyEntity) o).getPrimaryKey());
         }
         return returnValue;
+    }
+
+    /**
+     * Populates the database with the basic project - ricotta-ost itself!
+     */
+    protected final void populate() {
+        // populate Languages
+        final Language en = languageDao.persist("en", "English");
+        final Language en_GB = languageDao.persist("en_GB", "British English");
+        final Language sv = languageDao.persist("sv", "Swedish");
+
+        // populate Templates
+        final Mall androidStringsInherited = mallDao.persist(MALL_BODY_ANDROID,
+                "Android strings.xml with parent default translations", "text/plain", "strings_android_inherit");
+
+        // Projects
+        final Project project = projectDao.persist("ricotta", "s.o.sandstrom@gmail.com");
+        projectUserDao.persist(project.getKey(), "test@example.com");
+
+        // Artifact
+        final Artifact ricottaOst = artifactDao.persist(project.getKey(), "ricotta-ost");
+
+        // Tokens
+        final Token appTitle = tokenDao.persist(project.getKey(), "appTitle", "The Application title as displayed to the user");
+        final Token tokenProject = tokenDao.persist(project.getKey(), "Project", "The Project Entity");
+
+        // Artifact tokens
+
     }
 
     public ProjectLanguageDao getProjectLanguageDao() {
@@ -189,5 +234,25 @@ public class UberDaoBean implements UberDao {
 
     public void setTokenArtifactDao(TokenArtifactDao tokenArtifactDao) {
         this.tokenArtifactDao = tokenArtifactDao;
+    }
+
+    public void setProjectDao(ProjectDao projectDao) {
+        this.projectDao = projectDao;
+    }
+
+    public ProjectDao getProjectDao() {
+        return projectDao;
+    }
+
+    public void setProjectUserDao(ProjectUserDao projectUserDao) {
+        this.projectUserDao = projectUserDao;
+    }
+
+    public ProjectUserDao getProjectUserDao() {
+        return projectUserDao;
+    }
+
+    public void setArtifactDao(ArtifactDao artifactDao) {
+        this.artifactDao = artifactDao;
     }
 }
