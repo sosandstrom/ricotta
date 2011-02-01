@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.mardao.api.domain.PrimaryKeyEntity;
 
@@ -50,6 +52,7 @@ public class UberDaoBean implements UberDao {
     private TranslationDao     translationDao;
 
     public void init() {
+        // patch();
         populate();
     }
 
@@ -125,14 +128,19 @@ public class UberDaoBean implements UberDao {
         else {
             tokens = tokenDao.findByProject(projectKey);
         }
+        final Set<Key> tokenKeys = new HashSet<Key>();
+        for(Token t : tokens) {
+            tokenKeys.add(t.getKey());
+        }
+        LOG.debug("fetched {} tokens for {} keys", tokens.size(), tokenKeys.size());
 
         // this language's tokens
-        final Map<Key, Translation> locals = translationDao.findByLanguageKeyTokens(languageKey, tokens);
+        final Map<Key, Translation> locals = translationDao.findByLanguageKeyTokens(projectKey, languageKey, tokenKeys);
 
         // if there is a parent, get its tokens
         Map<Key, Translation> parents = new HashMap<Key, Translation>();
         if (null != projectLanguage.getParent()) {
-            parents = translationDao.findByLanguageKeyTokens(projectLanguage.getParent(), tokens);
+            parents = translationDao.findByLanguageKeyTokens(projectKey, projectLanguage.getParent(), tokenKeys);
         }
 
         // for each token, build a TranslationModel
@@ -166,6 +174,24 @@ public class UberDaoBean implements UberDao {
             returnValue.add(((PrimaryKeyEntity) o).getPrimaryKey());
         }
         return returnValue;
+    }
+
+    /**
+     * Patches any old persisted data
+     */
+    protected void patch() {
+        Map<Key, Key> tokenProjectMap = new HashMap<Key, Key>();
+        for(Token t : tokenDao.findAll()) {
+            tokenProjectMap.put(t.getKey(), t.getProject());
+        }
+
+        // patch all translations:
+        for(Translation t : translationDao.findAll()) {
+            if (null == t.getProject()) {
+                t.setProject(tokenProjectMap.get(t.getToken()));
+                translationDao.update(t);
+            }
+        }
     }
 
     /**

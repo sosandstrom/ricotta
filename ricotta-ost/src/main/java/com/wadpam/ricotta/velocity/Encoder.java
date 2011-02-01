@@ -33,6 +33,7 @@ public class Encoder {
         final String apostrophy = quot.replace("'", "\\'");
         final String lt = apostrophy.replace("<", "&lt;");
         final String gt = lt.replace(">", "&gt;");
-        return gt;
+        final String br = gt.replace("\n", "\\n");
+        return br;
     }
 }

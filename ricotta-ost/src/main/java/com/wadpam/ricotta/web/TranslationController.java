@@ -119,6 +119,7 @@ public class TranslationController {
                         // create new translation for token?
                         if (null != value && 0 < value.length()) {
                             t = new Translation();
+                            t.setProject(project.getKey());
                             t.setToken(key);
                             t.setLanguage(language.getKey());
                             t.setLocal(value);

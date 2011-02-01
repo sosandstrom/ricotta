@@ -21,6 +21,10 @@ public class Translation {
 
     // ManyToOne
     @Basic
+    Key    project;
+
+    // ManyToOne
+    @Basic
     Key    token;
 
     // ManyToOne
@@ -81,6 +85,14 @@ public class Translation {
 
     public void setVersion(Key version) {
         this.version = version;
+    }
+
+    public Key getProject() {
+        return project;
+    }
+
+    public void setProject(Key project) {
+        this.project = project;
     }
 
 }
