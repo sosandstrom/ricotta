@@ -14,4 +14,6 @@ public interface UberDao {
 
     void deleteTokens(List<Key> keys);
 
+    void invalidateCache(Key projectKey, Key languageKey, Key artifactKey);
+
 }

@@ -19,4 +19,6 @@ public interface TranslationDao extends GeneratedTranslationDao {
 
     List<Key> findKeysByTokenLanguageVersion(Key token, Key language, Key version);
 
+    Translation persist(Key language, Key project, Key token, Key version, String value);
+
 }

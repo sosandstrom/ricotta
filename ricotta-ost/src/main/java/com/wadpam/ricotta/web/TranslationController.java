@@ -78,6 +78,7 @@ public class TranslationController {
         Key key;
         Translation t;
         Token token;
+        boolean invalidateCache = false;
         // iterate all posted parameters (descriptions and translations)
         for(@SuppressWarnings("unchecked")
         Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
@@ -91,6 +92,7 @@ public class TranslationController {
                     if (false == value.equals(token.getDescription())) {
                         token.setDescription(value);
                         tokenDao.update(token);
+                        invalidateCache = true;
                         LOG.debug("updated description for {} to {}", token.getName(), value);
                     }
                 }
@@ -101,32 +103,11 @@ public class TranslationController {
                     if (Translation.class.getSimpleName().equals(key.getKind())) {
                         // update or delete existing translation
                         t = translationDao.findByPrimaryKey(key);
-                        if (null != value && 0 < value.length()) {
-                            if (false == value.equals(t.getLocal())) {
-                                t.setLocal(value);
-                                translationDao.update(t);
-                                LOG.debug("updated translation for {} to {}", key, value);
-                            }
-                        }
-                        else {
-                            final List<Key> ts = translationDao.findKeysByTokenLanguageVersion(t.getToken(), t.getLanguage(),
-                                    t.getVersion());
-                            translationDao.delete(ts);
-                            LOG.debug("deleted translation for {} value={}", t.getToken(), t.getLocal());
-                        }
+                        invalidateCache |= updateTranslation(project.getKey(), null, language.getKey(), t, value, true);
                     }
                     else {
-                        // create new translation for token?
-                        if (null != value && 0 < value.length()) {
-                            t = new Translation();
-                            t.setProject(project.getKey());
-                            t.setToken(key);
-                            t.setLanguage(language.getKey());
-                            t.setLocal(value);
-                            // TODO: set version
-                            translationDao.persist(t);
-                            LOG.debug("persisted new translation for {}: {}", key, value);
-                        }
+                        // create new translation for token
+                        invalidateCache |= updateTranslation(project.getKey(), key, language.getKey(), null, value, false);
                     }
                 }
             }
@@ -136,7 +117,47 @@ public class TranslationController {
 
         }
 
+        if (invalidateCache) {
+            uberDao.invalidateCache(project.getKey(), language.getKey(), null);
+        }
+
         return "redirect:index.html";
+    }
+
+    /** If translation is null, projectKey, tokenKey and languageKey must be specified! */
+    protected boolean updateTranslation(Key projectKey, Key tokenKey, Key languageKey, Translation t, String value, boolean delete) {
+        boolean invalidateCache = false;
+        if (null != t) {
+            if (null != value && 0 < value.length()) {
+                if (false == value.equals(t.getLocal())) {
+                    t.setLocal(value);
+                    translationDao.update(t);
+                    invalidateCache = true;
+                    LOG.debug("updated translation for {} to {}", t.getToken(), value);
+                }
+            }
+            else if (delete) {
+                final List<Key> ts = translationDao.findKeysByTokenLanguageVersion(t.getToken(), t.getLanguage(), t.getVersion());
+                translationDao.delete(ts);
+                invalidateCache = true;
+                LOG.debug("deleted translation for {} value={}", t.getToken(), t.getLocal());
+            }
+        }
+        else {
+            // create new translation for token?
+            if (null != value && 0 < value.length()) {
+                t = new Translation();
+                t.setProject(projectKey);
+                t.setToken(tokenKey);
+                t.setLanguage(languageKey);
+                t.setLocal(value);
+                // TODO: set version
+                translationDao.persist(t);
+                invalidateCache = true;
+                LOG.debug("persisted new translation for {}: {}", tokenKey, value);
+            }
+        }
+        return invalidateCache;
     }
 
     public void setProjectDao(ProjectDao projectDao) {

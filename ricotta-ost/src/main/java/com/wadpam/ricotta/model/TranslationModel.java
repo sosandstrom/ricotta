@@ -1,19 +1,20 @@
 package com.wadpam.ricotta.model;
 
+import java.io.Serializable;
+
+import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
+
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 import com.wadpam.ricotta.domain.Token;
 import com.wadpam.ricotta.domain.Translation;
 
-public class TranslationModel {
-    private Key         key;
-    private Token       token;
-    private Translation local;
-    private Translation parent;
+public class TranslationModel extends AEDPrimaryKeyEntity implements Serializable {
+    private static final long serialVersionUID = 1059177606423578865L;
 
-    public String getKeyString() {
-        return (null != key) ? KeyFactory.keyToString(key) : null;
-    }
+    private Key               key;
+    private Token             token;
+    private Translation       local;
+    private Translation       parent;
 
     public Token getToken() {
         return token;
@@ -44,6 +45,11 @@ public class TranslationModel {
     }
 
     public Key getKey() {
+        return key;
+    }
+
+    @Override
+    public Object getPrimaryKey() {
         return key;
     }
 }

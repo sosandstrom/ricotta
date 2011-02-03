@@ -9,7 +9,6 @@ import net.sf.mardao.api.dao.Expression;
 import net.sf.mardao.api.dao.FilterEqual;
 
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.wadpam.ricotta.domain.Translation;
 
 /**
@@ -24,9 +23,9 @@ public class TranslationDaoBean extends GeneratedTranslationDaoImpl implements T
     public Map<Key, Translation> findByLanguageKeyTokens(Key projectKey, Key languageKey, Set<Key> tokenKeys) {
         final Map<Key, Translation> returnValue = new HashMap<Key, Translation>();
         if (false == tokenKeys.isEmpty()) {
-            final Expression eqLang = new Expression(COLUMN_NAME_LANGUAGE, FilterOperator.EQUAL, languageKey);
+            LOGGER.debug("findByLanguage {} {}", languageKey, projectKey);
+            final Expression eqLang = new FilterEqual(COLUMN_NAME_LANGUAGE, languageKey);
             final Expression eqProject = new FilterEqual(COLUMN_NAME_PROJECT, projectKey);
-            LOGGER.debug("findByLanguage {} Project {}", languageKey, projectKey);
 
             final List<Translation> translations = findBy(null, false, -1, 0, eqLang, eqProject);
             for(Translation t : translations) {
@@ -43,5 +42,20 @@ public class TranslationDaoBean extends GeneratedTranslationDaoImpl implements T
     public List<Key> findKeysByTokenLanguageVersion(Key token, Key language, Key version) {
         return findKeysBy(null, false, -1, 0, new FilterEqual(COLUMN_NAME_TOKEN, token), new FilterEqual(COLUMN_NAME_LANGUAGE,
                 language));
+    }
+
+    @Override
+    public Translation persist(Key language, Key project, Key token, Key version, String value) {
+        Translation returnValue = findByLanguageTokenVersion(language, token, version);
+        if (null == returnValue) {
+            returnValue = new Translation();
+            returnValue.setLanguage(language);
+            returnValue.setLocal(value);
+            returnValue.setProject(project);
+            returnValue.setToken(token);
+            returnValue.setVersion(version);
+            persist(returnValue);
+        }
+        return returnValue;
     }
 }

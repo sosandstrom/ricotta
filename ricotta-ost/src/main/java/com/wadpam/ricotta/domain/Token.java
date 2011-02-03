@@ -13,17 +13,19 @@ import com.google.appengine.api.datastore.Key;
 
 @Entity
 public class Token extends AEDPrimaryKeyEntity implements PrimaryKeyEntity {
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Key    key;
+    Key                       key;
 
-    String name;
+    String                    name;
 
-    String description;
+    String                    description;
 
     // ManyToOne
     @Basic
-    Key    project;
+    Key                       project;
 
     @Override
     public String toString() {

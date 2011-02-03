@@ -8,36 +8,41 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
+
 import com.google.appengine.api.datastore.Key;
 
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"token", "language", "country", "version"})})
-public class Translation {
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"token", "language", "version"})})
+public class Translation extends AEDPrimaryKeyEntity {
+    private static final long serialVersionUID = -5659004527175071885L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Key    key;
+    Key                       key;
 
-    String local;
-
-    // ManyToOne
-    @Basic
-    Key    project;
+    String                    local;
 
     // ManyToOne
     @Basic
-    Key    token;
+    Key                       project;
 
     // ManyToOne
     @Basic
-    Key    language;
+    Key                       token;
 
     // ManyToOne
     @Basic
-    Key    country;
+    Key                       language;
 
     // ManyToOne
     @Basic
-    Key    version;
+    Key                       version;
+
+    @Override
+    public String toString() {
+        return "Translation{" + local + ", tokenKey=" + token + ", languageKey=" + language + '}';
+    }
 
     public Key getKey() {
         return key;
@@ -71,14 +76,6 @@ public class Translation {
         this.language = language;
     }
 
-    public Key getCountry() {
-        return country;
-    }
-
-    public void setCountry(Key country) {
-        this.country = country;
-    }
-
     public Key getVersion() {
         return version;
     }
@@ -93,6 +90,11 @@ public class Translation {
 
     public void setProject(Key project) {
         this.project = project;
+    }
+
+    @Override
+    public Object getPrimaryKey() {
+        return key;
     }
 
 }
