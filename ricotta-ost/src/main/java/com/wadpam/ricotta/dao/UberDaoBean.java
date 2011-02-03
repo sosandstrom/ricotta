@@ -7,12 +7,20 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.cache.Cache;
 import javax.cache.CacheException;
 import javax.cache.CacheFactory;
 import javax.cache.CacheManager;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import net.sf.mardao.api.domain.PrimaryKeyEntity;
 
@@ -264,6 +272,33 @@ public class UberDaoBean implements UberDao {
         }
 
         return returnValue;
+    }
+
+    @Override
+    public void notifyOwner(Project project, String languageCode, List<String> changes, String from) {
+        Properties props = new Properties();
+        Session session = Session.getDefaultInstance(props, null);
+
+        try {
+            Message msg = new MimeMessage(session);
+            msg.setFrom(new InternetAddress(from));
+            msg.addRecipient(Message.RecipientType.TO, new InternetAddress(project.getOwner()));
+            msg.setSubject("Ricotta: changes in " + project.getName() + " (" + languageCode + ")");
+            StringBuffer sb = new StringBuffer();
+            for(String s : changes) {
+                sb.append(s);
+                sb.append('\n');
+            }
+            msg.setText(sb.toString());
+            Transport.send(msg);
+
+        }
+        catch (AddressException e) {
+            e.printStackTrace();
+        }
+        catch (MessagingException e) {
+            e.printStackTrace();
+        }
     }
 
     public static List<Object> getKeys(List entities) {

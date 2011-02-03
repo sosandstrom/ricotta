@@ -3,6 +3,7 @@ package com.wadpam.ricotta.dao;
 import java.util.List;
 
 import com.google.appengine.api.datastore.Key;
+import com.wadpam.ricotta.domain.Project;
 import com.wadpam.ricotta.model.ProjectLanguageModel;
 import com.wadpam.ricotta.model.TranslationModel;
 
@@ -15,5 +16,7 @@ public interface UberDao {
     void deleteTokens(List<Key> keys);
 
     void invalidateCache(Key projectKey, Key languageKey, Key artifactKey);
+
+    void notifyOwner(Project project, String languageCode, List<String> changes, String from);
 
 }

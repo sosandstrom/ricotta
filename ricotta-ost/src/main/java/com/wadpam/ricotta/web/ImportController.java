@@ -1,6 +1,7 @@
 package com.wadpam.ricotta.web;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -68,13 +69,13 @@ public class ImportController {
             regexp = custom;
         }
 
-        importBody(project, language, regexp, body);
+        importBody(request, project, language, regexp, body);
 
         return "redirect:/projects/" + projectName + "/languages/" + languageCode + "/translations/";
     }
 
-    protected void importBody(Project project, Language language, String regexp, String body) {
-        boolean invalidateCache = false;
+    protected void importBody(HttpServletRequest request, Project project, Language language, String regexp, String body) {
+        List<String> changes = new ArrayList<String>();
         Key invalidateLanguageKey = language.getKey();
         LOGGER.info("matching {} on {}", body, regexp);
         final Pattern pattern = Pattern.compile(regexp);
@@ -90,12 +91,13 @@ public class ImportController {
                 Token token = null;
                 List<Token> tokens = tokenDao.findByNameProject(tokenName, project.getKey());
                 if (tokens.isEmpty()) {
-                    LOGGER.info("Creating token {}", tokenName);
+                    final String change = String.format("C %s %s", language.getCode(), tokenName);
+                    LOGGER.info(change);
+                    changes.add(change);
                     token = new Token();
                     token.setName(tokenName);
                     token.setProject(project.getKey());
                     tokenDao.persist(token);
-                    invalidateCache = true;
 
                     // if new token created, invalidate cache for all languages
                     invalidateLanguageKey = null;
@@ -111,25 +113,8 @@ public class ImportController {
                         break;
                     }
                 }
-                invalidateCache |= translationController.updateTranslation(project.getKey(), token.getKey(), language.getKey(),
-                        translation, value, true);
-                // LOGGER.debug("    for {} found {}", language.getCode(), translation);
-                // if (null == translation) {
-                // LOGGER.info("Creating translation {}={}", tokenName, value);
-                // Translation t = new Translation();
-                // t.setProject(project.getKey());
-                // t.setLanguage(language.getKey());
-                // t.setLocal(value);
-                // t.setToken(token.getKey());
-                // translationDao.persist(t);
-                // invalidateCache = true;
-                // }
-                // else if (null == translation.getLocal() || false == value.equals(translation.getLocal())) {
-                // LOGGER.info("Updating translation {}={}", tokenName, value);
-                // translation.setLocal(value);
-                // translationDao.update(translation);
-                // invalidateCache = true;
-                // }
+                changes.addAll(translationController.updateTranslation(project.getKey(), token.getKey(), language, translation,
+                        tokenName, value, true));
             }
             catch (RuntimeException e) {
                 LOGGER.error("Problems importing translation " + value + " for token " + tokenName, e);
@@ -137,9 +122,12 @@ public class ImportController {
         }
 
         // invalidate cache for all artifacts (and for all languages)
-        if (invalidateCache) {
+        if (!changes.isEmpty()) {
             uberDao.invalidateCache(project.getKey(), invalidateLanguageKey, null);
         }
+
+        uberDao.notifyOwner(project, language.getCode(), changes, request.getUserPrincipal().getName());
+
     }
 
     public void setLanguageDao(LanguageDao languageDao) {

@@ -1,6 +1,7 @@
 package com.wadpam.ricotta.web;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -78,7 +79,7 @@ public class TranslationController {
         Key key;
         Translation t;
         Token token;
-        boolean invalidateCache = false;
+        List<String> changes = new ArrayList<String>();
         // iterate all posted parameters (descriptions and translations)
         for(@SuppressWarnings("unchecked")
         Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
@@ -92,7 +93,6 @@ public class TranslationController {
                     if (false == value.equals(token.getDescription())) {
                         token.setDescription(value);
                         tokenDao.update(token);
-                        invalidateCache = true;
                         LOG.debug("updated description for {} to {}", token.getName(), value);
                     }
                 }
@@ -103,11 +103,11 @@ public class TranslationController {
                     if (Translation.class.getSimpleName().equals(key.getKind())) {
                         // update or delete existing translation
                         t = translationDao.findByPrimaryKey(key);
-                        invalidateCache |= updateTranslation(project.getKey(), null, language.getKey(), t, value, true);
+                        changes.addAll(updateTranslation(project.getKey(), null, language, t, name, value, true));
                     }
                     else {
                         // create new translation for token
-                        invalidateCache |= updateTranslation(project.getKey(), key, language.getKey(), null, value, false);
+                        changes.addAll(updateTranslation(project.getKey(), key, language, null, name, value, false));
                     }
                 }
             }
@@ -117,47 +117,55 @@ public class TranslationController {
 
         }
 
-        if (invalidateCache) {
+        if (!changes.isEmpty()) {
             uberDao.invalidateCache(project.getKey(), language.getKey(), null);
         }
+
+        uberDao.notifyOwner(project, languageCode, changes, request.getUserPrincipal().getName());
 
         return "redirect:index.html";
     }
 
     /** If translation is null, projectKey, tokenKey and languageKey must be specified! */
-    protected boolean updateTranslation(Key projectKey, Key tokenKey, Key languageKey, Translation t, String value, boolean delete) {
-        boolean invalidateCache = false;
+    protected List<String> updateTranslation(Key projectKey, Key tokenKey, Language language, Translation t, String name,
+            String value, boolean delete) {
+        List<String> returnValue = new ArrayList<String>();
         if (null != t) {
+            final Token token = tokenDao.findByPrimaryKey(t.getToken());
             if (null != value && 0 < value.length()) {
                 if (false == value.equals(t.getLocal())) {
+                    final String u = String.format("U %s %s=%s (%s)", language.getCode(), token.getName(), value, t.getLocal());
                     t.setLocal(value);
                     translationDao.update(t);
-                    invalidateCache = true;
-                    LOG.debug("updated translation for {} to {}", t.getToken(), value);
+                    returnValue.add(u);
+                    LOG.debug(u);
                 }
             }
             else if (delete) {
                 final List<Key> ts = translationDao.findKeysByTokenLanguageVersion(t.getToken(), t.getLanguage(), t.getVersion());
                 translationDao.delete(ts);
-                invalidateCache = true;
-                LOG.debug("deleted translation for {} value={}", t.getToken(), t.getLocal());
+                final String d = String.format("D %s %s", language.getCode(), token.getName());
+                LOG.debug(d);
+                returnValue.add(d);
             }
         }
         else {
+            final Token token = tokenDao.findByPrimaryKey(tokenKey);
             // create new translation for token?
             if (null != value && 0 < value.length()) {
                 t = new Translation();
                 t.setProject(projectKey);
                 t.setToken(tokenKey);
-                t.setLanguage(languageKey);
+                t.setLanguage(language.getKey());
                 t.setLocal(value);
                 // TODO: set version
                 translationDao.persist(t);
-                invalidateCache = true;
-                LOG.debug("persisted new translation for {}: {}", tokenKey, value);
+                final String c = String.format("A %s %s=%s", language.getCode(), token.getName(), value);
+                returnValue.add(c);
+                LOG.debug(c);
             }
         }
-        return invalidateCache;
+        return returnValue;
     }
 
     public void setProjectDao(ProjectDao projectDao) {
