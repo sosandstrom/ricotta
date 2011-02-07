@@ -11,8 +11,8 @@ import javax.persistence.UniqueConstraint;
 import com.google.appengine.api.datastore.Key;
 
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"project", "language"}),
-        @UniqueConstraint(columnNames = {"parent", "language"})})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"project", "language", "version"}),
+        @UniqueConstraint(columnNames = {"parent", "language", "version"})})
 public class ProjectLanguage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,6 +29,10 @@ public class ProjectLanguage {
     // ManyToOne
     @Basic
     Key language;
+
+    // ManyToOne
+    @Basic
+    Key version;
 
     @Override
     public String toString() {
@@ -65,6 +69,14 @@ public class ProjectLanguage {
 
     public void setProject(Key project) {
         this.project = project;
+    }
+
+    public Key getVersion() {
+        return version;
+    }
+
+    public void setVersion(Key version) {
+        this.version = version;
     }
 
 }

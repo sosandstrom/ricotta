@@ -25,6 +25,7 @@ import com.wadpam.ricotta.dao.UberDao;
 import com.wadpam.ricotta.domain.Language;
 import com.wadpam.ricotta.domain.Project;
 import com.wadpam.ricotta.domain.ProjectLanguage;
+import com.wadpam.ricotta.domain.Version;
 import com.wadpam.ricotta.model.ProjectLanguageModel;
 
 /**
@@ -44,13 +45,13 @@ public class ProjectLanguageController {
     private UberDao            uberDao;
 
     @RequestMapping(value = "create.html", method = RequestMethod.GET)
-    public String getProjectLanguageForm(Model model, @PathVariable String projectName) {
-        // TODO: check project role
-        Project project = projectDao.findByName(projectName);
+    public String getProjectLanguageForm(HttpServletRequest request, Model model, @PathVariable String projectName) {
+        final Project project = (Project) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJECT);
         model.addAttribute("project", project);
+        final Version version = (Version) request.getAttribute(ProjectHandlerInterceptor.KEY_VERSION);
 
         // for parent list
-        List<ProjectLanguageModel> projectLanguages = uberDao.loadProjectLanguages(project.getKey());
+        List<ProjectLanguageModel> projectLanguages = uberDao.loadProjectLanguages(project.getKey(), version.getKey());
         model.addAttribute("parentLanguages", projectLanguages);
 
         // for new project language list
@@ -75,9 +76,7 @@ public class ProjectLanguageController {
     public String postProjectLanguage(HttpServletRequest request, @PathVariable String projectName,
             @ModelAttribute("projectLanguage") ProjectLanguage projectLanguage) throws IOException {
         LOGGER.debug("create projectLanguage");
-        // TODO: check project role
-
-        Project project = projectDao.findByName(projectName);
+        final Project project = (Project) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJECT);
         projectLanguage.setProject(project.getKey());
         projectLanguageDao.persist(projectLanguage);
 

@@ -26,6 +26,7 @@ import com.wadpam.ricotta.domain.Language;
 import com.wadpam.ricotta.domain.Project;
 import com.wadpam.ricotta.domain.Token;
 import com.wadpam.ricotta.domain.Translation;
+import com.wadpam.ricotta.domain.Version;
 
 /**
  * Created by Ola on Nov 12, 2010
@@ -61,7 +62,7 @@ public class ImportController {
     public String postProjectLanguage(HttpServletRequest request, @PathVariable String projectName,
             @PathVariable String languageCode, @RequestParam String regexp, @RequestParam String custom, @RequestParam String body)
             throws IOException {
-        final Project project = (Project) request.getAttribute("project");
+        final Project project = (Project) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJECT);
 
         final Language language = languageDao.findByCode(languageCode);
 
@@ -76,6 +77,8 @@ public class ImportController {
 
     protected void importBody(HttpServletRequest request, Project project, Language language, String regexp, String body) {
         List<String> changes = new ArrayList<String>();
+        final Version version = (Version) request.getAttribute(ProjectHandlerInterceptor.KEY_VERSION);
+        Key versionKey = version.getKey();
         Key invalidateLanguageKey = language.getKey();
         LOGGER.info("matching {} on {}", body, regexp);
         final Pattern pattern = Pattern.compile(regexp);
@@ -89,7 +92,7 @@ public class ImportController {
 
                 // create new token?
                 Token token = null;
-                List<Token> tokens = tokenDao.findByNameProject(tokenName, project.getKey());
+                List<Token> tokens = tokenDao.findByNameProjectVersion(tokenName, project.getKey(), versionKey);
                 if (tokens.isEmpty()) {
                     final String change = String.format("C %s %s", language.getCode(), tokenName);
                     LOGGER.info(change);
@@ -97,6 +100,7 @@ public class ImportController {
                     token = new Token();
                     token.setName(tokenName);
                     token.setProject(project.getKey());
+                    token.setVersion(versionKey);
                     tokenDao.persist(token);
 
                     // if new token created, invalidate cache for all languages
@@ -123,10 +127,10 @@ public class ImportController {
 
         // invalidate cache for all artifacts (and for all languages)
         if (!changes.isEmpty()) {
-            uberDao.invalidateCache(project.getKey(), invalidateLanguageKey, null);
+            uberDao.invalidateCache(project.getKey(), versionKey, invalidateLanguageKey, null);
         }
 
-        uberDao.notifyOwner(project, language.getCode(), changes, request.getUserPrincipal().getName());
+        uberDao.notifyOwner(project, version, language.getCode(), changes, request.getUserPrincipal().getName());
 
     }
 

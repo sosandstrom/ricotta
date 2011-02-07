@@ -1,5 +1,7 @@
 package com.wadpam.ricotta.dao;
 
+import java.util.List;
+
 import com.google.appengine.api.datastore.Key;
 import com.wadpam.ricotta.domain.TokenArtifact;
 
@@ -8,6 +10,6 @@ import com.wadpam.ricotta.domain.TokenArtifact;
  */
 public interface TokenArtifactDao extends GeneratedTokenArtifactDao {
 
-    TokenArtifact persist(Key tokenKey, Key artifactKey, Key projectKey);
+    List<TokenArtifact> findByArtifactVersion(Key artifactKey, Key versionKey);
 
 }

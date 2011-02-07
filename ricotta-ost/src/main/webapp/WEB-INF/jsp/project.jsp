@@ -11,14 +11,12 @@
 <table>
 		<thead>
 		<tr>
-			<th>Key</th>
 			<th>Name</th>
 			<th>Owner</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
-			<td><c:out value="${project.key}" /></td>
 			<td><c:out value="${project.name}" /></td>
 			<td><c:out value="${project.owner}" /></td>
 		</tr>
@@ -66,6 +64,34 @@
 	</tbody>
 </table>
 <a href="/projects/<c:out value="${project.name}"/>/artifacts/create.html">Create artifact</a>
+<form action="" method="post" name="deleteForm" id="deleteForm">
+<h3>Project Versions</h3>
+<table>
+		<thead>
+		<tr>
+			<th>Name</th>
+			<th>Description</th>
+			<th>Date</th>
+		</tr>
+	</thead>
+	<tbody>
+	<c:set var="even" scope="page" value="${true}" />
+		<tr class="evenRow<c:out value='${even}' />">
+			<td><a href="?" ><c:out value="${HEAD.name}" /></a></td>
+			<td><c:out value="${HEAD.description}" /></td>
+			<td><c:out value="${HEAD.datum}" /></td>
+		</tr>
+	<c:forEach items="${versions}" var="v">
+		<c:set var="even" scope="page" value="${!even}" />
+		<tr class="evenRow<c:out value='${even}' />">
+			<td><a href="?version=<c:out value='${v.name}' />"><c:out value="${v.name}" /></a></td>
+			<td><c:out value="${v.description}" /></td>
+			<td><c:out value="${v.datum}" /></td>
+		</tr>
+	</c:forEach>
+	</tbody>
+</table>
+<a href="/projects/<c:out value="${project.name}"/>/versions/create.html">Create version</a>
 <form action="" method="post" name="deleteForm" id="deleteForm">
 <h3>Project Users</h3>
 <input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected users and tokens" />

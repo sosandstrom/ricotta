@@ -22,9 +22,11 @@ import com.wadpam.ricotta.dao.ProjectDao;
 import com.wadpam.ricotta.dao.ProjectUserDao;
 import com.wadpam.ricotta.dao.TokenDao;
 import com.wadpam.ricotta.dao.UberDao;
+import com.wadpam.ricotta.dao.VersionDao;
 import com.wadpam.ricotta.domain.Project;
 import com.wadpam.ricotta.domain.ProjectUser;
 import com.wadpam.ricotta.domain.Token;
+import com.wadpam.ricotta.domain.Version;
 import com.wadpam.ricotta.model.ProjectLanguageModel;
 
 /**
@@ -44,6 +46,8 @@ public class ProjectController {
     private ArtifactDao    artifactDao;
 
     private TokenDao       tokenDao;
+
+    private VersionDao     versionDao;
 
     @RequestMapping(value = "index.html", method = RequestMethod.GET)
     public String getProjects(HttpServletRequest request, Model model) {
@@ -111,21 +115,29 @@ public class ProjectController {
         LOGGER.debug("get project");
 
         // fetch and add project details
-        final Project project = (Project) request.getAttribute("project");
+        final Project project = (Project) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJECT);
         model.addAttribute("project", project);
 
+        // version
+        final Version version = (Version) request.getAttribute(ProjectHandlerInterceptor.KEY_VERSION);
+        model.addAttribute(ProjectHandlerInterceptor.KEY_VERSION, version);
+
         // fetch and add languages for this project
-        List<ProjectLanguageModel> languages = uberDao.loadProjectLanguages(project.getKey());
+        List<ProjectLanguageModel> languages = uberDao.loadProjectLanguages(project.getKey(), version.getKey());
         model.addAttribute("languages", languages);
 
         // fetch and add artifacts for this project
         model.addAttribute("artifacts", artifactDao.findByProject(project.getKey()));
 
+        // fetch and add versions for this project
+        model.addAttribute(UberDao.VALUE_HEAD, uberDao.getHead());
+        model.addAttribute("versions", versionDao.findByProject(project.getKey()));
+
         // fetch and add users for this project
         model.addAttribute("users", projectUserDao.findByProject(project.getKey()));
 
         // fetch and add tokens for this project
-        List<Token> tokens = tokenDao.findByProject(project.getKey(), true);
+        List<Token> tokens = tokenDao.findByProjectVersion(project.getKey(), version.getKey(), true);
         model.addAttribute("tokens", tokens);
 
         return "project";
@@ -153,6 +165,10 @@ public class ProjectController {
 
     public ProjectUserDao getProjectUserDao() {
         return projectUserDao;
+    }
+
+    public void setVersionDao(VersionDao versionDao) {
+        this.versionDao = versionDao;
     }
 
 }

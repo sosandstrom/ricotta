@@ -27,6 +27,10 @@ public class Token extends AEDPrimaryKeyEntity implements PrimaryKeyEntity {
     @Basic
     Key                       project;
 
+    // ManyToOne
+    @Basic
+    Key                       version;
+
     @Override
     public String toString() {
         return getClass().getSimpleName() + '{' + name + ',' + description + ',' + key + '}';
@@ -67,6 +71,14 @@ public class Token extends AEDPrimaryKeyEntity implements PrimaryKeyEntity {
     @Override
     public Object getPrimaryKey() {
         return key;
+    }
+
+    public Key getVersion() {
+        return version;
+    }
+
+    public void setVersion(Key version) {
+        this.version = version;
     }
 
 }

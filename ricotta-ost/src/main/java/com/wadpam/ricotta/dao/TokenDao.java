@@ -10,10 +10,10 @@ import com.wadpam.ricotta.domain.Token;
  */
 public interface TokenDao extends GeneratedTokenDao {
 
-    List<Token> findByNameProject(String tokenName, Key key);
+    List<Token> findByNameProjectVersion(String tokenName, Key key, Key versionKey);
 
     List<Token> findByProject(Key projectKey, boolean ascending);
 
-    Token persist(Key projectKey, String name, String description);
+    List<Token> findByProjectVersion(Key projectKey, Key versionKey, boolean ascending);
 
 }

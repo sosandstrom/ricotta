@@ -31,6 +31,7 @@ import com.wadpam.ricotta.domain.Artifact;
 import com.wadpam.ricotta.domain.Language;
 import com.wadpam.ricotta.domain.Mall;
 import com.wadpam.ricotta.domain.Project;
+import com.wadpam.ricotta.domain.Version;
 import com.wadpam.ricotta.model.TranslationModel;
 import com.wadpam.ricotta.velocity.Encoder;
 
@@ -83,8 +84,9 @@ public class VelocityController {
         final VelocityContext model = new VelocityContext();
         model.put("encoder", new Encoder());
 
-        final Project project = (Project) request.getAttribute("project");
-        model.put("project", project);
+        final Project project = (Project) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJECT);
+        model.put(ProjectHandlerInterceptor.KEY_PROJECT, project);
+        final Version version = (Version) request.getAttribute(ProjectHandlerInterceptor.KEY_VERSION);
 
         Language language = languageDao.findByCode(languageCode);
         if (null == language) {
@@ -104,7 +106,8 @@ public class VelocityController {
             artifactKey = artifact.getKey();
         }
 
-        List<TranslationModel> translations = uberDao.loadTranslations(project.getKey(), language.getKey(), artifactKey);
+        List<TranslationModel> translations = uberDao.loadTranslations(project.getKey(), version.getKey(), language.getKey(),
+                artifactKey);
         model.put("translations", translations);
 
         Mall mall = mallDao.findByName(templateName);

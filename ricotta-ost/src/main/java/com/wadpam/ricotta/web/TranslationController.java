@@ -27,6 +27,7 @@ import com.wadpam.ricotta.domain.Language;
 import com.wadpam.ricotta.domain.Project;
 import com.wadpam.ricotta.domain.Token;
 import com.wadpam.ricotta.domain.Translation;
+import com.wadpam.ricotta.domain.Version;
 import com.wadpam.ricotta.model.TranslationModel;
 
 /**
@@ -56,13 +57,15 @@ public class TranslationController {
     @RequestMapping(value = "index.html", method = RequestMethod.GET)
     public String getProjectLanguageForm(HttpServletRequest request, Model model, @PathVariable String projectName,
             @PathVariable String languageCode) {
-        final Project project = (Project) request.getAttribute("project");
+        final Project project = (Project) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJECT);
+        final Version version = (Version) request.getAttribute(ProjectHandlerInterceptor.KEY_VERSION);
         model.addAttribute("project", project);
 
         Language language = languageDao.findByCode(languageCode);
         model.addAttribute("language", language);
 
-        List<TranslationModel> translations = uberDao.loadTranslations(project.getKey(), language.getKey(), null);
+        List<TranslationModel> translations = uberDao.loadTranslations(project.getKey(), version.getKey(), language.getKey(),
+                null);
         model.addAttribute("translations", translations);
 
         return "translations";
@@ -72,7 +75,8 @@ public class TranslationController {
     public String postProjectLanguage(HttpServletRequest request, @PathVariable String projectName,
             @PathVariable String languageCode) throws IOException {
         LOG.debug("post translations");
-        final Project project = (Project) request.getAttribute("project");
+        final Project project = (Project) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJECT);
+        final Version version = (Version) request.getAttribute(ProjectHandlerInterceptor.KEY_VERSION);
         Language language = languageDao.findByCode(languageCode);
 
         String name, value;
@@ -118,10 +122,10 @@ public class TranslationController {
         }
 
         if (!changes.isEmpty()) {
-            uberDao.invalidateCache(project.getKey(), language.getKey(), null);
+            uberDao.invalidateCache(project.getKey(), version.getKey(), language.getKey(), null);
         }
 
-        uberDao.notifyOwner(project, languageCode, changes, request.getUserPrincipal().getName());
+        uberDao.notifyOwner(project, version, languageCode, changes, request.getUserPrincipal().getName());
 
         return "redirect:index.html";
     }
@@ -158,7 +162,7 @@ public class TranslationController {
                 t.setToken(tokenKey);
                 t.setLanguage(language.getKey());
                 t.setLocal(value);
-                // TODO: set version
+                t.setVersion(token.getVersion());
                 translationDao.persist(t);
                 final String c = String.format("A %s %s=%s", language.getCode(), token.getName(), value);
                 returnValue.add(c);

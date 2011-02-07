@@ -17,11 +17,14 @@
 		<property name="tokenDao" ref="tokenDao" />
 		<property name="tokenArtifactDao" ref="tokenArtifactDao" />
 		<property name="translationDao" ref="translationDao" />
+		<property name="versionDao" ref="versionDao" />
 	</bean>
 
 	<bean id="projectHandlerInterceptor" class="com.wadpam.ricotta.web.ProjectHandlerInterceptor">
 		<property name="projectDao" ref="projectDao" />
 		<property name="projectUserDao" ref="projectUserDao" />
+		<property name="versionDao" ref="versionDao" />
+		<property name="uberDao" ref="uberDao" />
 	</bean>
 
 	<!-- As auto-wiring does not work well in GAE, define controllers manually: -->
@@ -32,6 +35,7 @@
 		<property name="artifactDao" ref="artifactDao" />
 		<property name="projectUserDao" ref="projectUserDao" />
 		<property name="tokenDao" ref="tokenDao" />
+		<property name="versionDao" ref="versionDao" />
 		<property name="uberDao" ref="uberDao" />
 	</bean>
 
@@ -46,6 +50,11 @@
 	<bean id="artifactController" class="com.wadpam.ricotta.web.ArtifactController">
 		<property name="projectDao" ref="projectDao" />
 		<property name="artifactDao" ref="artifactDao" />
+	</bean>
+
+	<bean id="versionController" class="com.wadpam.ricotta.web.VersionController">
+		<property name="versionDao" ref="versionDao" />
+		<property name="uberDao" ref="uberDao" />
 	</bean>
 
 	<bean id="userController" class="com.wadpam.ricotta.web.UserController">

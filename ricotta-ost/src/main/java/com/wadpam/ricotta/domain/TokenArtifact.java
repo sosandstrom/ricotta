@@ -32,6 +32,10 @@ public class TokenArtifact extends AEDPrimaryKeyEntity {
     @Basic
     Key artifact;
 
+    // ManyToOne
+    @Basic
+    Key version;
+
     @Override
     public String toString() {
         return getClass().getSimpleName() + '{' + token + '.' + artifact + ',' + key + '}';
@@ -78,6 +82,14 @@ public class TokenArtifact extends AEDPrimaryKeyEntity {
 
     public void setProject(Key project) {
         this.project = project;
+    }
+
+    public Key getVersion() {
+        return version;
+    }
+
+    public void setVersion(Key version) {
+        this.version = version;
     }
 
 }

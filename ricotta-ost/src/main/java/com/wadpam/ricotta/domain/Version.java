@@ -21,9 +21,16 @@ public class Version {
 
     String description;
 
+    String datum;
+
     // @ManyToOne
     @Basic
     Key    project;
+
+    @Override
+    public String toString() {
+        return "Version{" + name + ',' + datum + '}';
+    }
 
     public Key getKey() {
         return key;
@@ -55,6 +62,14 @@ public class Version {
 
     public void setProject(Key project) {
         this.project = project;
+    }
+
+    public String getDatum() {
+        return datum;
+    }
+
+    public void setDatum(String datum) {
+        this.datum = datum;
     }
 
 }

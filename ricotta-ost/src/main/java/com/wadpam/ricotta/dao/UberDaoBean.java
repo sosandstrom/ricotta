@@ -36,6 +36,7 @@ import com.wadpam.ricotta.domain.ProjectLanguage;
 import com.wadpam.ricotta.domain.Token;
 import com.wadpam.ricotta.domain.TokenArtifact;
 import com.wadpam.ricotta.domain.Translation;
+import com.wadpam.ricotta.domain.Version;
 import com.wadpam.ricotta.model.ProjectLanguageModel;
 import com.wadpam.ricotta.model.TranslationModel;
 
@@ -67,10 +68,13 @@ public class UberDaoBean implements UberDao {
     private TokenDao           tokenDao;
     private TokenArtifactDao   tokenArtifactDao;
     private TranslationDao     translationDao;
+    private VersionDao         versionDao;
+
+    private Version            _HEAD                         = null;
 
     public void init() {
-        patch();
-        populate();
+        Key HEAD = populate();
+        patch(HEAD);
     }
 
     // ------------------ methods managing the cache ------------------------------
@@ -84,46 +88,46 @@ public class UberDaoBean implements UberDao {
         return _cache;
     }
 
-    public static String cacheKeyLoadTranslations(Key projectKey, Key languageKey, Key artifactKey) {
-        return CACHE_KEY_TRANSLATIONS_PREFIX + projectKey
+    public static String cacheKeyLoadTranslations(Key projectKey, Key versionKey, Key languageKey, Key artifactKey) {
+        return CACHE_KEY_TRANSLATIONS_PREFIX + projectKey + versionKey
                 + (null == languageKey ? "" : languageKey.toString() + (null != artifactKey ? artifactKey : ""));
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public void invalidateCache(Key projectKey, Key languageKey, Key artifactKey) {
+    public void invalidateCache(Key projectKey, Key versionKey, Key languageKey, Key artifactKey) {
         if (null != projectKey) {
 
             // all languages or specific?
             if (null == languageKey) {
                 // get the default language
-                ProjectLanguage pl = projectLanguageDao.findDefault(projectKey);
+                ProjectLanguage pl = projectLanguageDao.findDefault(projectKey, versionKey);
                 // LOG.debug("invalidateCache {} PL {}", languageKey, pl);
                 // invalidate defualt language first:
-                invalidateCache(projectKey, pl.getLanguage(), artifactKey);
+                invalidateCache(projectKey, versionKey, pl.getLanguage(), artifactKey);
             }
             else {
                 // get the specified language
-                ProjectLanguage pl = projectLanguageDao.findByLanguageProject(languageKey, projectKey);
+                ProjectLanguage pl = projectLanguageDao.findByLanguageProjectVersion(languageKey, projectKey, versionKey);
                 // LOG.debug("invalidateCache {} PL {}", languageKey, pl);
                 // invalidate sub-languages (NOT recursive, only one level)
                 for(ProjectLanguage spl : projectLanguageDao.findByParent(pl.getKey())) {
-                    invalidateCacheInternal(spl.getProject(), spl.getLanguage(), artifactKey);
+                    invalidateCacheInternal(spl.getProject(), versionKey, spl.getLanguage(), artifactKey);
                 }
 
                 // all artifacts or specific?
                 if (null == artifactKey) {
                     // project-language first
-                    invalidateCacheInternal(projectKey, languageKey, null);
+                    invalidateCacheInternal(projectKey, versionKey, languageKey, null);
 
                     // all!
                     for(Key a : artifactDao.findKeysByProject(projectKey)) {
-                        invalidateCache(projectKey, languageKey, a);
+                        invalidateCache(projectKey, versionKey, languageKey, a);
                     }
                 }
                 else {
                     // base: invalidate this
-                    invalidateCacheInternal(projectKey, languageKey, artifactKey);
+                    invalidateCacheInternal(projectKey, versionKey, languageKey, artifactKey);
                 }
 
             }
@@ -131,8 +135,8 @@ public class UberDaoBean implements UberDao {
     }
 
     /** For exact project-language-artifact */
-    protected void invalidateCacheInternal(Key projectKey, Key languageKey, Key artifactKey) {
-        final String cacheKey = cacheKeyLoadTranslations(projectKey, languageKey, artifactKey);
+    protected void invalidateCacheInternal(Key projectKey, Key versionKey, Key languageKey, Key artifactKey) {
+        final String cacheKey = cacheKeyLoadTranslations(projectKey, versionKey, languageKey, artifactKey);
         LOG.debug("invalidating {}" + cacheKey);
         try {
             final Cache cache = getCache();
@@ -144,6 +148,74 @@ public class UberDaoBean implements UberDao {
     }
 
     // ------------------ methods managing the cache ------------------------------
+
+    @Override
+    public void cloneVersion(Project project, Key from, Version version) {
+        LOG.info("--- cloning {} version {}", project.getName(), version.getName());
+        // project & artifacts are "immutable"
+
+        // project languages
+        ProjectLanguage root = projectLanguageDao.findDefault(project.getKey(), from);
+        cloneProjectLanguage(root, version.getKey());
+
+        // tokens
+        List<Token> tokens = tokenDao.findByProjectVersion(project.getKey(), from, true);
+        LOG.error("--- cloning {} tokens", tokens.size());
+        for(Token t : tokens) {
+            cloneToken(t, version.getKey());
+        }
+    }
+
+    protected void cloneProjectLanguage(ProjectLanguage projectLanguage, Key toVersion) {
+        // load children for old version before cloning:
+        List<ProjectLanguage> children = projectLanguageDao.findByProjectParentVersion(projectLanguage.getProject(),
+                projectLanguage.getLanguage(), projectLanguage.getVersion());
+
+        // clone
+        projectLanguage.setKey(null);
+        projectLanguage.setVersion(toVersion);
+        projectLanguageDao.persist(projectLanguage);
+
+        // and clone children recursively
+        for(ProjectLanguage child : children) {
+            cloneProjectLanguage(child, toVersion);
+        }
+    }
+
+    protected void cloneToken(Token t, Key toVersion) {
+        // retrieve before cloning
+        List<TokenArtifact> tas = tokenArtifactDao.findByToken(t.getKey());
+        List<Translation> ts = translationDao.findByTokenVersion(t.getKey(), t.getVersion());
+
+        // clone
+        t.setKey(null);
+        t.setVersion(toVersion);
+        tokenDao.persist(t);
+
+        // clone tokenArtifacts
+        for(TokenArtifact ta : tas) {
+            cloneTokenArtifact(ta, t.getKey(), toVersion);
+        }
+
+        // and translations
+        for(Translation tr : ts) {
+            cloneTranslation(tr, t.getKey(), toVersion);
+        }
+    }
+
+    protected void cloneTranslation(Translation t, Key tokenKey, Key toVersion) {
+        t.setKey(null);
+        t.setToken(tokenKey);
+        t.setVersion(toVersion);
+        translationDao.persist(t);
+    }
+
+    protected void cloneTokenArtifact(TokenArtifact ta, Key tokenKey, Key toVersion) {
+        ta.setKey(null);
+        ta.setToken(tokenKey);
+        ta.setVersion(toVersion);
+        tokenArtifactDao.persist(ta);
+    }
 
     @Override
     public void deleteTokens(List<Key> keys) {
@@ -162,10 +234,10 @@ public class UberDaoBean implements UberDao {
     }
 
     @Override
-    public List<ProjectLanguageModel> loadProjectLanguages(Key project) {
+    public List<ProjectLanguageModel> loadProjectLanguages(Key project, Key version) {
         final List<ProjectLanguageModel> returnValue = new ArrayList<ProjectLanguageModel>();
 
-        final List<ProjectLanguage> pls = projectLanguageDao.findByProject(project);
+        final List<ProjectLanguage> pls = projectLanguageDao.findByProjectVersion(project, version);
 
         // create a key-value map
         HashMap<Key, ProjectLanguage> plMap = new HashMap<Key, ProjectLanguage>();
@@ -193,22 +265,23 @@ public class UberDaoBean implements UberDao {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<TranslationModel> loadTranslations(Key projectKey, Key languageKey, Key artifactKey) {
+    public List<TranslationModel> loadTranslations(Key projectKey, Key versionKey, Key languageKey, Key artifactKey) {
         final List<TranslationModel> returnValue = new ArrayList<TranslationModel>();
         try {
             // check cache first!
             Cache cache = getCache();
-            final String cacheKey = cacheKeyLoadTranslations(projectKey, languageKey, artifactKey);
+            final String cacheKey = cacheKeyLoadTranslations(projectKey, versionKey, languageKey, artifactKey);
             final List<TranslationModel> tms = (List<TranslationModel>) cache.get(cacheKey);
             LOG.debug("Cache hit for {}: {}", cacheKey, tms);
             if (null != tms) {
                 return tms;
             }
 
-            final ProjectLanguage projectLanguage = projectLanguageDao.findByLanguageProject(languageKey, projectKey);
+            final ProjectLanguage projectLanguage = projectLanguageDao.findByLanguageProjectVersion(languageKey, projectKey,
+                    versionKey);
             List<Token> tokens = null;
             if (null != artifactKey) {
-                List<TokenArtifact> mappings = tokenArtifactDao.findByArtifact(artifactKey);
+                List<TokenArtifact> mappings = tokenArtifactDao.findByArtifactVersion(artifactKey, versionKey);
                 tokens = new ArrayList<Token>();
                 Token token;
                 for(TokenArtifact ta : mappings) {
@@ -225,7 +298,7 @@ public class UberDaoBean implements UberDao {
                 }
             }
             else {
-                tokens = tokenDao.findByProject(projectKey);
+                tokens = tokenDao.findByProjectVersion(projectKey, versionKey, true);
             }
             final Set<Key> tokenKeys = new HashSet<Key>();
             for(Token t : tokens) {
@@ -239,8 +312,7 @@ public class UberDaoBean implements UberDao {
             // if there is a parent, get its tokens
             Map<Key, Translation> parents = new HashMap<Key, Translation>();
             if (null != projectLanguage.getParent()) {
-                ProjectLanguage parent = projectLanguageDao.findByPrimaryKey(projectLanguage.getParent());
-                parents = translationDao.findByLanguageKeyTokens(projectKey, parent.getLanguage(), tokenKeys);
+                parents = translationDao.findByLanguageKeyTokens(projectKey, projectLanguage.getParent(), tokenKeys);
             }
 
             // for each token, build a TranslationModel
@@ -265,7 +337,7 @@ public class UberDaoBean implements UberDao {
                 }
             });
 
-            cache.put(cacheKeyLoadTranslations(projectKey, languageKey, artifactKey), returnValue);
+            cache.put(cacheKeyLoadTranslations(projectKey, versionKey, languageKey, artifactKey), returnValue);
         }
         catch (CacheException e) {
             e.printStackTrace();
@@ -275,7 +347,7 @@ public class UberDaoBean implements UberDao {
     }
 
     @Override
-    public void notifyOwner(Project project, String languageCode, List<String> changes, String from) {
+    public void notifyOwner(Project project, Version version, String languageCode, List<String> changes, String from) {
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
 
@@ -283,7 +355,7 @@ public class UberDaoBean implements UberDao {
             Message msg = new MimeMessage(session);
             msg.setFrom(new InternetAddress(from));
             msg.addRecipient(Message.RecipientType.TO, new InternetAddress(project.getOwner()));
-            msg.setSubject("Ricotta: changes in " + project.getName() + " (" + languageCode + ")");
+            msg.setSubject("Ricotta: changes in " + project.getName() + ":" + version.getName() + " (" + languageCode + ")");
             StringBuffer sb = new StringBuffer();
             for(String s : changes) {
                 sb.append(s);
@@ -312,25 +384,48 @@ public class UberDaoBean implements UberDao {
     /**
      * Patches any old persisted data
      */
-    protected void patch() {
+    protected void patch(final Key HEAD) {
         Map<Key, Key> tokenProjectMap = new HashMap<Key, Key>();
         for(Token t : tokenDao.findAll()) {
             tokenProjectMap.put(t.getKey(), t.getProject());
+
+            // add token version?
+            if (null == t.getVersion()) {
+                LOG.warn("HEAD token {}", t.getName());
+                t.setVersion(HEAD);
+                tokenDao.update(t);
+            }
+
+            // add TokenArtifact version?
+            for(TokenArtifact ta : tokenArtifactDao.findByToken(t.getKey())) {
+                if (null == ta.getVersion()) {
+                    LOG.warn("HEAD TokenArtifact {}, {}", t.getName(), ta.getKey());
+                    ta.setVersion(HEAD);
+                    tokenArtifactDao.update(ta);
+                }
+            }
+
+            // patch all translations:
+            for(Translation tr : translationDao.findByToken(t.getKey())) {
+                if (null == tr.getProject()) {
+                    LOG.warn("Project {} {} " + tr.getLocal(), t.getName(), tr.getLanguage());
+                    tr.setProject(tokenProjectMap.get(tr.getToken()));
+                    translationDao.update(tr);
+                }
+
+                if (null == tr.getVersion()) {
+                    LOG.warn("HEAD translation {} {} " + tr.getLocal(), t.getName(), tr.getLanguage());
+                }
+            }
+
         }
 
-        // patch all translations:
-        for(Translation t : translationDao.findAll()) {
-            if (null == t.getProject()) {
-                t.setProject(tokenProjectMap.get(t.getToken()));
-                translationDao.update(t);
-            }
-        }
     }
 
     /**
      * Populates the database with the basic project - ricotta-ost itself!
      */
-    protected final void populate() {
+    protected final Key populate() {
         // populate Languages
         final Language en = languageDao.persist("en", "English");
         final Language en_GB = languageDao.persist("en_GB", "British English");
@@ -340,32 +435,49 @@ public class UberDaoBean implements UberDao {
         final Mall androidStringsInherited = mallDao.persist(MALL_BODY_ANDROID,
                 "Android strings.xml with parent default translations", "text/plain", "strings_android_inherit");
 
+        // HEAD version is cross-project
+        _HEAD = versionDao.persist(null, "2011-01-28 10:10 GMT+7", "Latest version", VALUE_HEAD, null);
+        final Key HEAD = _HEAD.getKey();
+
         // Projects
         final Project project = projectDao.persist("ricotta", "s.o.sandstrom@gmail.com");
         projectUserDao.persist(project.getKey(), "test@example.com");
 
         // ProjectLanguages
-        ProjectLanguage root = projectLanguageDao.persist(null, project.getKey(), en.getKey());
-        projectLanguageDao.persist(root.getKey(), project.getKey(), en_GB.getKey());
-        projectLanguageDao.persist(root.getKey(), project.getKey(), sv.getKey());
+        ProjectLanguage root = projectLanguageDao.persist(null, en.getKey(), null, project.getKey(), HEAD);
+        projectLanguageDao.persist(null, en_GB.getKey(), en.getKey(), project.getKey(), HEAD);
+        projectLanguageDao.persist(null, sv.getKey(), en.getKey(), project.getKey(), HEAD);
 
         // Artifact
         final Artifact ricottaOst = artifactDao.persist(project.getKey(), "ricotta-ost");
         final Artifact ricottaPlugin = artifactDao.persist(project.getKey(), "ricotta-maven-plugin");
 
         // Tokens
-        final Token appTitle = tokenDao.persist(project.getKey(), "appTitle", "The Application title as displayed to the user");
-        final Token tokenProject = tokenDao.persist(project.getKey(), "Project", "The Project Entity");
+        final Token appTitle = tokenDao.persist(null, "The Application title as displayed to the user", "appTitle",
+                project.getKey(), HEAD);
+        final Token tokenProject = tokenDao.persist(null, "The Project Entity", "Project", project.getKey(), HEAD);
 
         // Artifact tokens
-        final TokenArtifact appTitleOst = tokenArtifactDao.persist(appTitle.getKey(), ricottaOst.getKey(), project.getKey());
-        tokenArtifactDao.persist(tokenProject.getKey(), ricottaOst.getKey(), project.getKey());
-        tokenArtifactDao.persist(appTitle.getKey(), ricottaPlugin.getKey(), project.getKey());
+        final TokenArtifact appTitleOst = tokenArtifactDao.persist(null, ricottaOst.getKey(), project.getKey(),
+                appTitle.getKey(), HEAD);
+        tokenArtifactDao.persist(null, ricottaOst.getKey(), project.getKey(), tokenProject.getKey(), HEAD);
+        tokenArtifactDao.persist(null, ricottaPlugin.getKey(), project.getKey(), appTitle.getKey(), HEAD);
 
         // Translations
-        translationDao.persist(en.getKey(), project.getKey(), appTitle.getKey(), null, "Ricotta");
-        translationDao.persist(en_GB.getKey(), project.getKey(), tokenProject.getKey(), null, "Project");
-        translationDao.persist(sv.getKey(), project.getKey(), tokenProject.getKey(), null, "Projekt");
+        translationDao.persist(null, en.getKey(), "Ricotta", project.getKey(), appTitle.getKey(), HEAD);
+        translationDao.persist(null, en_GB.getKey(), "Project", project.getKey(), tokenProject.getKey(), HEAD);
+        translationDao.persist(null, sv.getKey(), "Projekt", project.getKey(), tokenProject.getKey(), HEAD);
+
+        return HEAD;
+    }
+
+    @Override
+    public Version getHead() {
+        if (null == _HEAD) {
+            _HEAD = versionDao.findByNameProject(UberDao.VALUE_HEAD, null);
+            LOG.info("Initializing HEAD: {}", _HEAD);
+        }
+        return _HEAD;
     }
 
     public ProjectLanguageDao getProjectLanguageDao() {
@@ -426,5 +538,9 @@ public class UberDaoBean implements UberDao {
 
     public void setArtifactDao(ArtifactDao artifactDao) {
         this.artifactDao = artifactDao;
+    }
+
+    public void setVersionDao(VersionDao versionDao) {
+        this.versionDao = versionDao;
     }
 }

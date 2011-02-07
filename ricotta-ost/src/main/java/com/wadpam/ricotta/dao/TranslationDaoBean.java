@@ -45,17 +45,23 @@ public class TranslationDaoBean extends GeneratedTranslationDaoImpl implements T
     }
 
     @Override
-    public Translation persist(Key language, Key project, Key token, Key version, String value) {
-        Translation returnValue = findByLanguageTokenVersion(language, token, version);
-        if (null == returnValue) {
-            returnValue = new Translation();
-            returnValue.setLanguage(language);
-            returnValue.setLocal(value);
-            returnValue.setProject(project);
-            returnValue.setToken(token);
-            returnValue.setVersion(version);
-            persist(returnValue);
-        }
-        return returnValue;
+    public List<Translation> findByTokenVersion(Key tokenKey, Key versionKey) {
+        return findBy(null, false, -1, 0, new FilterEqual(COLUMN_NAME_TOKEN, tokenKey), new FilterEqual(COLUMN_NAME_VERSION,
+                versionKey));
     }
+
+    // @Override
+    // public Translation persist(Key language, Key project, Key token, Key version, String value) {
+    // Translation returnValue = findByLanguageTokenVersion(language, token, version);
+    // if (null == returnValue) {
+    // returnValue = new Translation();
+    // returnValue.setLanguage(language);
+    // returnValue.setLocal(value);
+    // returnValue.setProject(project);
+    // returnValue.setToken(token);
+    // returnValue.setVersion(version);
+    // persist(returnValue);
+    // }
+    // return returnValue;
+    // }
 }
