@@ -23,7 +23,8 @@
 				<artifactId>ricotta-maven-plugin</artifactId>
 				<version>${project.version}</version>
 				<configuration>
-					<projectName>ricotta-maven-plugin</projectName>
+					<projectName>ricotta</projectName>
+					<version>plugin-test</version>
 					<resourceItems>
 						<resourceItem>
 							<languageCode>sv</languageCode>
@@ -32,8 +33,9 @@
 						</resourceItem>
 						<resourceItem>
 							<languageCode>en</languageCode>
-							<templateName>properties_java</templateName>
-							<filePath>values/en.properties</filePath>
+							<artifactName>ricotta-ost</artifactName>
+							<templateName>strings_android_inherit</templateName>
+							<filePath>values/strings.xml</filePath>
 						</resourceItem>
 					</resourceItems>
 				</configuration>
