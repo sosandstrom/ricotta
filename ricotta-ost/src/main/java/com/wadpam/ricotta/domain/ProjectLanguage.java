@@ -11,14 +11,16 @@ import javax.persistence.UniqueConstraint;
 import com.google.appengine.api.datastore.Key;
 
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"project", "language", "version"}),
-        @UniqueConstraint(columnNames = {"parent", "language", "version"})})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"project", "language", "version"})})
 public class ProjectLanguage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Key key;
 
     // ManyToOne
+    /**
+     * Parent Language, not Parent ProjectLanguage!
+     */
     @Basic
     Key parent;
 

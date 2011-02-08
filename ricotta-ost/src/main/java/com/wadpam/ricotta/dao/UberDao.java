@@ -26,4 +26,6 @@ public interface UberDao {
 
     Version getHead();
 
+    void deleteVersion(Project project, String vk);
+
 }

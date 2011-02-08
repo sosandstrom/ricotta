@@ -8,11 +8,13 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
+
 import com.google.appengine.api.datastore.Key;
 
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "project"})})
-public class Version {
+public class Version extends AEDPrimaryKeyEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Key    key;
@@ -70,6 +72,11 @@ public class Version {
 
     public void setDatum(String datum) {
         this.datum = datum;
+    }
+
+    @Override
+    public Object getPrimaryKey() {
+        return key;
     }
 
 }

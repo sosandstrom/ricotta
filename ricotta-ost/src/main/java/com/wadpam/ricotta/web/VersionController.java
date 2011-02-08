@@ -57,6 +57,18 @@ public class VersionController {
         return "redirect:/projects/" + project.getName() + '/';
     }
 
+    @RequestMapping(value = "deleteVersions.html", method = RequestMethod.POST)
+    public String deleteVersion(HttpServletRequest request) throws IOException {
+        LOGGER.debug("delete version");
+
+        final Project project = (Project) request.getAttribute("project");
+        for(String vk : request.getParameterValues("versions")) {
+            uberDao.deleteVersion(project, vk);
+        }
+
+        return "redirect:/projects/" + project.getName() + '/';
+    }
+
     public void setUberDao(UberDao uberDao) {
         this.uberDao = uberDao;
     }

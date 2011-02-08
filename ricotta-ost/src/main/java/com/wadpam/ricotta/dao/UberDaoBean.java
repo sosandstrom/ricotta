@@ -1,6 +1,7 @@
 package com.wadpam.ricotta.dao;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.wadpam.ricotta.domain.Artifact;
 import com.wadpam.ricotta.domain.Language;
 import com.wadpam.ricotta.domain.Mall;
@@ -234,6 +236,20 @@ public class UberDaoBean implements UberDao {
     }
 
     @Override
+    public void deleteVersion(Project project, String vk) {
+        final Key versionKey = KeyFactory.stringToKey(vk);
+
+        // ProjectLanguages
+        projectLanguageDao.delete(projectLanguageDao.findKeysByVersion(versionKey));
+
+        // Tokens (incl TokenArtifacts and Translations)
+        deleteTokens(tokenDao.findKeysByVersion(versionKey));
+
+        // and the version itself
+        versionDao.delete(Arrays.asList(versionKey));
+    }
+
+    @Override
     public List<ProjectLanguageModel> loadProjectLanguages(Key project, Key version) {
         final List<ProjectLanguageModel> returnValue = new ArrayList<ProjectLanguageModel>();
 
@@ -385,6 +401,16 @@ public class UberDaoBean implements UberDao {
      * Patches any old persisted data
      */
     protected void patch(final Key HEAD) {
+        // ProjectLanguages needs version
+        for(ProjectLanguage pl : projectLanguageDao.findAll()) {
+            if (null == pl.getVersion()) {
+                LOG.warn("HEAD ProjectLanguage {}", pl);
+                pl.setVersion(HEAD);
+                projectLanguageDao.update(pl);
+            }
+        }
+
+        // token-related
         Map<Key, Key> tokenProjectMap = new HashMap<Key, Key>();
         for(Token t : tokenDao.findAll()) {
             tokenProjectMap.put(t.getKey(), t.getProject());

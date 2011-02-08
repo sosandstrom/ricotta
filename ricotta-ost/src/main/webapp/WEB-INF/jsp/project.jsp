@@ -64,11 +64,12 @@
 	</tbody>
 </table>
 <a href="/projects/<c:out value="${project.name}"/>/artifacts/create.html">Create artifact</a>
-<form action="" method="post" name="deleteForm" id="deleteForm">
+<form action="versions/deleteVersions.html" method="post" name="deleteVersions" id="deleteVersions">
 <h3>Project Versions</h3>
 <table>
 		<thead>
 		<tr>
+			<th>Delete</th>
 			<th>Name</th>
 			<th>Description</th>
 			<th>Date</th>
@@ -77,6 +78,7 @@
 	<tbody>
 	<c:set var="even" scope="page" value="${true}" />
 		<tr class="evenRow<c:out value='${even}' />">
+			<td></td>
 			<td><a href="?" ><c:out value="${HEAD.name}" /></a></td>
 			<td><c:out value="${HEAD.description}" /></td>
 			<td><c:out value="${HEAD.datum}" /></td>
@@ -84,6 +86,7 @@
 	<c:forEach items="${versions}" var="v">
 		<c:set var="even" scope="page" value="${!even}" />
 		<tr class="evenRow<c:out value='${even}' />">
+			<td><input type="checkbox" name="versions" id="versions" value="<c:out value='${v.keyString}' />" /></td>
 			<td><a href="?version=<c:out value='${v.name}' />"><c:out value="${v.name}" /></a></td>
 			<td><c:out value="${v.description}" /></td>
 			<td><c:out value="${v.datum}" /></td>
@@ -91,6 +94,10 @@
 	</c:forEach>
 	</tbody>
 </table>
+<c:if test="${pageContext.request.userPrincipal.name == project.owner}">
+	<input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected versions" />
+</c:if>
+</form>
 <a href="/projects/<c:out value="${project.name}"/>/versions/create.html">Create version</a>
 <form action="" method="post" name="deleteForm" id="deleteForm">
 <h3>Project Users</h3>

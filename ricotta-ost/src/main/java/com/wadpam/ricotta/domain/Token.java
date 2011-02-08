@@ -5,6 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
 import net.sf.mardao.api.domain.PrimaryKeyEntity;
@@ -12,6 +14,7 @@ import net.sf.mardao.api.domain.PrimaryKeyEntity;
 import com.google.appengine.api.datastore.Key;
 
 @Entity
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"project", "version", "name", "description"})})
 public class Token extends AEDPrimaryKeyEntity implements PrimaryKeyEntity {
     private static final long serialVersionUID = 1L;
 
