@@ -30,20 +30,20 @@ public class Downloader {
         }
     }
 
-    public static void download(String projectName, String languageCode, String templateName, String artifactName,
-            File destination) throws ClientProtocolException, IOException {
+    public static void download(String projectName, String version, String languageCode, String templateName,
+            String artifactName, File destination) throws ClientProtocolException, IOException {
         File folder = destination.getParentFile();
         if (false == folder.exists()) {
             folder.mkdirs();
         }
         FileOutputStream fos = new FileOutputStream(destination);
         PrintStream ps = new PrintStream(fos);
-        download(projectName, languageCode, templateName, artifactName, ps);
+        download(projectName, version, languageCode, templateName, artifactName, ps);
         ps.close();
     }
 
-    public static void download(String projectName, String languageCode, String templateName, String artifactName, PrintStream fos)
-            throws ClientProtocolException, IOException {
+    public static void download(String projectName, String version, String languageCode, String templateName,
+            String artifactName, PrintStream fos) throws ClientProtocolException, IOException {
         StringBuffer url = new StringBuffer("http://ricotta-ost.appspot.com/projects/");
         url.append(projectName);
         url.append("/languages/");
@@ -55,6 +55,10 @@ public class Downloader {
             url.append(artifactName);
         }
         url.append('/');
+        if (null != version && 0 < version.length()) {
+            url.append("?version=");
+            url.append(version);
+        }
         info("Download URL " + url.toString());
         HttpGet method = new HttpGet(url.toString());
 
@@ -104,13 +108,24 @@ public class Downloader {
     public static void main(String[] args) throws ClientProtocolException, IOException {
         switch (args.length) {
             case 3:
-                download(args[0], args[1], args[2], null, System.out);
+                download(args[0], null, args[1], args[2], null, System.out);
                 break;
-            case 4:
-                download(args[0], args[1], args[2], args[3], System.out);
+            case 5:
+            case 7:
+                String version = null;
+                String artifact = null;
+                for(int i = 3; i < args.length; i += 2) {
+                    if ("-artifact".equals(args[i])) {
+                        artifact = args[i + 1];
+                    }
+                    else if ("-version".equals(args[i])) {
+                        version = args[i + 1];
+                    }
+                }
+                download(args[0], version, args[1], args[2], artifact, System.out);
                 break;
             default:
-                throw new IOException("Usage: <projectName> <languageCode> <templateName> [<artifactName>]");
+                throw new IOException("Usage: <projectName> <languageCode> <templateName> [-artifact <artifactName>] [-version");
         }
     }
 

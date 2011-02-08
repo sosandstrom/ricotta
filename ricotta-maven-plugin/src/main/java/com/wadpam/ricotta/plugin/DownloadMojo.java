@@ -22,10 +22,10 @@ public class DownloadMojo extends AbstractMojo {
      */
     private String       projectName;
 
-    // /**
-    // * @parameter expression="${download.languageCode}" default-value="en"
-    // */
-    // private String languageCode;
+    /**
+     * @parameter expression="${download.version}"
+     */
+    private String       version;
     //
     // /**
     // * @parameter expression="${download.templateName}" default-value="properties_java"
@@ -55,7 +55,8 @@ public class DownloadMojo extends AbstractMojo {
         for(ResourceItem item : resourceItems) {
             File output = new File(destination, item.getFilePath());
             try {
-                Downloader.download(projectName, item.getLanguageCode(), item.getTemplateName(), item.getArtifactName(), output);
+                Downloader.download(projectName, version, item.getLanguageCode(), item.getTemplateName(), item.getArtifactName(),
+                        output);
             }
             catch (ClientProtocolException e) {
                 // TODO Auto-generated catch block
