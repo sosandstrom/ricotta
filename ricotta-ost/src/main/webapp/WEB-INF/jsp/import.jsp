@@ -19,6 +19,7 @@
 			 <!-- name[\s]*=[\s]*"([^"]+)"[\s]*\>([^\<]*)\</string\> -->
 			 <option value='name[\s]*=[\s]*"([^"]+)"[\s]*\>([^\<]*)\&lt;/string\&gt;' >Android strings file</option>
 			 <option value='([^=^\s]+)=\"([^\"]*)\"\;' >iPhone Localizeable.strings file</option>
+			 <option value='name="([^"]+)"[^\&lt;]*\&lt;value\&gt;([^\&lt;]*)\&lt;/value\&gt;' >WM7 xml file</option>
 		</td>
 	</tr>
 	<tr>
