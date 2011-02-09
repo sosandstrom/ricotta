@@ -78,6 +78,8 @@ public class ProjectLanguageController {
         LOGGER.debug("create projectLanguage");
         final Project project = (Project) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJECT);
         projectLanguage.setProject(project.getKey());
+        final Version version = (Version) request.getAttribute(ProjectHandlerInterceptor.KEY_VERSION);
+        projectLanguage.setVersion(version.getKey());
         projectLanguageDao.persist(projectLanguage);
 
         return "redirect:/projects/" + projectName + "/index.html";
