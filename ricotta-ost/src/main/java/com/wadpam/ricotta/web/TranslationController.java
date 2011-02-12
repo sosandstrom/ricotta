@@ -23,11 +23,13 @@ import com.wadpam.ricotta.dao.ProjectLanguageDao;
 import com.wadpam.ricotta.dao.TokenDao;
 import com.wadpam.ricotta.dao.TranslationDao;
 import com.wadpam.ricotta.dao.UberDao;
+import com.wadpam.ricotta.dao.ViewContextDao;
 import com.wadpam.ricotta.domain.Language;
 import com.wadpam.ricotta.domain.Project;
 import com.wadpam.ricotta.domain.Token;
 import com.wadpam.ricotta.domain.Translation;
 import com.wadpam.ricotta.domain.Version;
+import com.wadpam.ricotta.domain.ViewContext;
 import com.wadpam.ricotta.model.TranslationModel;
 
 /**
@@ -54,6 +56,8 @@ public class TranslationController {
 
     private UberDao            uberDao;
 
+    private ViewContextDao     viewContextDao;
+
     @RequestMapping(value = "index.html", method = RequestMethod.GET)
     public String getProjectLanguageForm(HttpServletRequest request, Model model, @PathVariable String projectName,
             @PathVariable String languageCode) {
@@ -64,11 +68,41 @@ public class TranslationController {
         Language language = languageDao.findByCode(languageCode);
         model.addAttribute("language", language);
 
+        List<ViewContext> viewContexts = viewContextDao.findByProject(project.getKey());
+        if (viewContexts.isEmpty()) {
+            List<TranslationModel> translations = uberDao.loadTranslations(project.getKey(), version.getKey(), language.getKey(),
+                    null);
+            model.addAttribute("translations", translations);
+            return "translations";
+        }
+        model.addAttribute("viewContexts", viewContexts);
+        return "viewContexts";
+    }
+
+    @RequestMapping(value = "{viewContextName}/index.html", method = RequestMethod.GET)
+    public String getContextTranslations(HttpServletRequest request, Model model, @PathVariable String projectName,
+            @PathVariable String languageCode, @PathVariable String viewContextName) {
+        final Project project = (Project) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJECT);
+        final Version version = (Version) request.getAttribute(ProjectHandlerInterceptor.KEY_VERSION);
+        model.addAttribute("project", project);
+
+        Language language = languageDao.findByCode(languageCode);
+        model.addAttribute("language", language);
+
+        ViewContext viewContext = viewContextDao.findByNameProject(viewContextName, project.getKey());
+        model.addAttribute("viewContext", viewContext);
+
         List<TranslationModel> translations = uberDao.loadTranslations(project.getKey(), version.getKey(), language.getKey(),
                 null);
-        model.addAttribute("translations", translations);
+        List<TranslationModel> contextTranslations = new ArrayList<TranslationModel>();
+        for(TranslationModel tm : translations) {
+            if (viewContext.getKey().equals(tm.getToken().getViewContext())) {
+                contextTranslations.add(tm);
+            }
+        }
+        model.addAttribute("translations", contextTranslations);
 
-        return "translations";
+        return "contextTranslations";
     }
 
     @RequestMapping(value = "index.html", method = RequestMethod.POST)
@@ -194,6 +228,10 @@ public class TranslationController {
 
     public void setTokenDao(TokenDao tokenDao) {
         this.tokenDao = tokenDao;
+    }
+
+    public void setViewContextDao(ViewContextDao viewContextDao) {
+        this.viewContextDao = viewContextDao;
     }
 
 }

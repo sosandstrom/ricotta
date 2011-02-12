@@ -480,8 +480,8 @@ public class UberDaoBean implements UberDao {
 
         // Tokens
         final Token appTitle = tokenDao.persist(null, "The Application title as displayed to the user", "appTitle",
-                project.getKey(), HEAD);
-        final Token tokenProject = tokenDao.persist(null, "The Project Entity", "Project", project.getKey(), HEAD);
+                project.getKey(), HEAD, null);
+        final Token tokenProject = tokenDao.persist(null, "The Project Entity", "Project", project.getKey(), HEAD, null);
 
         // Artifact tokens
         final TokenArtifact appTitleOst = tokenArtifactDao.persist(null, ricottaOst.getKey(), project.getKey(),

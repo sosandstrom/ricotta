@@ -40,6 +40,15 @@
 		<servlet-name>ricotta</servlet-name>
 		<url-pattern>*.html</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>blobstore</servlet-name>
+		<servlet-class>com.wadpam.ricotta.gae.BlobstoreServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>blobstore</servlet-name>
+		<url-pattern>/screenshot</url-pattern>
+	</servlet-mapping>
 
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>

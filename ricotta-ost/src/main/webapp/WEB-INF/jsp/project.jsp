@@ -22,6 +22,7 @@
 		</tr>
 	</tbody>
 </table>
+
 <h3>Project Languages</h3>
 <table>
 		<thead>
@@ -44,6 +45,28 @@
 	</tbody>
 </table>
 <a href="/projects/<c:out value="${project.name}"/>/languages/create.html">Add language</a>
+
+<h3>Project contexts</h3>
+<table>
+		<thead>
+		<tr>
+			<th>Name</th>
+			<th>Description</th>
+		</tr>
+	</thead>
+	<tbody>
+	<c:set var="even" scope="page" value="${true}" />
+	<c:forEach items="${viewContexts}" var="c">
+		<c:set var="even" scope="page" value="${!even}" />
+		<tr class="evenRow<c:out value='${even}' />">
+			<td><a href="/projects/<c:out value='${project.name}'/>/viewContexts/<c:out value='${c.name}' />/"><c:out value="${c.name}" /></a></td>
+			<td><c:out value="${c.description}" /></td>
+		</tr>
+	</c:forEach>
+	</tbody>
+</table>
+<a href="/projects/<c:out value="${project.name}"/>/uploadContext.html">Upload context</a>
+
 <h3>Project Artifacts</h3>
 <table>
 		<thead>
@@ -64,6 +87,7 @@
 	</tbody>
 </table>
 <a href="/projects/<c:out value="${project.name}"/>/artifacts/create.html">Create artifact</a>
+
 <form action="versions/deleteVersions.html" method="post" name="deleteVersions" id="deleteVersions">
 <h3>Project Versions</h3>
 <table>

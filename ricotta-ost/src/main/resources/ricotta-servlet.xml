@@ -37,6 +37,7 @@
 		<property name="tokenDao" ref="tokenDao" />
 		<property name="versionDao" ref="versionDao" />
 		<property name="uberDao" ref="uberDao" />
+		<property name="viewContextDao" ref="viewContextDao" />
 	</bean>
 
 	<bean id="languageController" class="com.wadpam.ricotta.web.LanguageController">
@@ -90,6 +91,7 @@
 		<property name="tokenDao" ref="tokenDao" />
 		<property name="translationDao" ref="translationDao" />
 		<property name="uberDao" ref="uberDao" />
+		<property name="viewContextDao" ref="viewContextDao" />
 	</bean>
 
 	<bean id="velocityController" class="com.wadpam.ricotta.web.VelocityController"

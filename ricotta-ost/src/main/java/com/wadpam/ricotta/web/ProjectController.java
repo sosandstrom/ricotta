@@ -3,6 +3,7 @@ package com.wadpam.ricotta.web;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -14,7 +15,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.api.blobstore.BlobstoreService;
+import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.wadpam.ricotta.dao.ArtifactDao;
@@ -23,10 +28,12 @@ import com.wadpam.ricotta.dao.ProjectUserDao;
 import com.wadpam.ricotta.dao.TokenDao;
 import com.wadpam.ricotta.dao.UberDao;
 import com.wadpam.ricotta.dao.VersionDao;
+import com.wadpam.ricotta.dao.ViewContextDao;
 import com.wadpam.ricotta.domain.Project;
 import com.wadpam.ricotta.domain.ProjectUser;
 import com.wadpam.ricotta.domain.Token;
 import com.wadpam.ricotta.domain.Version;
+import com.wadpam.ricotta.domain.ViewContext;
 import com.wadpam.ricotta.model.ProjectLanguageModel;
 
 /**
@@ -35,19 +42,23 @@ import com.wadpam.ricotta.model.ProjectLanguageModel;
 @Controller
 @RequestMapping("/projects")
 public class ProjectController {
-    static final Logger    LOGGER = LoggerFactory.getLogger(ProjectController.class);
+    static final Logger            LOGGER           = LoggerFactory.getLogger(ProjectController.class);
 
-    private ProjectDao     projectDao;
+    private ProjectDao             projectDao;
 
-    private ProjectUserDao projectUserDao;
+    private ProjectUserDao         projectUserDao;
 
-    private UberDao        uberDao;
+    private UberDao                uberDao;
 
-    private ArtifactDao    artifactDao;
+    private ArtifactDao            artifactDao;
 
-    private TokenDao       tokenDao;
+    private TokenDao               tokenDao;
 
-    private VersionDao     versionDao;
+    private VersionDao             versionDao;
+
+    private ViewContextDao         viewContextDao;
+
+    private final BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
 
     @RequestMapping(value = "index.html", method = RequestMethod.GET)
     public String getProjects(HttpServletRequest request, Model model) {
@@ -76,6 +87,45 @@ public class ProjectController {
         project.setOwner(request.getUserPrincipal().getName());
 
         projectDao.persist(project);
+
+        return "redirect:/projects/" + project.getName() + '/';
+    }
+
+    @RequestMapping(value = "{projectName}/uploadContext.html", method = RequestMethod.GET)
+    public String uploadContext(Model model, @PathVariable String projectName) {
+
+        // create upload URL for Blob
+        model.addAttribute("action", blobstoreService.createUploadUrl("/projects/" + projectName + "/uploadedContext.html"));
+
+        return "uploadContext";
+    }
+
+    @RequestMapping(value = "{projectName}/uploadedContext.html", method = RequestMethod.POST)
+    public String uploadedContext(HttpServletRequest request, @PathVariable String projectName) throws IOException {
+        LOGGER.debug("create context details");
+        Map<String, BlobKey> blobs = blobstoreService.getUploadedBlobs(request);
+        BlobKey blobKey = blobs.get("screenShot");
+        return "redirect:/projects/" + projectName + "/createContext.html?blobKey=" + blobKey.getKeyString();
+    }
+
+    @RequestMapping(value = "{projectName}/createContext.html", method = RequestMethod.GET)
+    public String createContext(HttpServletRequest request, @PathVariable String projectName, @RequestParam String blobKey,
+            Model model) throws IOException {
+        LOGGER.debug("create context details");
+        model.addAttribute("blobKeyString", blobKey);
+        return "createContext";
+    }
+
+    @RequestMapping(value = "{projectName}/createContext.html", method = RequestMethod.POST)
+    public String createdContext(HttpServletRequest request, @ModelAttribute("viewContext") ViewContext viewContext,
+            @RequestParam String blobKeyString) throws IOException {
+        LOGGER.debug("created context");
+        final Project project = (Project) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJECT);
+
+        viewContext.setProject(project.getKey());
+        viewContext.setBlobKey(new BlobKey(blobKeyString));
+
+        viewContextDao.persist(viewContext);
 
         return "redirect:/projects/" + project.getName() + '/';
     }
@@ -126,6 +176,10 @@ public class ProjectController {
         List<ProjectLanguageModel> languages = uberDao.loadProjectLanguages(project.getKey(), version.getKey());
         model.addAttribute("languages", languages);
 
+        // fetch and add viewContexts for this project
+        List<ViewContext> viewContexts = viewContextDao.findByProject(project.getKey());
+        model.addAttribute("viewContexts", viewContexts);
+
         // fetch and add artifacts for this project
         model.addAttribute("artifacts", artifactDao.findByProject(project.getKey()));
 
@@ -169,6 +223,10 @@ public class ProjectController {
 
     public void setVersionDao(VersionDao versionDao) {
         this.versionDao = versionDao;
+    }
+
+    public void setViewContextDao(ViewContextDao viewContextDao) {
+        this.viewContextDao = viewContextDao;
     }
 
 }
