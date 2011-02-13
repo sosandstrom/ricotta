@@ -43,7 +43,12 @@ function all_checkboxes(id, checked, artifactKey) {
 			<td><input type="checkbox" id="delete" name="delete" value="<c:out value='${token.keyString}' />" /></td>
 			<td><c:out value="${token.name}" /></td>
 			<td><c:out value="${token.description}" /></td>
-			<td>TODO</td>
+			<td><select name="viewContext.<c:out value='${token.keyString}' />" id="viewContext.<c:out value='${token.keyString}' />">
+				<c:forEach items="${viewContexts}" var="c">
+					<option value="<c:out value='${c.keyString}'/>" <c:if test="${token.viewContext == c.key}"> selected="selected" </c:if> >
+						<c:out value="${c.name}" /></option>
+				</c:forEach>
+			</select></td>
 			<c:forEach items="${artifacts}" var="artifact">
 				<td><c:set var="key" scope="page"><c:out value='${token.keyString}' />.<c:out value='${artifact.keyString}' /></c:set>
 					<input type="checkbox" id="mappings" name="mappings" value="<c:out value='${key}' />"

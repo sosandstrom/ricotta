@@ -18,10 +18,15 @@
 	</thead>
 	<tbody>
 	<c:set var="even" scope="page" value="${true}" />
+		<tr class="evenRow<c:out value='${even}' />">
+			<td><a href="/projects/<c:out value='${project.name}'/>/languages/<c:out value='${language.code}'/>/translations/NO_CONTEXT.html">All tokens</a></td>
+			<td><c:out value="All tokens, with or without context" /></td>
+			<td></td>
+		</tr>
 	<c:forEach items="${viewContexts}" var="c">
 		<c:set var="even" scope="page" value="${!even}" />
 		<tr class="evenRow<c:out value='${even}' />">
-			<td><a href="/projects/<c:out value='${project.name}'/>/viewContexts/<c:out value='${c.name}' />/"><c:out value="${c.name}" /></a></td>
+			<td><a href="/projects/<c:out value='${project.name}'/>/languages/<c:out value='${language.code}'/>/translations/<c:out value='${c.name}' />/"><c:out value="${c.name}" /></a></td>
 			<td><c:out value="${c.description}" /></td>
 			<td><img src="/screenshot?blobKey=<c:out value='${c.blobKey.keyString}' />" /></td>
 		</tr>

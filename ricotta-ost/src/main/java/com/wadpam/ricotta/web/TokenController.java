@@ -1,6 +1,8 @@
 package com.wadpam.ricotta.web;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 
@@ -10,20 +12,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.wadpam.ricotta.dao.ArtifactDao;
 import com.wadpam.ricotta.dao.ProjectDao;
 import com.wadpam.ricotta.dao.TokenArtifactDao;
 import com.wadpam.ricotta.dao.TokenDao;
+import com.wadpam.ricotta.dao.UberDao;
+import com.wadpam.ricotta.dao.ViewContextDao;
 import com.wadpam.ricotta.domain.Artifact;
 import com.wadpam.ricotta.domain.Project;
 import com.wadpam.ricotta.domain.Token;
 import com.wadpam.ricotta.domain.TokenArtifact;
+import com.wadpam.ricotta.domain.Version;
+import com.wadpam.ricotta.domain.ViewContext;
 
 /**
  * Created by Ola on Nov 12, 2010
@@ -31,7 +37,9 @@ import com.wadpam.ricotta.domain.TokenArtifact;
 @Controller
 @RequestMapping("/projects/{projectName}/tokens")
 public class TokenController {
-    static final Logger      LOGGER = LoggerFactory.getLogger(TokenController.class);
+    static final String      VIEW_CONTEXT_PREFIX = "viewContext.";
+
+    static final Logger      LOGGER              = LoggerFactory.getLogger(TokenController.class);
 
     private ProjectDao       projectDao;
 
@@ -40,6 +48,10 @@ public class TokenController {
     private TokenDao         tokenDao;
 
     private TokenArtifactDao tokenArtifactDao;
+
+    private UberDao          uberDao;
+
+    private ViewContextDao   viewContextDao;
 
     @RequestMapping(value = "create.html", method = RequestMethod.GET)
     public String createToken(Model model, @PathVariable String projectName) {
@@ -55,17 +67,19 @@ public class TokenController {
     }
 
     @RequestMapping(value = "{action}.html", method = RequestMethod.POST)
-    public String postToken(HttpServletRequest request, @PathVariable String projectName, @ModelAttribute("token") Token token)
-            throws IOException {
+    public String postToken(HttpServletRequest request, @PathVariable String projectName) throws IOException {
         LOGGER.debug("create token");
+        final Project project = (Project) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJECT);
 
-        Project project = projectDao.findByName(projectName);
-        LOGGER.debug(project.toString());
-        // TODO: check project role
+        // version
+        final Version version = (Version) request.getAttribute(ProjectHandlerInterceptor.KEY_VERSION);
 
-        if (null != token.getName()) {
+        if (null != request.getParameter("name")) {
+            Token token = new Token();
+            token.setName(request.getParameter("name"));
+            token.setDescription(request.getParameter("description"));
             token.setProject(project.getKey());
-            LOGGER.debug(token.toString());
+            token.setVersion(version.getKey());
             tokenDao.persist(token);
             // in createToken, there are no mappings
             // updateArtifactTokens(request, project, token, null);
@@ -79,7 +93,6 @@ public class TokenController {
 
     @RequestMapping(value = "index.html", method = RequestMethod.GET)
     public String tokens(Model model, @PathVariable String projectName) {
-        // TODO: check project role
         LOGGER.debug("display tokens");
         Project project = projectDao.findByName(projectName);
         model.addAttribute("project", project);
@@ -89,6 +102,14 @@ public class TokenController {
 
         // fetch and add artifacts for this project
         model.addAttribute("artifacts", artifactDao.findByProject(project.getKey()));
+
+        // fetch and add viewContexts for this project
+        List<ViewContext> viewContexts = new ArrayList<ViewContext>(viewContextDao.findByProject(project.getKey()));
+        ViewContext noContext = new ViewContext();
+        noContext.setName("NO CONTEXT");
+        noContext.setDescription("Tokens in no specific context");
+        viewContexts.add(0, noContext);
+        model.addAttribute("viewContexts", viewContexts);
 
         // and TokenArtifact mappings
         HashMap<String, TokenArtifact> mappings = new HashMap<String, TokenArtifact>();
@@ -101,6 +122,40 @@ public class TokenController {
     }
 
     protected void updateArtifactTokens(HttpServletRequest request, Project project, Token token, Artifact artifact) {
+        // HashMap<String, Token> tokenMap = new HashMap<String, Token>();
+        // for(Token t : tokenDao.findByProjectVersion(project.getKey(), uberDao.getHead().getKey(), true)) {
+        // tokenMap.put(t.getKeyString(), t);
+        // }
+
+        // <select name="viewContext.<c:out value='${token.keyString}' />
+        // <option value="${c.keyString}"
+        Token t;
+        Key tokenKey;
+        String name, keyString;
+        for(Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
+            name = e.nextElement();
+            if (name.startsWith(VIEW_CONTEXT_PREFIX)) {
+                keyString = request.getParameter(name);
+                tokenKey = KeyFactory.stringToKey(name.substring(VIEW_CONTEXT_PREFIX.length()));
+                t = tokenDao.findByPrimaryKey(tokenKey);
+                // no viewContext selected
+                if (0 == keyString.length()) {
+                    if (null != t.getViewContext()) {
+                        t.setViewContext(null);
+                        tokenDao.update(t);
+                    }
+                }
+                else {
+                    // context selected
+                    if (null == t.getViewContext() || false == keyString.equals(KeyFactory.keyToString(t.getViewContext()))) {
+                        Key contextKey = KeyFactory.stringToKey(keyString);
+                        t.setViewContext(contextKey);
+                        tokenDao.update(t);
+                    }
+                }
+            }
+        }
+
         // <input type="checkbox" name="mappings" value="tokenKey.artifactKey" />
         List<TokenArtifact> mappings;
         if (null != token) {
@@ -161,4 +216,17 @@ public class TokenController {
     public void setTokenArtifactDao(TokenArtifactDao tokenArtifactDao) {
         this.tokenArtifactDao = tokenArtifactDao;
     }
+
+    public ViewContextDao getViewContextDao() {
+        return viewContextDao;
+    }
+
+    public void setViewContextDao(ViewContextDao viewContextDao) {
+        this.viewContextDao = viewContextDao;
+    }
+
+    public void setUberDao(UberDao uberDao) {
+        this.uberDao = uberDao;
+    }
+
 }

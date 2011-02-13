@@ -30,6 +30,14 @@ public class ViewContext extends AEDPrimaryKeyEntity {
         return key;
     }
 
+    @Override
+    public String getKeyString() {
+        if (null == key) {
+            return "";
+        }
+        return super.getKeyString();
+    }
+
     public String getName() {
         return name;
     }

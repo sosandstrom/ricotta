@@ -6,7 +6,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <jsp:include page="header.jsp" />
 <body>
-<a href="/index.html">Home</a> | <a href="/projects/index.html">Projects</a> | <a href="/projects/<c:out value='${project.name}' />/index.html"><c:out value="${project.name}" /></a>
+<a href="/index.html">Home</a> | 
+<a href="/projects/index.html">Projects</a> | 
+<a href="/projects/<c:out value='${project.name}' />/index.html"><c:out value="${project.name}" /></a>
+<c:if test="${null != viewContext}" >
+ | <a href="/projects/<c:out value='${project.name}' />/languages/<c:out value='${language.code}' />/translations/"><c:out value="${language.name}" /></a>  
+	<div class="pageHeading">Translations for context <c:out value="${viewContext.name}" /></div>
+	<b>Description: </b><c:out value="${viewContext.description}" /><br />
+	<img src="/screenshot?blobKey=<c:out value='${viewContext.blobKey.keyString}' />" />
+</c:if>
 <div class="pageHeading">Translations - <c:out value="${language.name}" /> (<c:out value="${language.code}" />)</div>
 <form id="translations" name="translations" action="" method="post" >
 <input type="submit" value="Save" />

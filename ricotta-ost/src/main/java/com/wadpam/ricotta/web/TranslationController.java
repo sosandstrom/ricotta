@@ -58,9 +58,9 @@ public class TranslationController {
 
     private ViewContextDao     viewContextDao;
 
-    @RequestMapping(value = "index.html", method = RequestMethod.GET)
+    @RequestMapping(value = "{pageName}.html", method = RequestMethod.GET)
     public String getProjectLanguageForm(HttpServletRequest request, Model model, @PathVariable String projectName,
-            @PathVariable String languageCode) {
+            @PathVariable String languageCode, @PathVariable String pageName) {
         final Project project = (Project) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJECT);
         final Version version = (Version) request.getAttribute(ProjectHandlerInterceptor.KEY_VERSION);
         model.addAttribute("project", project);
@@ -69,7 +69,7 @@ public class TranslationController {
         model.addAttribute("language", language);
 
         List<ViewContext> viewContexts = viewContextDao.findByProject(project.getKey());
-        if (viewContexts.isEmpty()) {
+        if (viewContexts.isEmpty() || "NO_CONTEXT".equals(pageName)) {
             List<TranslationModel> translations = uberDao.loadTranslations(project.getKey(), version.getKey(), language.getKey(),
                     null);
             model.addAttribute("translations", translations);
@@ -102,7 +102,7 @@ public class TranslationController {
         }
         model.addAttribute("translations", contextTranslations);
 
-        return "contextTranslations";
+        return "translations";
     }
 
     @RequestMapping(value = "index.html", method = RequestMethod.POST)
