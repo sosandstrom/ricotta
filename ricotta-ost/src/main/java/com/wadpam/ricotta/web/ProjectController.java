@@ -133,7 +133,8 @@ public class ProjectController {
     @RequestMapping(value = "{projectName}/index.html", method = RequestMethod.POST)
     public String deleteUsersTokens(HttpServletRequest request) throws IOException {
         LOGGER.debug("delete from project");
-        final Project project = (Project) request.getAttribute("project");
+        final Project project = (Project) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJECT);
+        final Version version = (Version) request.getAttribute(ProjectHandlerInterceptor.KEY_VERSION);
 
         // delete selected project users:
         final List<Key> keys = new ArrayList<Key>();
@@ -155,6 +156,7 @@ public class ProjectController {
                 keys.add(key);
             }
             uberDao.deleteTokens(keys);
+            uberDao.invalidateCache(project.getKey(), version.getKey(), null, null);
         }
 
         return "redirect:/projects/" + project.getName() + '/';

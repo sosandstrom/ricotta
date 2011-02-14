@@ -61,5 +61,6 @@ function all_checkboxes(id, checked, artifactKey) {
 </table>
 <input type="submit" value="Save" />
 </form>
+<a href="/projects/<c:out value="${project.name}"/>/tokens/create.html">Create token</a>
 </body>
 </html>

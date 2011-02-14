@@ -81,11 +81,11 @@ public class TokenController {
             token.setProject(project.getKey());
             token.setVersion(version.getKey());
             tokenDao.persist(token);
-            // in createToken, there are no mappings
-            // updateArtifactTokens(request, project, token, null);
+
+            uberDao.invalidateCache(token.getProject(), token.getVersion(), null, null);
         }
         else {
-            updateArtifactTokens(request, project, null, null);
+            updateArtifactTokens(request, project, version, null, null);
         }
 
         return "redirect:/projects/" + projectName + "/tokens/index.html";
@@ -121,7 +121,8 @@ public class TokenController {
         return "tokens";
     }
 
-    protected void updateArtifactTokens(HttpServletRequest request, Project project, Token token, Artifact artifact) {
+    protected void updateArtifactTokens(HttpServletRequest request, Project project, Version version, Token token,
+            Artifact artifact) {
         // HashMap<String, Token> tokenMap = new HashMap<String, Token>();
         // for(Token t : tokenDao.findByProjectVersion(project.getKey(), uberDao.getHead().getKey(), true)) {
         // tokenMap.put(t.getKeyString(), t);
@@ -176,21 +177,26 @@ public class TokenController {
 
         // process all mappings
         TokenArtifact ta;
-        for(String value : request.getParameterValues("mappings")) {
-            // find existing
-            ta = current.remove(value);
-            if (null == ta) {
-                try {
-                    int beginIndex = value.indexOf('.');
+        String mappingValues[] = request.getParameterValues("mappings");
+        if (null != mappingValues) {
+            for(String value : mappingValues) {
+                // find existing
+                ta = current.remove(value);
+                if (null == ta) {
+                    try {
+                        int beginIndex = value.indexOf('.');
 
-                    ta = new TokenArtifact();
-                    ta.setProject(project.getKey());
-                    ta.setToken(KeyFactory.stringToKey(value.substring(0, beginIndex)));
-                    ta.setArtifact(KeyFactory.stringToKey(value.substring(beginIndex + 1)));
-                    tokenArtifactDao.persist(ta);
-                }
-                catch (IllegalArgumentException log) {
-                    LOGGER.warn("No such tokenArtifact " + value);
+                        ta = new TokenArtifact();
+                        ta.setProject(project.getKey());
+                        ta.setToken(KeyFactory.stringToKey(value.substring(0, beginIndex)));
+                        final Key artifactKey = KeyFactory.stringToKey(value.substring(beginIndex + 1));
+                        ta.setArtifact(artifactKey);
+                        tokenArtifactDao.persist(ta);
+                        uberDao.invalidateCache(project.getKey(), version.getKey(), null, artifactKey);
+                    }
+                    catch (IllegalArgumentException log) {
+                        LOGGER.warn("No such tokenArtifact " + value);
+                    }
                 }
             }
         }
@@ -198,6 +204,7 @@ public class TokenController {
         // delete no longer checked
         for(TokenArtifact entity : current.values()) {
             tokenArtifactDao.delete(entity);
+            uberDao.invalidateCache(entity.getProject(), entity.getVersion(), null, entity.getArtifact());
         }
     }
 
