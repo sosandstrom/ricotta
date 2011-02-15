@@ -16,7 +16,7 @@
 	<img src="/screenshot?blobKey=<c:out value='${viewContext.blobKey.keyString}' />" />
 </c:if>
 <div class="pageHeading">Translations - <c:out value="${language.name}" /> (<c:out value="${language.code}" />)</div>
-<form id="translations" name="translations" action="" method="post" >
+<form id="translations" name="translations" action="<c:out value='${action}' />" method="post" >
 <input type="submit" value="Save" />
 <table>
 		<thead>

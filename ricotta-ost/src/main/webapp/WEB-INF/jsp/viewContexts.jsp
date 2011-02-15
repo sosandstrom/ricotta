@@ -21,7 +21,7 @@
 		<tr class="evenRow<c:out value='${even}' />">
 			<td><a href="/projects/<c:out value='${project.name}'/>/languages/<c:out value='${language.code}'/>/translations/NO_CONTEXT.html">All tokens</a></td>
 			<td><c:out value="All tokens, with or without context" /></td>
-			<td><img src="/screenshot?blobKey=AMIfv96Fnv_y5-TLlw7eCMOEWNk_AWHYWyQFPi-jAX4DfIXRihEkgXb18IptzdbTbFgNmInVY6yJavvZqhOVDuAYjrIPswXNudGD1gRp5vGupRAs1QM03_KJGCfaBhki8nMYIlk_Td4oAgAl7is1eZRCepP_32gkTg" /></td>
+			<td><img src="/screenshot?blobKey=AMIfv96vJ5hngrNuZdTZzG8P0SfT2aDcJwqmVo928rnYBQBeNeWmfGd3HhOZ6xlAVCPchkW7FKhiDg3biDgGD1pz8Oc3JUmX-qeYgm3gRbZ4007L1CT65_JXol1_JMypAyR4aY04EcU0FXRy6dPHfI5Vdvu7gHSIqQ" /></td>
 		</tr>
 	<c:forEach items="${viewContexts}" var="c">
 		<c:set var="even" scope="page" value="${!even}" />

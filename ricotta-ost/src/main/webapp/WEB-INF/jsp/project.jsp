@@ -46,6 +46,9 @@
 </table>
 <a href="/projects/<c:out value="${project.name}"/>/languages/create.html">Add language</a>
 
+<h3>Project Tokens</h3>
+<a href="/projects/<c:out value='${project.name}'/>/tokens/">Edit tokens...</a>
+
 <h3>Project contexts</h3>
 <table>
 		<thead>
@@ -59,7 +62,7 @@
 	<c:forEach items="${viewContexts}" var="c">
 		<c:set var="even" scope="page" value="${!even}" />
 		<tr class="evenRow<c:out value='${even}' />">
-			<td><a href="/projects/<c:out value='${project.name}'/>/viewContexts/<c:out value='${c.name}' />/"><c:out value="${c.name}" /></a></td>
+			<td><c:out value="${c.name}" /></td>
 			<td><c:out value="${c.description}" /></td>
 		</tr>
 	</c:forEach>
@@ -80,7 +83,7 @@
 	<c:forEach items="${artifacts}" var="a">
 		<c:set var="even" scope="page" value="${!even}" />
 		<tr class="evenRow<c:out value='${even}' />">
-			<td><a href="/projects/<c:out value='${project.name}'/>/tokens/"><c:out value="${a.name}" /></a></td>
+			<td><c:out value="${a.name}" /></td>
 			<td><c:out value="${a.description}" /></td>
 		</tr>
 	</c:forEach>
@@ -123,9 +126,10 @@
 </c:if>
 </form>
 <a href="/projects/<c:out value="${project.name}"/>/versions/create.html">Create version</a>
-<form action="" method="post" name="deleteForm" id="deleteForm">
+
 <h3>Project Users</h3>
-<input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected users and tokens" />
+<form action="" method="post" name="deleteForm" id="deleteForm">
+<input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected users" />
 <table>
 		<thead>
 		<tr>
@@ -144,32 +148,9 @@
 	</c:forEach>
 	</tbody>
 </table>
-<input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected users and tokens" /><br />
-<a href="/projects/<c:out value="${project.name}"/>/users/create.html">Add user</a>
-<h3>Project Tokens</h3>
-<input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected users and tokens" />
-<table>
-		<thead>
-		<tr>
-			<th>Delete</th>
-			<th>Name</th>
-			<th>Description</th>
-		</tr>
-	</thead>
-	<tbody>
-	<c:set var="even" scope="page" value="${true}" />
-	<c:forEach items="${tokens}" var="token">
-		<c:set var="even" scope="page" value="${!even}" />
-		<tr class="evenRow<c:out value='${even}' />">
-			<td><input type="checkbox" id="tokens" name="tokens" value="<c:out value='${token.keyString}' />" /></td>
-			<td><c:out value="${token.name}" /></td>
-			<td><c:out value="${token.description}" /></td>
-		</tr>
-	</c:forEach>
-	</tbody>
-</table>
-<input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected users and tokens" />
+<input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected users" /><br />
 </form>
-<a href="/projects/<c:out value="${project.name}"/>/tokens/create.html">Create token</a>
+<a href="/projects/<c:out value="${project.name}"/>/users/create.html">Add user</a>
+
 </body>
 </html>

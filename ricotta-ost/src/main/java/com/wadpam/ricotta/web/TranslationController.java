@@ -73,6 +73,9 @@ public class TranslationController {
             List<TranslationModel> translations = uberDao.loadTranslations(project.getKey(), version.getKey(), language.getKey(),
                     null);
             model.addAttribute("translations", translations);
+
+            // POST to action, not to same page!
+            model.addAttribute("action", "/projects/" + projectName + "/languages/" + languageCode + "/translations/");
             return "translations";
         }
         model.addAttribute("viewContexts", viewContexts);
@@ -101,6 +104,9 @@ public class TranslationController {
             }
         }
         model.addAttribute("translations", contextTranslations);
+
+        // POST to action, not to same page!
+        model.addAttribute("action", "/projects/" + projectName + "/languages/" + languageCode + "/translations/");
 
         return "translations";
     }

@@ -146,19 +146,6 @@ public class ProjectController {
             projectUserDao.delete(keys);
         }
 
-        // delete selected project tokens:
-        keys.clear();
-        Key key;
-        values = request.getParameterValues("tokens");
-        if (null != values) {
-            for(String keyString : values) {
-                key = KeyFactory.stringToKey(keyString);
-                keys.add(key);
-            }
-            uberDao.deleteTokens(keys);
-            uberDao.invalidateCache(project.getKey(), version.getKey(), null, null);
-        }
-
         return "redirect:/projects/" + project.getName() + '/';
     }
 

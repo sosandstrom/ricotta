@@ -86,6 +86,19 @@ public class TokenController {
         }
         else {
             updateArtifactTokens(request, project, version, null, null);
+
+            // delete selected project tokens:
+            final List<Key> keys = new ArrayList<Key>();
+            Key key;
+            String values[] = request.getParameterValues("delete");
+            if (null != values) {
+                for(String keyString : values) {
+                    key = KeyFactory.stringToKey(keyString);
+                    keys.add(key);
+                }
+                uberDao.deleteTokens(keys);
+                uberDao.invalidateCache(project.getKey(), version.getKey(), null, null);
+            }
         }
 
         return "redirect:/projects/" + projectName + "/tokens/index.html";
