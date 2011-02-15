@@ -433,14 +433,19 @@ public class UberDaoBean implements UberDao {
 
             // patch all translations:
             for(Translation tr : translationDao.findByToken(t.getKey())) {
+                boolean patch = (null == tr.getProject() || null == tr.getVersion());
                 if (null == tr.getProject()) {
                     LOG.warn("Project {} {} " + tr.getLocal(), t.getName(), tr.getLanguage());
                     tr.setProject(tokenProjectMap.get(tr.getToken()));
-                    translationDao.update(tr);
                 }
 
                 if (null == tr.getVersion()) {
                     LOG.warn("HEAD translation {} {} " + tr.getLocal(), t.getName(), tr.getLanguage());
+                    tr.setVersion(HEAD);
+                }
+
+                if (patch) {
+                    translationDao.update(tr);
                 }
             }
 
