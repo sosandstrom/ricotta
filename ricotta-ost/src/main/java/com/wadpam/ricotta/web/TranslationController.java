@@ -135,9 +135,11 @@ public class TranslationController {
                     key = KeyFactory.stringToKey(name.substring(PREFIX_DESCRIPTION.length()));
                     token = tokenDao.findByPrimaryKey(key);
                     if (false == value.equals(token.getDescription())) {
+                        final String d = String.format("D %s %s, was ", token.getName(), value, token.getDescription());
                         token.setDescription(value);
                         tokenDao.update(token);
-                        LOG.debug("updated description for {} to {}", token.getName(), value);
+                        LOG.debug(d);
+                        changes.add(d);
                     }
                 }
                 else {
@@ -178,7 +180,8 @@ public class TranslationController {
             final Token token = tokenDao.findByPrimaryKey(t.getToken());
             if (null != value && 0 < value.length()) {
                 if (false == value.equals(t.getLocal())) {
-                    final String u = String.format("U %s %s=%s (%s)", language.getCode(), token.getName(), value, t.getLocal());
+                    final String u = String
+                            .format("U %s %s=%s, was %s", language.getCode(), token.getName(), value, t.getLocal());
                     t.setLocal(value);
                     translationDao.update(t);
                     returnValue.add(u);
@@ -188,7 +191,7 @@ public class TranslationController {
             else if (delete) {
                 final List<Key> ts = translationDao.findKeysByTokenLanguageVersion(t.getToken(), t.getLanguage(), t.getVersion());
                 translationDao.delete(ts);
-                final String d = String.format("D %s %s", language.getCode(), token.getName());
+                final String d = String.format("R %s %s", language.getCode(), token.getName());
                 LOG.debug(d);
                 returnValue.add(d);
             }
