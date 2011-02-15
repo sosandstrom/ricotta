@@ -75,6 +75,7 @@
 		<property name="artifactDao" ref="artifactDao" />
 		<property name="tokenDao" ref="tokenDao" />
 		<property name="tokenArtifactDao" ref="tokenArtifactDao" />
+		<property name="uberDao" ref="uberDao" />
 		<property name="viewContextDao" ref="viewContextDao" />
 	</bean>
 

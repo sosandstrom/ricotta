@@ -51,17 +51,19 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
 
             // load version
             String versionParam = request.getParameter(KEY_VERSION);
+            Version version = null;
             if (null == versionParam) {
-                request.setAttribute(KEY_VERSION, uberDao.getHead());
+                version = uberDao.getHead();
             }
             else {
-                final Version version = versionDao.findByNameProject(versionParam, project.getKey());
+                version = versionDao.findByNameProject(versionParam, project.getKey());
                 if (null == version) {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND, "No such version " + versionParam);
                     return false;
                 }
-                request.setAttribute(KEY_VERSION, version);
             }
+            request.setAttribute(KEY_VERSION, version);
+            LOG.debug("                   versionName is {}", version.getName());
 
             // template request?
             matcher = REGEXP_TRANSLATION.matcher(request.getRequestURI());

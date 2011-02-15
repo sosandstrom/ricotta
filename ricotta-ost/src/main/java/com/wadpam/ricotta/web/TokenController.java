@@ -123,16 +123,12 @@ public class TokenController {
 
     protected void updateArtifactTokens(HttpServletRequest request, Project project, Version version, Token token,
             Artifact artifact) {
-        // HashMap<String, Token> tokenMap = new HashMap<String, Token>();
-        // for(Token t : tokenDao.findByProjectVersion(project.getKey(), uberDao.getHead().getKey(), true)) {
-        // tokenMap.put(t.getKeyString(), t);
-        // }
-
         // <select name="viewContext.<c:out value='${token.keyString}' />
         // <option value="${c.keyString}"
         Token t;
         Key tokenKey;
         String name, keyString;
+        boolean contextsChanged = false;
         for(Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
             name = e.nextElement();
             if (name.startsWith(VIEW_CONTEXT_PREFIX)) {
@@ -144,6 +140,7 @@ public class TokenController {
                     if (null != t.getViewContext()) {
                         t.setViewContext(null);
                         tokenDao.update(t);
+                        contextsChanged = true;
                     }
                 }
                 else {
@@ -152,9 +149,15 @@ public class TokenController {
                         Key contextKey = KeyFactory.stringToKey(keyString);
                         t.setViewContext(contextKey);
                         tokenDao.update(t);
+                        contextsChanged = true;
                     }
                 }
             }
+        }
+        // invalidate cache?
+        if (contextsChanged) {
+            LOGGER.debug("project {} version {}", project, version);
+            uberDao.invalidateCache(project.getKey(), version.getKey(), null, null);
         }
 
         // <input type="checkbox" name="mappings" value="tokenKey.artifactKey" />
