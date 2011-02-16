@@ -64,9 +64,12 @@ public class ProjectController {
     public String getProjects(HttpServletRequest request, Model model) {
         LOGGER.debug("get projects list {}, {}", projectDao, request.getUserPrincipal());
 
-        final String user = request.getUserPrincipal().getName();
-        List<Project> projects = new ArrayList<Project>(projectDao.findByOwner(user));
-        for(ProjectUser pu : projectUserDao.findByUser(user)) {
+        String username = "Googlebot";
+        if (null != request.getUserPrincipal()) {
+            username = request.getUserPrincipal().getName();
+        }
+        List<Project> projects = new ArrayList<Project>(projectDao.findByOwner(username));
+        for(ProjectUser pu : projectUserDao.findByUser(username)) {
             projects.add(projectDao.findByPrimaryKey(pu.getProject()));
         }
         model.addAttribute("projects", projects);

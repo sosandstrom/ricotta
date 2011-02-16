@@ -88,10 +88,10 @@ public class TokenController {
             updateArtifactTokens(request, project, version, null, null);
 
             // delete selected project tokens:
-            final List<Key> keys = new ArrayList<Key>();
-            Key key;
             String values[] = request.getParameterValues("delete");
-            if (null != values) {
+            if (null != values && "Delete selected tokens".equals(request.getParameter("Action"))) {
+                final List<Key> keys = new ArrayList<Key>();
+                Key key;
                 for(String keyString : values) {
                     key = KeyFactory.stringToKey(keyString);
                     keys.add(key);

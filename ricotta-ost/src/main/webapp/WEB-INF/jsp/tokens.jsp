@@ -21,6 +21,7 @@ function all_checkboxes(id, checked, artifactKey) {
 <a href="/index.html">Home</a> | <a href="/projects/index.html">Projects</a> | <a href="/projects/<c:out value='${project.name}' />/index.html"><c:out value="${project.name}" /></a>
 <div class="pageHeading">Project Tokens</div>
 <form id="tokens" name="tokens" action="" method="post" >
+<input type="submit" name="Action" value="Delete selected tokens" />
 <input type="submit" value="Save" />
 <table>
 		<thead>
@@ -59,6 +60,7 @@ function all_checkboxes(id, checked, artifactKey) {
 	</c:forEach>
 	</tbody>
 </table>
+<input type="submit" name="Action" value="Delete selected tokens" />
 <input type="submit" value="Save" />
 </form>
 <a href="/projects/<c:out value="${project.name}"/>/tokens/create.html">Create token</a>
