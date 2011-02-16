@@ -36,4 +36,18 @@ public class Encoder {
         final String br = gt.replace("\n", "\\n");
         return br;
     }
+
+    public String firstToUpper(String s) {
+        if (null == s) {
+            return null;
+        }
+        StringBuffer sb = new StringBuffer();
+        if (1 <= s.length()) {
+            sb.append(s.substring(0, 1).toUpperCase());
+        }
+        if (2 <= s.length()) {
+            sb.append(s.substring(1));
+        }
+        return sb.toString();
+    }
 }
