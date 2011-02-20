@@ -18,6 +18,9 @@
 		<property name="tokenArtifactDao" ref="tokenArtifactDao" />
 		<property name="translationDao" ref="translationDao" />
 		<property name="versionDao" ref="versionDao" />
+		
+		<property name="projDao" ref="projDao" />
+		<property name="branchDao" ref="branchDao" />
 	</bean>
 
 	<bean id="projectHandlerInterceptor" class="com.wadpam.ricotta.web.ProjectHandlerInterceptor">

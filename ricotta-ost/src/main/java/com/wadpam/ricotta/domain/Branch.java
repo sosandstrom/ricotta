@@ -1,52 +1,41 @@
 package com.wadpam.ricotta.domain;
 
-import javax.persistence.Basic;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
+import net.sf.mardao.api.Parent;
 import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
 
 import com.google.appengine.api.datastore.Key;
 
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "project"})})
-public class Version extends AEDPrimaryKeyEntity {
-    private static final long serialVersionUID = -8079549249025941275L;
+// @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "project"})})
+public class Branch extends AEDPrimaryKeyEntity {
+    private static final long serialVersionUID = -5395287576673002330L;
+
+    @Parent(kind = "Proj")
+    Key                       project;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Key                       key;
-
     String                    name;
 
     String                    description;
 
     String                    datum;
 
-    // @ManyToOne
-    @Basic
-    Key                       project;
-
     @Override
-    public String toString() {
-        return "Version{" + name + ',' + datum + '}';
+    public Key getParentKey() {
+        return project;
     }
 
     @Override
     public Object getSimpleKey() {
-        return key;
+        return name;
     }
 
-    public Key getKey() {
-        return key;
-    }
-
-    public void setKey(Key key) {
-        this.key = key;
+    @Override
+    public String toString() {
+        return "Branch{" + project + ',' + name + ',' + datum + '}';
     }
 
     public String getName() {
@@ -80,5 +69,4 @@ public class Version extends AEDPrimaryKeyEntity {
     public void setDatum(String datum) {
         this.datum = datum;
     }
-
 }

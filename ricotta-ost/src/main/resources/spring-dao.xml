@@ -14,17 +14,20 @@
 	<bean id="translationDao" 
 		class="com.wadpam.ricotta.dao.TranslationDaoBean">
 	</bean>
+	<bean id="branchDao" 
+		class="com.wadpam.ricotta.dao.BranchDaoBean">
+	</bean>
 	<bean id="tokenArtifactDao" 
 		class="com.wadpam.ricotta.dao.TokenArtifactDaoBean">
+	</bean>
+	<bean id="projDao" 
+		class="com.wadpam.ricotta.dao.ProjDaoBean">
 	</bean>
 	<bean id="mallDao" 
 		class="com.wadpam.ricotta.dao.MallDaoBean">
 	</bean>
 	<bean id="tokenDao" 
 		class="com.wadpam.ricotta.dao.TokenDaoBean">
-	</bean>
-	<bean id="countryDao" 
-		class="com.wadpam.ricotta.dao.CountryDaoBean">
 	</bean>
 	<bean id="projectLanguageDao" 
 		class="com.wadpam.ricotta.dao.ProjectLanguageDaoBean">
@@ -44,11 +47,11 @@
 	<bean id="versionDao" 
 		class="com.wadpam.ricotta.dao.VersionDaoBean">
 	</bean>
-	<bean id="projectUserDao" 
-		class="com.wadpam.ricotta.dao.ProjectUserDaoBean">
-	</bean>
 	<bean id="appUserDao" 
 		class="com.wadpam.ricotta.dao.AppUserDaoBean">
+	</bean>
+	<bean id="projectUserDao" 
+		class="com.wadpam.ricotta.dao.ProjectUserDaoBean">
 	</bean>
 	
 

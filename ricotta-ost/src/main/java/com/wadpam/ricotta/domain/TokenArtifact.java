@@ -16,25 +16,27 @@ import com.google.appengine.api.datastore.KeyFactory;
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"token", "artifact"})})
 public class TokenArtifact extends AEDPrimaryKeyEntity {
+    private static final long serialVersionUID = -2998638040524758351L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Key key;
+    Key                       key;
 
     // ManyToOne
     @Basic
-    Key project;
+    Key                       project;
 
     // ManyToOne
     @Basic
-    Key token;
+    Key                       token;
 
     // ManyToOne
     @Basic
-    Key artifact;
+    Key                       artifact;
 
     // ManyToOne
     @Basic
-    Key version;
+    Key                       version;
 
     @Override
     public String toString() {
@@ -66,7 +68,7 @@ public class TokenArtifact extends AEDPrimaryKeyEntity {
     }
 
     @Override
-    public Object getPrimaryKey() {
+    public Object getSimpleKey() {
         return key;
     }
 

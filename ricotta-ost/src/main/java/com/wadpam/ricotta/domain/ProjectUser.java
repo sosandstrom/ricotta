@@ -15,15 +15,17 @@ import com.google.appengine.api.datastore.Key;
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"project", "user"})})
 public class ProjectUser extends AEDPrimaryKeyEntity {
+    private static final long serialVersionUID = 3376949683379424856L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Key    key;
+    Key                       key;
 
-    String user;
+    String                    user;
 
     // ManyToOne
     @Basic
-    Key    project;
+    Key                       project;
 
     @Override
     public String toString() {
@@ -47,7 +49,7 @@ public class ProjectUser extends AEDPrimaryKeyEntity {
     }
 
     @Override
-    public Object getPrimaryKey() {
+    public Object getSimpleKey() {
         return key;
     }
 

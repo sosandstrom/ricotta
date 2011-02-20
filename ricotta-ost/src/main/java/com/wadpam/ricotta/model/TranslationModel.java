@@ -16,6 +16,11 @@ public class TranslationModel extends AEDPrimaryKeyEntity implements Serializabl
     private Translation       local;
     private Translation       parent;
 
+    @Override
+    public Object getSimpleKey() {
+        return key;
+    }
+
     public Token getToken() {
         return token;
     }
@@ -45,11 +50,6 @@ public class TranslationModel extends AEDPrimaryKeyEntity implements Serializabl
     }
 
     public Key getKey() {
-        return key;
-    }
-
-    @Override
-    public Object getPrimaryKey() {
         return key;
     }
 }

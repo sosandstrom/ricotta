@@ -44,6 +44,11 @@ public class Translation extends AEDPrimaryKeyEntity {
         return "Translation{" + local + ", tokenKey=" + token + ", languageKey=" + language + '}';
     }
 
+    @Override
+    public Object getSimpleKey() {
+        return key;
+    }
+
     public Key getKey() {
         return key;
     }
@@ -90,11 +95,6 @@ public class Translation extends AEDPrimaryKeyEntity {
 
     public void setProject(Key project) {
         this.project = project;
-    }
-
-    @Override
-    public Object getPrimaryKey() {
-        return key;
     }
 
 }

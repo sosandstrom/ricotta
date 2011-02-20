@@ -26,7 +26,7 @@ public class ViewContext extends AEDPrimaryKeyEntity {
     private BlobKey           blobKey;
 
     @Override
-    public Object getPrimaryKey() {
+    public Object getSimpleKey() {
         return key;
     }
 

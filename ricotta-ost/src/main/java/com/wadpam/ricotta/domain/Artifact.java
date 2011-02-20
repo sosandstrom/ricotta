@@ -16,17 +16,19 @@ import com.google.appengine.api.datastore.Key;
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "project"})})
 public class Artifact extends AEDPrimaryKeyEntity implements PrimaryKeyEntity {
+    private static final long serialVersionUID = -3099992336486992018L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Key    key;
+    Key                       key;
 
-    String name;
+    String                    name;
 
-    String description;
+    String                    description;
 
     // ManyToOne
     @Basic
-    Key    project;
+    Key                       project;
 
     @Override
     public String toString() {
@@ -66,7 +68,7 @@ public class Artifact extends AEDPrimaryKeyEntity implements PrimaryKeyEntity {
     }
 
     @Override
-    public Object getPrimaryKey() {
+    public Object getSimpleKey() {
         return key;
     }
 

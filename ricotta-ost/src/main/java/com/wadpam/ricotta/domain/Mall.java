@@ -15,17 +15,19 @@ import com.google.appengine.api.datastore.Key;
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"name"})})
 public class Mall extends AEDPrimaryKeyEntity implements PrimaryKeyEntity {
+    private static final long serialVersionUID = 7906382709967388339L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Key    key;
+    Key                       key;
 
-    String name;
+    String                    name;
 
-    String description;
+    String                    description;
 
-    String body;
+    String                    body;
 
-    String mimeType;
+    String                    mimeType;
 
     @Override
     public String toString() {
@@ -57,7 +59,7 @@ public class Mall extends AEDPrimaryKeyEntity implements PrimaryKeyEntity {
     }
 
     @Override
-    public Object getPrimaryKey() {
+    public Object getSimpleKey() {
         return key;
     }
 

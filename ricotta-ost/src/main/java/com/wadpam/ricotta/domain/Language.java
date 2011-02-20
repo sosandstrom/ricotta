@@ -15,13 +15,15 @@ import com.google.appengine.api.datastore.Key;
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"code"})})
 public class Language extends AEDPrimaryKeyEntity implements PrimaryKeyEntity {
+    private static final long serialVersionUID = -7733471256247686317L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Key    key;
+    Key                       key;
 
-    String code;
+    String                    code;
 
-    String name;
+    String                    name;
 
     public Key getKey() {
         return key;
@@ -48,7 +50,7 @@ public class Language extends AEDPrimaryKeyEntity implements PrimaryKeyEntity {
     }
 
     @Override
-    public Object getPrimaryKey() {
+    public Object getSimpleKey() {
         return key;
     }
 

@@ -31,8 +31,10 @@ import org.slf4j.LoggerFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.wadpam.ricotta.domain.Artifact;
+import com.wadpam.ricotta.domain.Branch;
 import com.wadpam.ricotta.domain.Language;
 import com.wadpam.ricotta.domain.Mall;
+import com.wadpam.ricotta.domain.Proj;
 import com.wadpam.ricotta.domain.Project;
 import com.wadpam.ricotta.domain.ProjectLanguage;
 import com.wadpam.ricotta.domain.Token;
@@ -72,11 +74,15 @@ public class UberDaoBean implements UberDao {
     private TranslationDao     translationDao;
     private VersionDao         versionDao;
 
+    private ProjDao            projDao;
+    private BranchDao          branchDao;
+
     private Version            _HEAD                         = null;
 
     public void init() {
         Key HEAD = populate();
-        patch(HEAD);
+        // moved to ProjectController.patchAll()
+        // patch(HEAD);
     }
 
     // ------------------ methods managing the cache ------------------------------
@@ -400,7 +406,7 @@ public class UberDaoBean implements UberDao {
     /**
      * Patches any old persisted data
      */
-    protected void patch(final Key HEAD) {
+    public void patch(final Key HEAD) {
         // ProjectLanguages needs version
         for(ProjectLanguage pl : projectLanguageDao.findAll()) {
             if (null == pl.getVersion()) {
@@ -499,6 +505,12 @@ public class UberDaoBean implements UberDao {
         translationDao.persist(null, en_GB.getKey(), "Project", project.getKey(), tokenProject.getKey(), HEAD);
         translationDao.persist(null, sv.getKey(), "Projekt", project.getKey(), tokenProject.getKey(), HEAD);
 
+        // FIXME: remove test entities
+        Proj proj = projDao.persist("proj", "test@example.com");
+        Branch head = branchDao.persist((Key) proj.getPrimaryKey(), "trunk", "2011-02-20", "proj's trunk");
+        Branch integration = branchDao.persist((Key) proj.getPrimaryKey(), "integration", "2011-02-20",
+                "proj's integration branch");
+
         return HEAD;
     }
 
@@ -509,6 +521,25 @@ public class UberDaoBean implements UberDao {
             LOG.info("Initializing HEAD: {}", _HEAD);
         }
         return _HEAD;
+    }
+
+    public void upgrade() {
+        for(Project project : projectDao.findAll()) {
+            upgradeProject(project);
+        }
+    }
+
+    public void upgradeProject(Project project) {
+        final Proj proj = projDao.persist(project.getName(), project.getOwner());
+
+        upgradeVersion((Key) proj.getPrimaryKey(), getHead());
+        for(Version v : versionDao.findByProject(project.getKey())) {
+            upgradeVersion((Key) proj.getPrimaryKey(), v);
+        }
+    }
+
+    public void upgradeVersion(Key projectKey, Version v) {
+        branchDao.persist(projectKey, v.getName(), v.getDatum(), v.getDescription());
     }
 
     public ProjectLanguageDao getProjectLanguageDao() {
@@ -573,5 +604,13 @@ public class UberDaoBean implements UberDao {
 
     public void setVersionDao(VersionDao versionDao) {
         this.versionDao = versionDao;
+    }
+
+    public void setProjDao(ProjDao projDao) {
+        this.projDao = projDao;
+    }
+
+    public void setBranchDao(BranchDao branchDao) {
+        this.branchDao = branchDao;
     }
 }

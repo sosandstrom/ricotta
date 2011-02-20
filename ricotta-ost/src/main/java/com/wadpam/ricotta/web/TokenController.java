@@ -207,6 +207,7 @@ public class TokenController {
                         ta.setToken(KeyFactory.stringToKey(value.substring(0, beginIndex)));
                         final Key artifactKey = KeyFactory.stringToKey(value.substring(beginIndex + 1));
                         ta.setArtifact(artifactKey);
+                        ta.setVersion(version.getKey());
                         tokenArtifactDao.persist(ta);
                         uberDao.invalidateCache(project.getKey(), version.getKey(), null, artifactKey);
                     }

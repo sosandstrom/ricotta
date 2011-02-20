@@ -27,6 +27,7 @@ import com.wadpam.ricotta.dao.ProjectDao;
 import com.wadpam.ricotta.dao.ProjectUserDao;
 import com.wadpam.ricotta.dao.TokenDao;
 import com.wadpam.ricotta.dao.UberDao;
+import com.wadpam.ricotta.dao.UberDaoBean;
 import com.wadpam.ricotta.dao.VersionDao;
 import com.wadpam.ricotta.dao.ViewContextDao;
 import com.wadpam.ricotta.domain.Project;
@@ -150,6 +151,18 @@ public class ProjectController {
         }
 
         return "redirect:/projects/" + project.getName() + '/';
+    }
+
+    @RequestMapping(value = "patchAll.html", method = RequestMethod.GET)
+    public String patchAll() {
+        ((UberDaoBean) uberDao).patch(uberDao.getHead().getKey());
+        return "redirect:/index.html";
+    }
+
+    @RequestMapping(value = "upgrade.html", method = RequestMethod.GET)
+    public String upgrade() {
+        ((UberDaoBean) uberDao).upgrade();
+        return "redirect:/index.html";
     }
 
     @RequestMapping(value = "{projectName}/index.html", method = RequestMethod.GET)

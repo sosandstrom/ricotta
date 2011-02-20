@@ -52,7 +52,7 @@ function all_checkboxes(id, checked, artifactKey) {
 			</select></td>
 			<c:forEach items="${artifacts}" var="artifact">
 				<td><c:set var="key" scope="page"><c:out value='${token.keyString}' />.<c:out value='${artifact.keyString}' /></c:set>
-					<input type="checkbox" id="mappings" name="mappings" value="<c:out value='${key}' />"
+					<input type="checkbox" id="mappings" name="mappings" value="<c:out value='${key}' />" title="<c:out value='${token.name}' />:<c:out value='${artifact.name}' />"
 						<c:if test="${null != mappings[key]}">checked="checked"</c:if> />
 				</td>
 			</c:forEach>
