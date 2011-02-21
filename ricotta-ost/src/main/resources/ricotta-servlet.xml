@@ -34,6 +34,11 @@
 		<property name="versionDao" ref="versionDao" />
 		<property name="uberDao" ref="uberDao" />
 	</bean>
+	
+	<bean id="branchController" class="com.wadpam.ricotta.web.BranchController">
+		<property name="branchDao" ref="branchDao" />
+	</bean>
+	
 
 	<!-- As auto-wiring does not work well in GAE, define controllers manually: -->
 	<bean id="indexController" class="com.wadpam.ricotta.web.IndexController" />
