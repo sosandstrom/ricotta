@@ -159,9 +159,9 @@ public class ProjectController {
         return "redirect:/index.html";
     }
 
-    @RequestMapping(value = "upgrade.html", method = RequestMethod.GET)
+    @RequestMapping(value = "upgradeAll.html", method = RequestMethod.GET)
     public String upgrade() {
-        ((UberDaoBean) uberDao).upgrade();
+        ((UberDaoBean) uberDao).upgradeAll();
         return "redirect:/index.html";
     }
 

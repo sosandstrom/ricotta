@@ -35,10 +35,15 @@ import com.wadpam.ricotta.domain.Branch;
 import com.wadpam.ricotta.domain.Language;
 import com.wadpam.ricotta.domain.Mall;
 import com.wadpam.ricotta.domain.Proj;
+import com.wadpam.ricotta.domain.ProjLang;
 import com.wadpam.ricotta.domain.Project;
 import com.wadpam.ricotta.domain.ProjectLanguage;
+import com.wadpam.ricotta.domain.Subset;
+import com.wadpam.ricotta.domain.SubsetTokn;
 import com.wadpam.ricotta.domain.Token;
 import com.wadpam.ricotta.domain.TokenArtifact;
+import com.wadpam.ricotta.domain.Tokn;
+import com.wadpam.ricotta.domain.Trans;
 import com.wadpam.ricotta.domain.Translation;
 import com.wadpam.ricotta.domain.Version;
 import com.wadpam.ricotta.model.ProjectLanguageModel;
@@ -76,6 +81,11 @@ public class UberDaoBean implements UberDao {
 
     private ProjDao            projDao;
     private BranchDao          branchDao;
+    private ProjLangDao        projLangDao;
+    private ToknDao            toknDao;
+    private TransDao           transDao;
+    private SubsetDao          subsetDao;
+    private SubsetToknDao      subsetToknDao;
 
     private Version            _HEAD                         = null;
 
@@ -523,23 +533,76 @@ public class UberDaoBean implements UberDao {
         return _HEAD;
     }
 
-    public void upgrade() {
+    public void upgradeAll() {
         for(Project project : projectDao.findAll()) {
             upgradeProject(project);
         }
     }
 
     public void upgradeProject(Project project) {
+        LOG.info("PROJ {}", project.getName());
         final Proj proj = projDao.persist(project.getName(), project.getOwner());
 
-        upgradeVersion((Key) proj.getPrimaryKey(), getHead());
+        // old HEAD singleton
+        upgradeVersion(project, getHead(), proj.getPrimaryKey(), "trunk");
+
+        // each version
         for(Version v : versionDao.findByProject(project.getKey())) {
-            upgradeVersion((Key) proj.getPrimaryKey(), v);
+            upgradeVersion(project, v, proj.getPrimaryKey(), v.getName());
         }
     }
 
-    public void upgradeVersion(Key projectKey, Version v) {
-        branchDao.persist(projectKey, v.getName(), v.getDatum(), v.getDescription());
+    public void upgradeVersion(Project project, Version version, Object projKey, String name) {
+        LOG.info("    BRANCH {} for {}", name, project.getName());
+        final Branch b = branchDao.persist(projKey, name, version.getDatum(), version.getDescription());
+
+        // ProjLang s
+        Map<Key, String> langMap = new HashMap<Key, String>();
+        for(ProjectLanguage pl : projectLanguageDao.findByVersion(version.getKey())) {
+            // add language code to langMap:
+            Language lang = languageDao.findByPrimaryKey(pl.getLanguage());
+            if (null == lang) {
+                LOG.warn("No language {} for projLang {}", pl.getLanguage(), pl);
+            }
+            else {
+                langMap.put(pl.getLanguage(), lang.getCode());
+                LOG.info("        PROJ_LANG {} for {}", lang.getCode(), name);
+                ProjLang projLang = projLangDao.persist(b.getPrimaryKey(), lang.getCode(), pl.getLanguage(), pl.getParent());
+                LOG.info("           returned {} for {}", projLang);
+            }
+
+        }
+
+        // Artifacts; create one per branch
+        Map<Key, Subset> artifactMap = new HashMap<Key, Subset>();
+        for(Artifact a : artifactDao.findByProject(project.getKey())) {
+            LOG.info("        SUBSET {} for {}", a.getName(), name);
+            Subset subset = subsetDao.persist(b.getPrimaryKey(), a.getName(), a.getDescription());
+            artifactMap.put(a.getKey(), subset);
+        }
+
+        // Tokens
+        for(Token t : tokenDao.findByProjectVersion(project.getKey(), version.getKey(), true)) {
+            upgradeToken(b.getPrimaryKey(), t, langMap, artifactMap);
+        }
+    }
+
+    public void upgradeToken(Object branchKey, Token token, Map<Key, String> langMap, Map<Key, Subset> artifactMap) {
+        LOG.info("        TOKN {} for {}", token.getName(), branchKey);
+        Tokn tokn = toknDao.persist(branchKey, null, token.getDescription(), token.getName(), token.getViewContext());
+
+        // TokenArtifacts
+        for(TokenArtifact ta : tokenArtifactDao.findByToken(token.getKey())) {
+            final Subset subset = artifactMap.get(ta.getArtifact());
+            LOG.info("            SUBSET_TOKN {} for {}", subset.getName(), token.getName());
+            SubsetTokn subsetTokn = subsetToknDao.persist(subset.getPrimaryKey(), tokn.getName(), (Key) tokn.getPrimaryKey());
+        }
+
+        // translations
+        for(Translation t : translationDao.findByTokenVersion(token.getKey(), token.getVersion())) {
+            LOG.info("            TRANS {} in {}", t.getLocal(), langMap.get(t.getLanguage()));
+            Trans trans = transDao.persist(tokn.getPrimaryKey(), langMap.get(t.getLanguage()), t.getLanguage(), t.getLocal());
+        }
     }
 
     public ProjectLanguageDao getProjectLanguageDao() {
@@ -612,5 +675,25 @@ public class UberDaoBean implements UberDao {
 
     public void setBranchDao(BranchDao branchDao) {
         this.branchDao = branchDao;
+    }
+
+    public void setProjLangDao(ProjLangDao projLangDao) {
+        this.projLangDao = projLangDao;
+    }
+
+    public void setToknDao(ToknDao toknDao) {
+        this.toknDao = toknDao;
+    }
+
+    public void setTransDao(TransDao transDao) {
+        this.transDao = transDao;
+    }
+
+    public void setSubsetDao(SubsetDao subsetDao) {
+        this.subsetDao = subsetDao;
+    }
+
+    public void setSubsetToknDao(SubsetToknDao subsetToknDao) {
+        this.subsetToknDao = subsetToknDao;
     }
 }

@@ -21,6 +21,11 @@
 		
 		<property name="projDao" ref="projDao" />
 		<property name="branchDao" ref="branchDao" />
+		<property name="projLangDao" ref="projLangDao" />
+		<property name="toknDao" ref="toknDao" />
+		<property name="transDao" ref="transDao" />
+		<property name="subsetDao" ref="subsetDao" />
+		<property name="subsetToknDao" ref="subsetToknDao" />
 	</bean>
 
 	<bean id="projectHandlerInterceptor" class="com.wadpam.ricotta.web.ProjectHandlerInterceptor">

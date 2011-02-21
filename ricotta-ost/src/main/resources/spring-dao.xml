@@ -11,6 +11,9 @@
 <!-- Bean managed transactions -->
 
 	<!-- ============== DaoBeans for entities in package com.wadpam.ricotta.domain ============ -->
+	<bean id="projLangDao" 
+		class="com.wadpam.ricotta.dao.ProjLangDaoBean">
+	</bean>
 	<bean id="translationDao" 
 		class="com.wadpam.ricotta.dao.TranslationDaoBean">
 	</bean>
@@ -26,11 +29,20 @@
 	<bean id="mallDao" 
 		class="com.wadpam.ricotta.dao.MallDaoBean">
 	</bean>
+	<bean id="toknDao" 
+		class="com.wadpam.ricotta.dao.ToknDaoBean">
+	</bean>
 	<bean id="tokenDao" 
 		class="com.wadpam.ricotta.dao.TokenDaoBean">
 	</bean>
 	<bean id="projectLanguageDao" 
 		class="com.wadpam.ricotta.dao.ProjectLanguageDaoBean">
+	</bean>
+	<bean id="subsetToknDao" 
+		class="com.wadpam.ricotta.dao.SubsetToknDaoBean">
+	</bean>
+	<bean id="transDao" 
+		class="com.wadpam.ricotta.dao.TransDaoBean">
 	</bean>
 	<bean id="artifactDao" 
 		class="com.wadpam.ricotta.dao.ArtifactDaoBean">
@@ -46,6 +58,9 @@
 	</bean>
 	<bean id="versionDao" 
 		class="com.wadpam.ricotta.dao.VersionDaoBean">
+	</bean>
+	<bean id="subsetDao" 
+		class="com.wadpam.ricotta.dao.SubsetDaoBean">
 	</bean>
 	<bean id="appUserDao" 
 		class="com.wadpam.ricotta.dao.AppUserDaoBean">
