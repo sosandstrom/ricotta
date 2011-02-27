@@ -1,6 +1,5 @@
 package com.wadpam.ricotta.domain;
 
-import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -10,34 +9,29 @@ import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
 import com.google.appengine.api.datastore.Key;
 
 @Entity
-// @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"token", "language", "version"})})
 public class Trans extends AEDPrimaryKeyEntity {
     private static final long serialVersionUID = -5659004527175071885L;
-    @Parent(kind = "Tokn")
-    Key                       token;
+    @Parent(kind = "ProjLang")
+    Key                       projLang;
 
     @Id
-    String                    langCode;
+    Key                       token;
 
     String                    local;
 
-    // ManyToOne
-    @Basic
-    Key                       lang;
-
     @Override
     public String toString() {
-        return "Translation{" + local + ", tokenKey=" + token + ", languageKey=" + lang + '}';
+        return "Translation{" + local + ", tokenKey=" + token + ", langKey=" + projLang + '}';
     }
 
     @Override
     public Object getSimpleKey() {
-        return langCode;
+        return token;
     }
 
     @Override
     public Object getParentKey() {
-        return token;
+        return projLang;
     }
 
     public String getLocal() {
@@ -56,20 +50,12 @@ public class Trans extends AEDPrimaryKeyEntity {
         this.token = token;
     }
 
-    public Key getLang() {
-        return lang;
+    public Key getProjLang() {
+        return projLang;
     }
 
-    public void setLang(Key langKey) {
-        this.lang = langKey;
-    }
-
-    public String getLangCode() {
-        return langCode;
-    }
-
-    public void setLangCode(String langCode) {
-        this.langCode = langCode;
+    public void setProjLang(Key projLang) {
+        this.projLang = projLang;
     }
 
 }

@@ -2,14 +2,17 @@ package com.wadpam.ricotta.dao;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.cache.Cache;
 import javax.cache.CacheException;
@@ -32,12 +35,14 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.wadpam.ricotta.domain.Artifact;
 import com.wadpam.ricotta.domain.Branch;
+import com.wadpam.ricotta.domain.Lang;
 import com.wadpam.ricotta.domain.Language;
 import com.wadpam.ricotta.domain.Mall;
 import com.wadpam.ricotta.domain.Proj;
 import com.wadpam.ricotta.domain.ProjLang;
 import com.wadpam.ricotta.domain.Project;
 import com.wadpam.ricotta.domain.ProjectLanguage;
+import com.wadpam.ricotta.domain.ProjectUser;
 import com.wadpam.ricotta.domain.Subset;
 import com.wadpam.ricotta.domain.SubsetTokn;
 import com.wadpam.ricotta.domain.Token;
@@ -47,9 +52,11 @@ import com.wadpam.ricotta.domain.Trans;
 import com.wadpam.ricotta.domain.Translation;
 import com.wadpam.ricotta.domain.Version;
 import com.wadpam.ricotta.model.ProjectLanguageModel;
+import com.wadpam.ricotta.model.TransModel;
 import com.wadpam.ricotta.model.TranslationModel;
+import com.wadpam.ricotta.web.AbstractDaoController;
 
-public class UberDaoBean implements UberDao {
+public class UberDaoBean extends AbstractDaoController implements UberDao {
     static final Logger        LOG                           = LoggerFactory.getLogger(UberDaoBean.class);
 
     public static final String MALL_BODY_ANDROID             = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
@@ -78,14 +85,6 @@ public class UberDaoBean implements UberDao {
     private TokenArtifactDao   tokenArtifactDao;
     private TranslationDao     translationDao;
     private VersionDao         versionDao;
-
-    private ProjDao            projDao;
-    private BranchDao          branchDao;
-    private ProjLangDao        projLangDao;
-    private ToknDao            toknDao;
-    private TransDao           transDao;
-    private SubsetDao          subsetDao;
-    private SubsetToknDao      subsetToknDao;
 
     private Version            _HEAD                         = null;
 
@@ -293,6 +292,63 @@ public class UberDaoBean implements UberDao {
         }
 
         return returnValue;
+    }
+
+    public Collection<TransModel> loadTrans(Key branchKey, Key subsetKey, ProjLang projLang) {
+        final Map<Key, TransModel> returnValue = new TreeMap<Key, TransModel>();
+        Map<Key, Tokn> tokens;
+        if (null == subsetKey) {
+            // find all tokens for branch:
+            tokens = new TreeMap<Key, Tokn>();
+            for(Tokn tokn : toknDao.findByBranch(branchKey)) {
+                tokens.put(tokn.getKey(), tokn);
+            }
+        }
+        else {
+            // find tokens for subset:
+            final List<SubsetTokn> subTokens = subsetToknDao.findBySubset(subsetKey);
+            final List<Key> tokenKeys = new ArrayList<Key>();
+            for(SubsetTokn st : subTokens) {
+                tokenKeys.add(st.getTokn());
+            }
+            tokens = toknDao.findByPrimaryKeys(branchKey, tokenKeys);
+        }
+
+        // fetch translations for this language
+        Map<Key, Trans> trans = transDao.findByPrimaryKeys(projLang.getPrimaryKey(), tokens.keySet());
+        final Map<Key, TransModel> defaults = new TreeMap<Key, TransModel>();
+        TransModel model;
+        for(Entry<Key, Trans> entry : trans.entrySet()) {
+            model = new TransModel();
+            model.setLocal(entry.getValue());
+            model.setToken(tokens.get(entry.getKey()));
+            model.setKey(null != model.getLocal() ? entry.getKey() : entry.getValue().getToken());
+            // schedule to add defualt or add to return value?
+            if (null == model.getLocal()) {
+                defaults.put(entry.getKey(), model);
+            }
+            else {
+                returnValue.put(entry.getKey(), model);
+            }
+        }
+
+        // if non-default language, fetch default translations too
+        if (false == defaults.isEmpty() && null != projLang.getDefaultLang()) {
+            final String defLangCode = projLang.getDefaultLang().getName();
+            final Key defLangKey = KeyFactory.createKey(branchKey, ProjLang.class.getSimpleName(), defLangCode);
+            trans = transDao.findByPrimaryKeys(defLangKey, defaults.keySet());
+
+            // populate existing TransModels
+            for(Entry<Key, Trans> entry : trans.entrySet()) {
+                model = defaults.get(entry.getKey());
+                model.setParent(entry.getValue());
+            }
+
+            // add all (with or without parent)
+            returnValue.putAll(defaults);
+        }
+
+        return returnValue.values();
     }
 
     @SuppressWarnings("unchecked")
@@ -521,6 +577,9 @@ public class UberDaoBean implements UberDao {
         Branch integration = branchDao.persist((Key) proj.getPrimaryKey(), "integration", "2011-02-20",
                 "proj's integration branch");
 
+        Proj other = projDao.persist("other", "s.o.sandstrom@gmail.com");
+        Branch trunk = branchDao.persist((Key) other.getPrimaryKey(), "trunk", "2011-02-26", "other's trunk");
+        projUserDao.persist(other.getPrimaryKey(), "test@example.com");
         return HEAD;
     }
 
@@ -534,6 +593,14 @@ public class UberDaoBean implements UberDao {
     }
 
     public void upgradeAll() {
+        for(Language l : languageDao.findAll()) {
+            langDao.persist(l.getCode(), l.getName());
+        }
+
+        for(Mall m : mallDao.findAll()) {
+            templateDao.persist(m.getName(), m.getBody(), m.getDescription(), m.getMimeType());
+        }
+
         for(Project project : projectDao.findAll()) {
             upgradeProject(project);
         }
@@ -542,6 +609,11 @@ public class UberDaoBean implements UberDao {
     public void upgradeProject(Project project) {
         LOG.info("PROJ {}", project.getName());
         final Proj proj = projDao.persist(project.getName(), project.getOwner());
+
+        // project users
+        for(ProjectUser pu : projectUserDao.findByProject(project.getKey())) {
+            projUserDao.persist(proj.getPrimaryKey(), pu.getUser());
+        }
 
         // old HEAD singleton
         upgradeVersion(project, getHead(), proj.getPrimaryKey(), "trunk");
@@ -566,8 +638,14 @@ public class UberDaoBean implements UberDao {
             }
             else {
                 langMap.put(pl.getLanguage(), lang.getCode());
+                Key defKey = null;
+                if (null != pl.getParent()) {
+                    Language def = languageDao.findByPrimaryKey(pl.getParent());
+                    defKey = KeyFactory.createKey(Lang.class.getSimpleName(), def.getCode());
+                }
                 LOG.info("        PROJ_LANG {} for {}", lang.getCode(), name);
-                ProjLang projLang = projLangDao.persist(b.getPrimaryKey(), lang.getCode(), pl.getLanguage(), pl.getParent());
+                ProjLang projLang = projLangDao.persist(b.getPrimaryKey(), lang.getCode(), defKey,
+                        KeyFactory.createKey(Lang.class.getSimpleName(), lang.getCode()));
                 LOG.info("           returned {} for {}", projLang);
             }
 
@@ -599,9 +677,12 @@ public class UberDaoBean implements UberDao {
         }
 
         // translations
+        Key projLang;
         for(Translation t : translationDao.findByTokenVersion(token.getKey(), token.getVersion())) {
             LOG.info("            TRANS {} in {}", t.getLocal(), langMap.get(t.getLanguage()));
-            Trans trans = transDao.persist(tokn.getPrimaryKey(), langMap.get(t.getLanguage()), t.getLanguage(), t.getLocal());
+            String langCode = langMap.get(t.getLanguage());
+            projLang = KeyFactory.createKey((Key) branchKey, ProjLang.class.getSimpleName(), langCode);
+            Trans trans = transDao.persist(projLang, (Key) tokn.getPrimaryKey(), t.getLocal());
         }
     }
 
@@ -669,31 +750,4 @@ public class UberDaoBean implements UberDao {
         this.versionDao = versionDao;
     }
 
-    public void setProjDao(ProjDao projDao) {
-        this.projDao = projDao;
-    }
-
-    public void setBranchDao(BranchDao branchDao) {
-        this.branchDao = branchDao;
-    }
-
-    public void setProjLangDao(ProjLangDao projLangDao) {
-        this.projLangDao = projLangDao;
-    }
-
-    public void setToknDao(ToknDao toknDao) {
-        this.toknDao = toknDao;
-    }
-
-    public void setTransDao(TransDao transDao) {
-        this.transDao = transDao;
-    }
-
-    public void setSubsetDao(SubsetDao subsetDao) {
-        this.subsetDao = subsetDao;
-    }
-
-    public void setSubsetToknDao(SubsetToknDao subsetToknDao) {
-        this.subsetToknDao = subsetToknDao;
-    }
 }

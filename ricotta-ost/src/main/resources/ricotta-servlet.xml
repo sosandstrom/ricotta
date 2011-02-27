@@ -19,9 +19,12 @@
 		<property name="translationDao" ref="translationDao" />
 		<property name="versionDao" ref="versionDao" />
 		
+		<property name="langDao" ref="langDao" />
+		<property name="templateDao" ref="templateDao" />
 		<property name="projDao" ref="projDao" />
 		<property name="branchDao" ref="branchDao" />
 		<property name="projLangDao" ref="projLangDao" />
+		<property name="projUserDao" ref="projUserDao" />
 		<property name="toknDao" ref="toknDao" />
 		<property name="transDao" ref="transDao" />
 		<property name="subsetDao" ref="subsetDao" />
@@ -36,7 +39,14 @@
 	</bean>
 	
 	<bean id="branchController" class="com.wadpam.ricotta.web.BranchController">
+		<property name="langDao" ref="langDao" />
 		<property name="branchDao" ref="branchDao" />
+		<property name="projLangDao" ref="projLangDao" />
+	</bean>
+	
+	<bean id="projController" class="com.wadpam.ricotta.web.ProjController">
+		<property name="projDao" ref="projDao" />
+		<property name="projUserDao" ref="projUserDao" />
 	</bean>
 	
 

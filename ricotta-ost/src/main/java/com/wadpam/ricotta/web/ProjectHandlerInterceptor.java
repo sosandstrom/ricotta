@@ -34,6 +34,8 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
     protected static final String KEY_BRANCH         = Branch.class.getSimpleName();
     protected static final String KEY_PROJKEY        = "projKey";
     protected static final String KEY_BRANCHKEY      = "branchKey";
+    protected static final String KEY_PROJNAME       = "projName";
+    protected static final String KEY_BRANCHNAME     = "branchName";
 
     static final Pattern          REGEXP_PROJECT     = Pattern.compile("\\A/projects/([^/]+)/");
     static final Pattern          REGEXP_TRANSLATION = Pattern.compile("\\A/projects/([^/]+)/languages/[^/]+/templates/[^/]+/");
@@ -106,23 +108,29 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
         matcher = REGEXP_PROJ.matcher(request.getRequestURI());
         if (matcher.find()) {
             projName = matcher.group(1);
-        }
 
-        // then /branch/branchname
-        matcher = REGEXP_BRANCH.matcher(request.getRequestURI());
-        if (matcher.find()) {
-            branchName = matcher.group(1);
-        }
+            // create projKey first
+            if (null != projName) {
+                request.setAttribute(KEY_PROJNAME, projName);
+                final Key projKey = KeyFactory.createKey(Proj.class.getSimpleName(), projName);
+                request.setAttribute(KEY_PROJKEY, projKey);
 
-        // create projKey first
-        if (null != projName) {
-            final Key projKey = KeyFactory.createKey(Proj.class.getSimpleName(), projName);
-            request.setAttribute(KEY_PROJKEY, projKey);
-            if (null != branchName) {
-                final Key branchKey = KeyFactory.createKey(projKey, Branch.class.getSimpleName(), branchName);
-                request.setAttribute(KEY_BRANCHKEY, branchKey);
+                // then /branch/branchname
+                matcher = REGEXP_BRANCH.matcher(request.getRequestURI());
+                if (matcher.find()) {
+                    branchName = matcher.group(1);
+                }
+                else {
+                    branchName = "trunk";
+                }
+                if (null != branchName) {
+                    request.setAttribute(KEY_BRANCHNAME, branchName);
+                    final Key branchKey = KeyFactory.createKey(projKey, Branch.class.getSimpleName(), branchName);
+                    request.setAttribute(KEY_BRANCHKEY, branchKey);
+                }
             }
         }
+
         return true;
     }
 

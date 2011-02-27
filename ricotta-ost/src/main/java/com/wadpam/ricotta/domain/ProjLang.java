@@ -21,17 +21,17 @@ public class ProjLang extends AEDPrimaryKeyEntity {
     String                    langCode;
 
     @Basic
-    Key                       language;
+    Key                       lang;
 
     /**
-     * Parent Language, not Parent ProjectLanguage!
+     * Default Lang, not Parent ProjLang!
      */
     @Basic
-    Key                       parentLang;
+    Key                       defaultLang;
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '{' + branch + ',' + langCode + '(' + parentLang + ")}";
+        return getClass().getSimpleName() + '{' + branch + ',' + langCode + '(' + defaultLang + ")}";
     }
 
     @Override
@@ -44,20 +44,20 @@ public class ProjLang extends AEDPrimaryKeyEntity {
         return branch;
     }
 
-    public Key getParentLang() {
-        return parentLang;
+    public Key getDefaultLang() {
+        return defaultLang;
     }
 
-    public void setParentLang(Key parentLang) {
-        this.parentLang = parentLang;
+    public void setDefaultLang(Key defaultLang) {
+        this.defaultLang = defaultLang;
     }
 
-    public Key getLanguage() {
-        return language;
+    public Key getLang() {
+        return lang;
     }
 
-    public void setLanguage(Key language) {
-        this.language = language;
+    public void setLang(Key language) {
+        this.lang = language;
     }
 
     public Key getBranch() {
