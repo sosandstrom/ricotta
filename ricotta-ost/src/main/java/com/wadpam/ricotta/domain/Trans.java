@@ -15,7 +15,7 @@ public class Trans extends AEDPrimaryKeyEntity {
     Key                       projLang;
 
     @Id
-    Key                       token;
+    Long                      token;
 
     String                    local;
 
@@ -42,11 +42,11 @@ public class Trans extends AEDPrimaryKeyEntity {
         this.local = local;
     }
 
-    public Key getToken() {
+    public Long getToken() {
         return token;
     }
 
-    public void setToken(Key token) {
+    public void setToken(Long token) {
         this.token = token;
     }
 

@@ -25,6 +25,7 @@
 		<property name="branchDao" ref="branchDao" />
 		<property name="projLangDao" ref="projLangDao" />
 		<property name="projUserDao" ref="projUserDao" />
+		<property name="ctxtDao" ref="ctxtDao" />
 		<property name="toknDao" ref="toknDao" />
 		<property name="transDao" ref="transDao" />
 		<property name="subsetDao" ref="subsetDao" />
@@ -49,6 +50,11 @@
 		<property name="projUserDao" ref="projUserDao" />
 	</bean>
 	
+	<bean id="transController" class="com.wadpam.ricotta.web.TransController">
+		<property name="ctxtDao" ref="ctxtDao" />
+		<property name="projLangDao" ref="projLangDao" />
+		<property name="uberDao" ref="uberDao" />
+	</bean>
 
 	<!-- As auto-wiring does not work well in GAE, define controllers manually: -->
 	<bean id="indexController" class="com.wadpam.ricotta.web.IndexController" />

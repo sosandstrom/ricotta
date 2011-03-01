@@ -44,11 +44,14 @@
 	<bean id="projectLanguageDao" 
 		class="com.wadpam.ricotta.dao.ProjectLanguageDaoBean">
 	</bean>
+	<bean id="subsetToknDao" 
+		class="com.wadpam.ricotta.dao.SubsetToknDaoBean">
+	</bean>
 	<bean id="projUserDao" 
 		class="com.wadpam.ricotta.dao.ProjUserDaoBean">
 	</bean>
-	<bean id="subsetToknDao" 
-		class="com.wadpam.ricotta.dao.SubsetToknDaoBean">
+	<bean id="ctxtDao" 
+		class="com.wadpam.ricotta.dao.CtxtDaoBean">
 	</bean>
 	<bean id="transDao" 
 		class="com.wadpam.ricotta.dao.TransDaoBean">

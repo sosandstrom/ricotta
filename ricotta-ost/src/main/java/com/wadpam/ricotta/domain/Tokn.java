@@ -22,7 +22,7 @@ public class Tokn extends AEDPrimaryKeyEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Key                       key;
+    Long                      id;
 
     String                    name;
 
@@ -33,25 +33,17 @@ public class Tokn extends AEDPrimaryKeyEntity {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '{' + name + ',' + description + ',' + key + '}';
+        return getClass().getSimpleName() + '{' + name + ',' + description + ',' + id + '}';
     }
 
     @Override
     public Object getSimpleKey() {
-        return key;
+        return id;
     }
 
     @Override
     public Object getParentKey() {
         return branch;
-    }
-
-    public Key getKey() {
-        return key;
-    }
-
-    public void setKey(Key key) {
-        this.key = key;
     }
 
     public String getName() {
@@ -84,6 +76,14 @@ public class Tokn extends AEDPrimaryKeyEntity {
 
     public void setViewContext(Key viewContext) {
         this.viewContext = viewContext;
+    }
+
+    public final Long getId() {
+        return id;
+    }
+
+    public final void setId(Long id) {
+        this.id = id;
     }
 
 }

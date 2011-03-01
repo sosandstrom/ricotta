@@ -35,6 +35,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.wadpam.ricotta.domain.Artifact;
 import com.wadpam.ricotta.domain.Branch;
+import com.wadpam.ricotta.domain.Ctxt;
 import com.wadpam.ricotta.domain.Lang;
 import com.wadpam.ricotta.domain.Language;
 import com.wadpam.ricotta.domain.Mall;
@@ -45,6 +46,7 @@ import com.wadpam.ricotta.domain.ProjectLanguage;
 import com.wadpam.ricotta.domain.ProjectUser;
 import com.wadpam.ricotta.domain.Subset;
 import com.wadpam.ricotta.domain.SubsetTokn;
+import com.wadpam.ricotta.domain.Template;
 import com.wadpam.ricotta.domain.Token;
 import com.wadpam.ricotta.domain.TokenArtifact;
 import com.wadpam.ricotta.domain.Tokn;
@@ -294,20 +296,21 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         return returnValue;
     }
 
-    public Collection<TransModel> loadTrans(Key branchKey, Key subsetKey, ProjLang projLang) {
-        final Map<Key, TransModel> returnValue = new TreeMap<Key, TransModel>();
-        Map<Key, Tokn> tokens;
+    @Override
+    public Collection<TransModel> loadTrans(Key branchKey, Key subsetKey, ProjLang projLang, Key ctxtKey) {
+        final Map<Long, TransModel> returnValue = new TreeMap<Long, TransModel>();
+        Map<Long, Tokn> tokens;
         if (null == subsetKey) {
             // find all tokens for branch:
-            tokens = new TreeMap<Key, Tokn>();
+            tokens = new TreeMap<Long, Tokn>();
             for(Tokn tokn : toknDao.findByBranch(branchKey)) {
-                tokens.put(tokn.getKey(), tokn);
+                tokens.put(tokn.getId(), tokn);
             }
         }
         else {
             // find tokens for subset:
             final List<SubsetTokn> subTokens = subsetToknDao.findBySubset(subsetKey);
-            final List<Key> tokenKeys = new ArrayList<Key>();
+            final List<Long> tokenKeys = new ArrayList<Long>();
             for(SubsetTokn st : subTokens) {
                 tokenKeys.add(st.getTokn());
             }
@@ -315,37 +318,27 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         }
 
         // fetch translations for this language
-        Map<Key, Trans> trans = transDao.findByPrimaryKeys(projLang.getPrimaryKey(), tokens.keySet());
-        final Map<Key, TransModel> defaults = new TreeMap<Key, TransModel>();
+        Map<Long, Trans> trans = transDao.findByPrimaryKeys(projLang.getPrimaryKey(), tokens.keySet());
         TransModel model;
-        for(Entry<Key, Trans> entry : trans.entrySet()) {
+        for(Entry<Long, Tokn> entry : tokens.entrySet()) {
             model = new TransModel();
-            model.setLocal(entry.getValue());
-            model.setToken(tokens.get(entry.getKey()));
-            model.setKey(null != model.getLocal() ? entry.getKey() : entry.getValue().getToken());
-            // schedule to add defualt or add to return value?
-            if (null == model.getLocal()) {
-                defaults.put(entry.getKey(), model);
-            }
-            else {
-                returnValue.put(entry.getKey(), model);
-            }
+            model.setLocal(trans.get(entry.getKey()));
+            model.setToken(entry.getValue());
+            model.setKey((Key) (null != model.getLocal() ? model.getLocal().getPrimaryKey() : model.getToken().getPrimaryKey()));
+            returnValue.put(entry.getKey(), model);
         }
 
         // if non-default language, fetch default translations too
-        if (false == defaults.isEmpty() && null != projLang.getDefaultLang()) {
+        if (null != projLang.getDefaultLang()) {
             final String defLangCode = projLang.getDefaultLang().getName();
             final Key defLangKey = KeyFactory.createKey(branchKey, ProjLang.class.getSimpleName(), defLangCode);
-            trans = transDao.findByPrimaryKeys(defLangKey, defaults.keySet());
+            trans = transDao.findByPrimaryKeys(defLangKey, tokens.keySet());
 
             // populate existing TransModels
-            for(Entry<Key, Trans> entry : trans.entrySet()) {
-                model = defaults.get(entry.getKey());
+            for(Entry<Long, Trans> entry : trans.entrySet()) {
+                model = returnValue.get(entry.getKey());
                 model.setParent(entry.getValue());
             }
-
-            // add all (with or without parent)
-            returnValue.putAll(defaults);
         }
 
         return returnValue.values();
@@ -529,57 +522,106 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
      * Populates the database with the basic project - ricotta-ost itself!
      */
     protected final Key populate() {
-        // populate Languages
-        final Language en = languageDao.persist("en", "English");
-        final Language en_GB = languageDao.persist("en_GB", "British English");
-        final Language sv = languageDao.persist("sv", "Swedish");
-
-        // populate Templates
-        final Mall androidStringsInherited = mallDao.persist(MALL_BODY_ANDROID,
-                "Android strings.xml with parent default translations", "text/plain", "strings_android_inherit");
-
         // HEAD version is cross-project
         _HEAD = versionDao.persist(null, "2011-01-28 10:10 GMT+7", "Latest version", VALUE_HEAD, null);
         final Key HEAD = _HEAD.getKey();
 
-        // Projects
-        final Project project = projectDao.persist("ricotta", "s.o.sandstrom@gmail.com");
-        projectUserDao.persist(project.getKey(), "test@example.com");
+        {
+            // populate Languages
+            final Language en = languageDao.persist("en", "English");
+            final Language en_GB = languageDao.persist("en_GB", "British English");
+            final Language sv = languageDao.persist("sv", "Swedish");
 
-        // ProjectLanguages
-        ProjectLanguage root = projectLanguageDao.persist(null, en.getKey(), null, project.getKey(), HEAD);
-        projectLanguageDao.persist(null, en_GB.getKey(), en.getKey(), project.getKey(), HEAD);
-        projectLanguageDao.persist(null, sv.getKey(), en.getKey(), project.getKey(), HEAD);
+            // populate Templates
+            final Mall androidStringsInherited = mallDao.persist(MALL_BODY_ANDROID,
+                    "Android strings.xml with parent default translations", "text/plain", "strings_android_inherit");
 
-        // Artifact
-        final Artifact ricottaOst = artifactDao.persist(project.getKey(), "ricotta-ost");
-        final Artifact ricottaPlugin = artifactDao.persist(project.getKey(), "ricotta-maven-plugin");
+            // Projects
+            final Project project = projectDao.persist("ricotta", "s.o.sandstrom@gmail.com");
+            projectUserDao.persist(project.getKey(), "test@example.com");
 
-        // Tokens
-        final Token appTitle = tokenDao.persist(null, "The Application title as displayed to the user", "appTitle",
-                project.getKey(), HEAD, null);
-        final Token tokenProject = tokenDao.persist(null, "The Project Entity", "Project", project.getKey(), HEAD, null);
+            // ProjectLanguages
+            ProjectLanguage root = projectLanguageDao.persist(null, en.getKey(), null, project.getKey(), HEAD);
+            projectLanguageDao.persist(null, en_GB.getKey(), en.getKey(), project.getKey(), HEAD);
+            projectLanguageDao.persist(null, sv.getKey(), en.getKey(), project.getKey(), HEAD);
 
-        // Artifact tokens
-        final TokenArtifact appTitleOst = tokenArtifactDao.persist(null, ricottaOst.getKey(), project.getKey(),
-                appTitle.getKey(), HEAD);
-        tokenArtifactDao.persist(null, ricottaOst.getKey(), project.getKey(), tokenProject.getKey(), HEAD);
-        tokenArtifactDao.persist(null, ricottaPlugin.getKey(), project.getKey(), appTitle.getKey(), HEAD);
+            // Artifact
+            final Artifact ricottaOst = artifactDao.persist(project.getKey(), "ricotta-ost");
+            final Artifact ricottaPlugin = artifactDao.persist(project.getKey(), "ricotta-maven-plugin");
 
-        // Translations
-        translationDao.persist(null, en.getKey(), "Ricotta", project.getKey(), appTitle.getKey(), HEAD);
-        translationDao.persist(null, en_GB.getKey(), "Project", project.getKey(), tokenProject.getKey(), HEAD);
-        translationDao.persist(null, sv.getKey(), "Projekt", project.getKey(), tokenProject.getKey(), HEAD);
+            // Tokens
+            final Token appTitle = tokenDao.persist(null, "The Application title as displayed to the user", "appTitle",
+                    project.getKey(), HEAD, null);
+            final Token tokenProject = tokenDao.persist(null, "The Project Entity", "Project", project.getKey(), HEAD, null);
 
+            // Artifact tokens
+            final TokenArtifact appTitleOst = tokenArtifactDao.persist(null, ricottaOst.getKey(), project.getKey(),
+                    appTitle.getKey(), HEAD);
+            tokenArtifactDao.persist(null, ricottaOst.getKey(), project.getKey(), tokenProject.getKey(), HEAD);
+            tokenArtifactDao.persist(null, ricottaPlugin.getKey(), project.getKey(), appTitle.getKey(), HEAD);
+
+            // Translations
+            translationDao.persist(null, en.getKey(), "Ricotta", project.getKey(), appTitle.getKey(), HEAD);
+            translationDao.persist(null, en_GB.getKey(), "Project", project.getKey(), tokenProject.getKey(), HEAD);
+            translationDao.persist(null, sv.getKey(), "Projekt", project.getKey(), tokenProject.getKey(), HEAD);
+        }
+        {
+            // populate Lang
+            final Lang en = langDao.persist("en", "English");
+            final Key enKey = (Key) en.getPrimaryKey();
+            final Lang en_GB = langDao.persist("en_GB", "British English");
+            final Lang sv = langDao.persist("sv", "Swedish");
+
+            // populate Templates
+            final Template androidStringsInherited = templateDao.persist(MALL_BODY_ANDROID,
+                    "Android strings.xml with parent default translations", "text/plain", "strings_android_inherit");
+
+            // Projects
+            final Proj proj = projDao.persist("ricotta", "s.o.sandstrom@gmail.com");
+            final Key projKey = (Key) proj.getPrimaryKey();
+            projUserDao.persist(projKey, "test@example.com");
+
+            // trunk per project
+            final Branch trunk = branchDao.persist(projKey, "trunk", "2011-01-28 10:10 GMT+7", "Latest version");
+            final Key branchKey = (Key) trunk.getPrimaryKey();
+
+            // ProjLang
+            final ProjLang plEN = projLangDao.persist(branchKey, en.getCode(), null, enKey);
+            final ProjLang plGB = projLangDao.persist(branchKey, en_GB.getCode(), enKey, (Key) en_GB.getPrimaryKey());
+            final ProjLang plSV = projLangDao.persist(branchKey, sv.getCode(), enKey, (Key) sv.getPrimaryKey());
+
+            // Variant
+            final Subset ricottaOst = subsetDao.persist(branchKey, "ricotta-ost", "The web app");
+            final Subset ricottaPlugin = subsetDao.persist(branchKey, "ricotta-maven-plugin", "The maven plugin");
+
+            // Contexts
+            final Ctxt projects = ctxtDao.persist(branchKey, "projects", null, "The projects view");
+
+            // Tokens
+            final Tokn appTitle = toknDao.persist(branchKey, 1L, "The Application title as displayed to the user", "appTitle",
+                    (Key) projects.getPrimaryKey());
+            final Tokn tokenProject = toknDao.persist(branchKey, 2L, "The Project Entity", "Project", null);
+
+            // subset tokens
+            final SubsetTokn appTitleOst = subsetToknDao.persist(ricottaOst.getPrimaryKey(), appTitle.getName(), 1L);
+            subsetToknDao.persist(ricottaOst.getPrimaryKey(), tokenProject.getName(), 2L);
+            subsetToknDao.persist(ricottaPlugin.getPrimaryKey(), appTitle.getName(), 1L);
+
+            // Trans
+            transDao.persist(plEN.getPrimaryKey(), appTitle.getId(), "Ricotta");
+            transDao.persist(plGB.getPrimaryKey(), tokenProject.getId(), "Project");
+            transDao.persist(plSV.getPrimaryKey(), tokenProject.getId(), "Projekt");
+
+        }
         // FIXME: remove test entities
-        Proj proj = projDao.persist("proj", "test@example.com");
-        Branch head = branchDao.persist((Key) proj.getPrimaryKey(), "trunk", "2011-02-20", "proj's trunk");
-        Branch integration = branchDao.persist((Key) proj.getPrimaryKey(), "integration", "2011-02-20",
-                "proj's integration branch");
-
-        Proj other = projDao.persist("other", "s.o.sandstrom@gmail.com");
-        Branch trunk = branchDao.persist((Key) other.getPrimaryKey(), "trunk", "2011-02-26", "other's trunk");
-        projUserDao.persist(other.getPrimaryKey(), "test@example.com");
+        // Proj proj = projDao.persist("proj", "test@example.com");
+        // Branch head = branchDao.persist((Key) proj.getPrimaryKey(), "trunk", "2011-02-20", "proj's trunk");
+        // Branch integration = branchDao.persist((Key) proj.getPrimaryKey(), "integration", "2011-02-20",
+        // "proj's integration branch");
+        //
+        // Proj other = projDao.persist("other", "s.o.sandstrom@gmail.com");
+        // Branch trunk = branchDao.persist((Key) other.getPrimaryKey(), "trunk", "2011-02-26", "other's trunk");
+        // projUserDao.persist(other.getPrimaryKey(), "test@example.com");
         return HEAD;
     }
 
@@ -673,7 +715,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         for(TokenArtifact ta : tokenArtifactDao.findByToken(token.getKey())) {
             final Subset subset = artifactMap.get(ta.getArtifact());
             LOG.info("            SUBSET_TOKN {} for {}", subset.getName(), token.getName());
-            SubsetTokn subsetTokn = subsetToknDao.persist(subset.getPrimaryKey(), tokn.getName(), (Key) tokn.getPrimaryKey());
+            SubsetTokn subsetTokn = subsetToknDao.persist(subset.getPrimaryKey(), tokn.getName(), tokn.getId());
         }
 
         // translations
@@ -682,7 +724,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
             LOG.info("            TRANS {} in {}", t.getLocal(), langMap.get(t.getLanguage()));
             String langCode = langMap.get(t.getLanguage());
             projLang = KeyFactory.createKey((Key) branchKey, ProjLang.class.getSimpleName(), langCode);
-            Trans trans = transDao.persist(projLang, (Key) tokn.getPrimaryKey(), t.getLocal());
+            Trans trans = transDao.persist(projLang, tokn.getId(), t.getLocal());
         }
     }
 

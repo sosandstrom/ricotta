@@ -19,7 +19,10 @@ import com.wadpam.ricotta.dao.ProjectUserDao;
 import com.wadpam.ricotta.dao.UberDao;
 import com.wadpam.ricotta.dao.VersionDao;
 import com.wadpam.ricotta.domain.Branch;
+import com.wadpam.ricotta.domain.Ctxt;
+import com.wadpam.ricotta.domain.Lang;
 import com.wadpam.ricotta.domain.Proj;
+import com.wadpam.ricotta.domain.ProjLang;
 import com.wadpam.ricotta.domain.Project;
 import com.wadpam.ricotta.domain.ProjectUser;
 import com.wadpam.ricotta.domain.Version;
@@ -32,8 +35,15 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
 
     protected static final String KEY_PROJ           = Proj.class.getSimpleName();
     protected static final String KEY_BRANCH         = Branch.class.getSimpleName();
+    protected static final String KEY_LANG           = Lang.class.getSimpleName();
+    protected static final String KEY_PROJLANG       = ProjLang.class.getSimpleName();
+    protected static final String KEY_CONTEXT        = Ctxt.class.getSimpleName();
+    protected static final String KEY_LANGCODE       = "langCode";
     protected static final String KEY_PROJKEY        = "projKey";
+    protected static final String KEY_LANGKEY        = "langKey";
+    protected static final String KEY_PROJLANGKEY    = "projLangKey";
     protected static final String KEY_BRANCHKEY      = "branchKey";
+    protected static final String KEY_CONTEXTKEY     = "ctxtKey";
     protected static final String KEY_PROJNAME       = "projName";
     protected static final String KEY_BRANCHNAME     = "branchName";
 
@@ -42,6 +52,8 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
 
     static final Pattern          REGEXP_PROJ        = Pattern.compile("\\A/proj/([^/]+)");
     static final Pattern          REGEXP_BRANCH      = Pattern.compile("/branch/([^/]+)");
+    static final Pattern          REGEXP_LANG        = Pattern.compile("/lang/([^/]+)");
+    static final Pattern          REGEXP_CONTEXT     = Pattern.compile("/context/([^/]+)");
 
     private ProjectDao            projectDao;
     private ProjectUserDao        projectUserDao;
@@ -127,6 +139,27 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
                     request.setAttribute(KEY_BRANCHNAME, branchName);
                     final Key branchKey = KeyFactory.createKey(projKey, Branch.class.getSimpleName(), branchName);
                     request.setAttribute(KEY_BRANCHKEY, branchKey);
+
+                    // lang available?
+                    matcher = REGEXP_LANG.matcher(request.getRequestURI());
+                    if (matcher.find()) {
+                        String langCode = matcher.group(1);
+                        request.setAttribute(KEY_LANGCODE, langCode);
+                        final Key langKey = KeyFactory.createKey(Lang.class.getSimpleName(), langCode);
+                        request.setAttribute(KEY_LANGKEY, langKey);
+                        final Key projLangKey = KeyFactory.createKey(branchKey, ProjLang.class.getSimpleName(), langCode);
+                        request.setAttribute(KEY_PROJLANGKEY, projLangKey);
+                    }
+
+                    // context available?
+                    matcher = REGEXP_CONTEXT.matcher(request.getRequestURI());
+                    if (matcher.find()) {
+                        String ctxtName = matcher.group(1);
+                        request.setAttribute(KEY_CONTEXTKEY, ctxtName);
+                        final Key ctxtKey = KeyFactory.createKey(Ctxt.class.getSimpleName(), ctxtName);
+                        request.setAttribute(KEY_CONTEXTKEY, ctxtKey);
+                    }
+
                 }
             }
         }

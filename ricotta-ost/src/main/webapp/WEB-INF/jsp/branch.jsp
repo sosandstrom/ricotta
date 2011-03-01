@@ -24,7 +24,7 @@
 		<c:set var="even" scope="page" value="${!even}" />
 		<tr class="evenRow<c:out value='${even}' />">
 			<td><c:out value="${plm.lang.code}" /></td>
-			<td><a href="lang/<c:out value='${plm.lang.code}' />/trans/" ><c:out value="${plm.lang.name}" /></a></td>
+			<td><a href="lang/<c:out value='${plm.lang.code}' />/" ><c:out value="${plm.lang.name}" /></a></td>
 			<td><c:out value="${plm.defaultCode}" /></td>
 		</tr>
 	</c:forEach>

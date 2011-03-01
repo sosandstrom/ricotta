@@ -22,7 +22,7 @@ public class SubsetTokn extends AEDPrimaryKeyEntity {
 
     // ManyToOne
     @Basic
-    Key                       tokn;
+    Long                      tokn;
 
     @Override
     public String toString() {
@@ -41,7 +41,7 @@ public class SubsetTokn extends AEDPrimaryKeyEntity {
 
     @Override
     public String getKeyString() {
-        return (null != tokn && null != subset) ? KeyFactory.keyToString(tokn) + '.' + KeyFactory.keyToString(subset) : null;
+        return (null != tokn && null != subset) ? tokn.toString() + '.' + KeyFactory.keyToString(subset) : null;
     }
 
     public Key getSubset() {
@@ -60,11 +60,11 @@ public class SubsetTokn extends AEDPrimaryKeyEntity {
         this.name = name;
     }
 
-    public Key getTokn() {
+    public Long getTokn() {
         return tokn;
     }
 
-    public void setTokn(Key tokn) {
+    public void setTokn(Long tokn) {
         this.tokn = tokn;
     }
 
