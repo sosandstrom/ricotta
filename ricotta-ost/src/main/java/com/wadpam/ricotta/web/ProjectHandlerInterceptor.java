@@ -46,6 +46,7 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
     protected static final String KEY_CONTEXTKEY     = "ctxtKey";
     protected static final String KEY_PROJNAME       = "projName";
     protected static final String KEY_BRANCHNAME     = "branchName";
+    protected static final String KEY_CONTEXTNAME    = "ctxtName";
 
     static final Pattern          REGEXP_PROJECT     = Pattern.compile("\\A/projects/([^/]+)/");
     static final Pattern          REGEXP_TRANSLATION = Pattern.compile("\\A/projects/([^/]+)/languages/[^/]+/templates/[^/]+/");
@@ -53,7 +54,7 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
     static final Pattern          REGEXP_PROJ        = Pattern.compile("\\A/proj/([^/]+)");
     static final Pattern          REGEXP_BRANCH      = Pattern.compile("/branch/([^/]+)");
     static final Pattern          REGEXP_LANG        = Pattern.compile("/lang/([^/]+)");
-    static final Pattern          REGEXP_CONTEXT     = Pattern.compile("/context/([^/]+)");
+    static final Pattern          REGEXP_CONTEXT     = Pattern.compile("/ctxt/([^/]+)");
 
     private ProjectDao            projectDao;
     private ProjectUserDao        projectUserDao;
@@ -155,8 +156,8 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
                     matcher = REGEXP_CONTEXT.matcher(request.getRequestURI());
                     if (matcher.find()) {
                         String ctxtName = matcher.group(1);
-                        request.setAttribute(KEY_CONTEXTKEY, ctxtName);
-                        final Key ctxtKey = KeyFactory.createKey(Ctxt.class.getSimpleName(), ctxtName);
+                        request.setAttribute(KEY_CONTEXTNAME, ctxtName);
+                        final Key ctxtKey = KeyFactory.createKey(branchKey, Ctxt.class.getSimpleName(), ctxtName);
                         request.setAttribute(KEY_CONTEXTKEY, ctxtKey);
                     }
 

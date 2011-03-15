@@ -23,9 +23,13 @@ public class TransController extends AbstractDaoController {
 
     @RequestMapping(value = "lang/{langCode}/index.html")
     public String getTrans(Model model, HttpServletRequest request) {
+        return getTrans(model, request, true);
+    }
+
+    protected String getTrans(Model model, HttpServletRequest request, boolean showAvailableContexts) {
         final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
         final List<Ctxt> contexts = ctxtDao.findByBranch(branchKey);
-        if (false == contexts.isEmpty()) {
+        if (false == contexts.isEmpty() && showAvailableContexts) {
             model.addAttribute("viewContexts", contexts);
             return "contexts";
         }
@@ -38,13 +42,18 @@ public class TransController extends AbstractDaoController {
 
     @RequestMapping(value = "lang/{langCode}/ctxt/index.html")
     public String getContexts(Model model, HttpServletRequest request) {
-        return getTrans(model, request);
+        return getTrans(model, request, false);
     }
 
     @RequestMapping(value = "lang/{langCode}/ctxt/{contextName}/index.html")
     public String getTransByContext(Model model, HttpServletRequest request) {
         final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
+
         final Key ctxtKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_CONTEXTKEY);
+        final String ctxtName = (String) request.getAttribute(ProjectHandlerInterceptor.KEY_CONTEXTNAME);
+        final Ctxt viewContext = ctxtDao.findByPrimaryKey(branchKey, ctxtName);
+        model.addAttribute("viewContext", viewContext);
+
         final String langCode = (String) request.getAttribute(ProjectHandlerInterceptor.KEY_LANGCODE);
         final ProjLang projLang = projLangDao.findByPrimaryKey(branchKey, langCode);
         final Collection<TransModel> trans = uberDao.loadTrans(branchKey, null, projLang, ctxtKey);

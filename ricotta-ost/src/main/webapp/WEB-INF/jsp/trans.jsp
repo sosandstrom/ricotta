@@ -10,7 +10,7 @@
 <a href="/proj/">Projects</a> | 
 <a href="/proj/<c:out value='${projName}' />/branch/<c:out value='${branchName}' />/"><c:out value="${projName}" /></a>
 <c:if test="${null != viewContext}" >
- | <a href="/proj/<c:out value='${projName}' />/lang/<c:out value='${langCode}' />/"><c:out value="${langCode}" /></a>  
+ | <a href="/proj/<c:out value='${projName}' />/branch/<c:out value='${branchName}' />/lang/<c:out value='${langCode}' />/"><c:out value="${langCode}" /></a>  
 	<div class="pageHeading">Translations for context <c:out value="${viewContext.name}" /></div>
 	<b>Description: </b><c:out value="${viewContext.description}" /><br />
 	<img src="/screenshot?blobKey=<c:out value='${viewContext.blobKey.keyString}' />" />

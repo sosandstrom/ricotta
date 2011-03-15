@@ -23,14 +23,14 @@
 	<tbody>
 	<c:set var="even" scope="page" value="${true}" />
 		<tr class="evenRow<c:out value='${even}' />">
-			<td><a href="context/NO_CONTEXT.html">All tokens</a></td>
+			<td><a href="ctxt/">All tokens</a></td>
 			<td><c:out value="All tokens, with or without context" /></td>
 			<td><img src="/screenshot?blobKey=AMIfv96vJ5hngrNuZdTZzG8P0SfT2aDcJwqmVo928rnYBQBeNeWmfGd3HhOZ6xlAVCPchkW7FKhiDg3biDgGD1pz8Oc3JUmX-qeYgm3gRbZ4007L1CT65_JXol1_JMypAyR4aY04EcU0FXRy6dPHfI5Vdvu7gHSIqQ" /></td>
 		</tr>
 	<c:forEach items="${viewContexts}" var="c">
 		<c:set var="even" scope="page" value="${!even}" />
 		<tr class="evenRow<c:out value='${even}' />">
-			<td><a href="context/<c:out value='${c.name}' />/"><c:out value="${c.name}" /></a></td>
+			<td><a href="ctxt/<c:out value='${c.name}' />/"><c:out value="${c.name}" /></a></td>
 			<td><c:out value="${c.description}" /></td>
 			<td><img src="/screenshot?blobKey=<c:out value='${c.blobKey.keyString}' />" /></td>
 		</tr>
