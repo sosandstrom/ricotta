@@ -13,6 +13,8 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.cache.Cache;
 import javax.cache.CacheException;
@@ -25,6 +27,7 @@ import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
 
 import net.sf.mardao.api.domain.PrimaryKeyEntity;
 
@@ -267,6 +270,49 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
     }
 
     @Override
+    public void importBody(HttpServletRequest request, Key branchKey, String langCode, String regexp, String body) {
+        LOG.info("matching {} on {}", body, regexp);
+        List<String> changes = new ArrayList<String>();
+        final Key projLangKey = projLangDao.createKey(branchKey, langCode);
+
+        final Pattern pattern = Pattern.compile(regexp);
+        Matcher matcher = pattern.matcher(body);
+        while (matcher.find()) {
+            final String tokenName = matcher.group(1);
+            final String value = matcher.group(2);
+            LOG.info("found {}={}", tokenName, value);
+
+            try {
+
+                // create new token?
+                Tokn token = null;
+                List<Tokn> tokens = toknDao.findByBranchName(branchKey, tokenName);
+                if (tokens.isEmpty()) {
+                    final String change = String.format("C %s %s", langCode, tokenName);
+                    LOG.info(change);
+                    changes.add(change);
+                    token = new Tokn();
+                    token.setName(tokenName);
+                    token.setBranch(branchKey);
+                    toknDao.persist(token);
+                }
+                else {
+                    token = tokens.get(0);
+                }
+
+                Trans translation = transDao.findByPrimaryKey(projLangKey, token.getId());
+                changes.addAll(updateTrans(projLangKey, token, translation, tokenName, value, true));
+            }
+            catch (RuntimeException e) {
+                LOG.error("Problems importing translation " + value + " for token " + tokenName, e);
+            }
+        }
+
+        Proj proj = projDao.findByPrimaryKey(branchKey.getParent().getName());
+        notifyOwner(proj, branchKey.getName(), langCode, changes, request.getUserPrincipal().getName());
+    }
+
+    @Override
     public List<ProjectLanguageModel> loadProjectLanguages(Key project, Key version) {
         final List<ProjectLanguageModel> returnValue = new ArrayList<ProjectLanguageModel>();
 
@@ -428,15 +474,25 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
     }
 
     @Override
+    public void notifyOwner(Proj proj, String branchName, String langCode, List<String> changes, String from) {
+        notifyOwner(from, proj.getOwner(), proj.getName(), branchName, langCode, changes);
+    }
+
+    @Override
     public void notifyOwner(Project project, Version version, String languageCode, List<String> changes, String from) {
+        notifyOwner(from, project.getOwner(), project.getName(), version.getName(), languageCode, changes);
+    }
+
+    protected void notifyOwner(String from, String to, String projName, String branchName, String languageCode,
+            List<String> changes) {
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
 
         try {
             Message msg = new MimeMessage(session);
             msg.setFrom(new InternetAddress(from));
-            msg.addRecipient(Message.RecipientType.TO, new InternetAddress(project.getOwner()));
-            msg.setSubject("Ricotta: changes in " + project.getName() + ":" + version.getName() + " (" + languageCode + ")");
+            msg.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+            msg.setSubject("Ricotta: changes in " + projName + ":" + branchName + " (" + languageCode + ")");
             StringBuffer sb = new StringBuffer();
             for(String s : changes) {
                 sb.append(s);
@@ -452,6 +508,47 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         catch (MessagingException e) {
             e.printStackTrace();
         }
+    }
+
+    /** If translation is null, projectKey, tokenKey and languageKey must be specified! */
+    @Override
+    public List<String> updateTrans(Key projLangKey, Tokn token, Trans t, String name, String value, boolean delete) {
+        final String langCode = projLangKey.getName();
+        List<String> returnValue = new ArrayList<String>();
+        if (null != t) {
+            if (null == token) {
+                token = toknDao.findByPrimaryKey(projLangKey.getParent(), t.getToken());
+            }
+            if (null != value && 0 < value.length()) {
+                if (false == value.equals(t.getLocal())) {
+                    final String u = String.format("U %s %s=%s, was %s", langCode, token.getName(), value, t.getLocal());
+                    t.setLocal(value);
+                    transDao.update(t);
+                    returnValue.add(u);
+                    LOG.debug(u);
+                }
+            }
+            else if (delete) {
+                transDao.delete(t);
+                final String d = String.format("R %s %s", langCode, token.getName());
+                LOG.debug(d);
+                returnValue.add(d);
+            }
+        }
+        else {
+            // create new translation for token?
+            if (null != value && 0 < value.length()) {
+                t = new Trans();
+                t.setProjLang(projLangKey);
+                t.setToken(token.getId());
+                t.setLocal(value);
+                transDao.persist(t);
+                final String c = String.format("A %s %s=%s", langCode, token.getName(), value);
+                returnValue.add(c);
+                LOG.debug(c);
+            }
+        }
+        return returnValue;
     }
 
     public static List<Object> getKeys(List entities) {

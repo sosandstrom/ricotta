@@ -52,7 +52,9 @@
 	
 	<bean id="transController" class="com.wadpam.ricotta.web.TransController">
 		<property name="ctxtDao" ref="ctxtDao" />
+		<property name="projDao" ref="projDao" />
 		<property name="projLangDao" ref="projLangDao" />
+		<property name="toknDao" ref="toknDao" />
 		<property name="uberDao" ref="uberDao" />
 	</bean>
 

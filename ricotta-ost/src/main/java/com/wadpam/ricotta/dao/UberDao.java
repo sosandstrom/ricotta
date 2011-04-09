@@ -3,9 +3,14 @@ package com.wadpam.ricotta.dao;
 import java.util.Collection;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.google.appengine.api.datastore.Key;
+import com.wadpam.ricotta.domain.Proj;
 import com.wadpam.ricotta.domain.ProjLang;
 import com.wadpam.ricotta.domain.Project;
+import com.wadpam.ricotta.domain.Tokn;
+import com.wadpam.ricotta.domain.Trans;
 import com.wadpam.ricotta.domain.Version;
 import com.wadpam.ricotta.model.ProjectLanguageModel;
 import com.wadpam.ricotta.model.TransModel;
@@ -32,5 +37,11 @@ public interface UberDao {
     void deleteVersion(Project project, String vk);
 
     Collection<TransModel> loadTrans(Key branchKey, Key subsetKey, ProjLang projLang, Key ctxtKey);
+
+    List<String> updateTrans(Key projLangKey, Tokn token, Trans t, String name, String value, boolean delete);
+
+    void notifyOwner(Proj proj, String branchName, String langCode, List<String> changes, String from);
+
+    void importBody(HttpServletRequest request, Key branchKey, String langCode, String regexp, String body);
 
 }

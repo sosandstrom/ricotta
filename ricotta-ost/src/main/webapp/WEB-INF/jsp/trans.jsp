@@ -11,11 +11,13 @@
 <a href="/proj/<c:out value='${projName}' />/branch/<c:out value='${branchName}' />/"><c:out value="${projName}" /></a>
 <c:if test="${null != viewContext}" >
  | <a href="/proj/<c:out value='${projName}' />/branch/<c:out value='${branchName}' />/lang/<c:out value='${langCode}' />/"><c:out value="${langCode}" /></a>  
-	<div class="pageHeading">Translations for context <c:out value="${viewContext.name}" /></div>
+</c:if>
+<div class="pageHeading"><c:out value="${langCode}" /> translations for context <c:out value="${viewContext.name}" /></div>
+<c:if test="${null != viewContext}" >
+ | <a href="/proj/<c:out value='${projName}' />/branch/<c:out value='${branchName}' />/lang/<c:out value='${langCode}' />/"><c:out value="${langCode}" /></a>  
 	<b>Description: </b><c:out value="${viewContext.description}" /><br />
 	<img src="/screenshot?blobKey=<c:out value='${viewContext.blobKey.keyString}' />" />
 </c:if>
-<div class="pageHeading">Translations - <c:out value="${langCode}" /></div>
 <form id="translations" name="translations" action="<c:out value='${action}' />" method="post" >
 <input type="submit" value="Save" />
 <table>
@@ -33,7 +35,7 @@
 		<c:set var="even" scope="page" value="${!even}" />
 		<tr id="<c:out value='${t.token.keyString}' />" class="evenRow<c:out value='${even}' />" title="<c:out value='${t.key.kind}' />">
 			<td><c:out value="${t.token.name}" /></td>
-			<td><input id="description.<c:out value='${t.token.keyString}' />" name="description.<c:out value='${t.token.keyString}' />" 
+			<td><input id="description.<c:out value='${t.token.id}' />" name="description.<c:out value='${t.token.id}' />" 
 				type="text" value="<c:out value='${t.token.description}' />" /></td>
 			<td><textarea id="<c:out value='${t.keyString}' />"	name="<c:out value='${t.keyString}' />"
 				cols="80" rows="2" ><c:out value='${t.local.local}' /></textarea></td>
@@ -45,6 +47,6 @@
 <input type="submit" value="Save" />
 </form>
 <h3>Import</h3>
-<a href="/proj/<c:out value="${projName}"/>/lang/<c:out value="${langCode}" />/import.html">Import tokens and translations</a>
+<a href="/proj/<c:out value="${projName}"/>/branch/<c:out value='${branchName}' />/lang/<c:out value="${langCode}" />/import.html">Import tokens and <c:out value="${langCode}" /> translations...</a>
 </body>
 </html>

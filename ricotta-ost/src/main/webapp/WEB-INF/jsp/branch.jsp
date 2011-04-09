@@ -9,7 +9,7 @@
 <a href="/">Home</a> | <a href="/proj/">Projects</a>
 <div class="pageHeading">Project: <c:out value="${projName}" /> (<c:out value="${branchName}" />)</div>
 <p />
-<div class="pageHeading">Languages</div>
+<h3>Languages</h3>
 <table>
 		<thead>
 		<tr>
@@ -32,10 +32,10 @@
 </table>
 <a href="lang/create.html">Add language</a>
 
-<h3>Project Tokens</h3>
+<h3>Tokens</h3>
 <a href="tokn/">Edit tokens...</a>
 
-<h3>Project contexts</h3>
+<h3>Contexts</h3>
 <table>
 		<thead>
 		<tr>
@@ -56,7 +56,7 @@
 </table>
 <a href="uploadContext.html">Upload context</a>
 
-<h3>Project Artifacts</h3>
+<h3>Subsets</h3>
 <table>
 		<thead>
 		<tr>
@@ -78,7 +78,7 @@
 <a href="variant/create.html">Create artifact</a>
 
 <form action="deleteBranches.html" method="post" name="deleteBranches" id="deleteBranches">
-<h3>Project Versions</h3>
+<h3>Branches</h3>
 <table>
 		<thead>
 		<tr>
@@ -108,12 +108,12 @@
 	</tbody>
 </table>
 <c:if test="${pageContext.request.userPrincipal.name == project.owner}">
-	<input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected versions" />
+	<input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected branches" />
 </c:if>
 </form>
-<a href="/projects/<c:out value="${project.name}"/>/versions/create.html">Create version</a>
+<a href="/proj/<c:out value="${project.name}"/>/branch/create.html">Create branch...</a>
 
-<h3>Project Users</h3>
+<h3>Users</h3>
 <form action="" method="post" name="deleteForm" id="deleteForm">
 <input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected users" />
 <table>
@@ -136,7 +136,7 @@
 </table>
 <input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected users" /><br />
 </form>
-<a href="/projects/<c:out value="${project.name}"/>/users/create.html">Add user</a>
+<a href="/proj/<c:out value="${project.name}"/>/users/create.html">Add user...</a>
 
 </body>
 </html>

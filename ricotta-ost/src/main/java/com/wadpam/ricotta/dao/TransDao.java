@@ -5,6 +5,6 @@ package com.wadpam.ricotta.dao;
  */
 public interface TransDao extends GeneratedTransDao {
 
-	// TODO: declare your Business Methods here
-	
+    // TODO: declare your Business Methods here
+
 }
