@@ -6,20 +6,21 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <jsp:include page="header.jsp" />
 <body>
-<a href="/">Home</a> | 
-<a href="/proj/">Projects</a>
-
-<div class="pageHeading">Create Project</div>
-
-<form id="project" name="project" action="" method="post">
+<a href="/index.html">Home</a> | <a href="/proj/index.html">Projects</a> | <a href="index.html"><c:out value="${project.name}" /></a>
+<div class="pageHeading">Subsets - <c:out value="${project.name}" /></div>
+<form id="subset" name="subset" action="" method="post">
 <table>
 	<tr>
-		<td>Project Name:</td>
+		<td>Subset Name:</td>
 		<td><input id="name" name="name" type="text" value="" /></td>
 	</tr>
 	<tr>
+		<td>Subset Description:</td>
+		<td><input id="description" name="description" type="text" value="" /></td>
+	</tr>
+	<tr>
 		<td></td>
-		<td><input id="create" name="create" type="submit" value="Create project" /></td>
+		<td><input id="create" name="create" type="submit" value="Create Subset" /></td>
 	</tr>
 </table>
 </form>

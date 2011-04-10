@@ -45,7 +45,7 @@
 	</thead>
 	<tbody>
 	<c:set var="even" scope="page" value="${true}" />
-	<c:forEach items="${viewContexts}" var="c">
+	<c:forEach items="${ctxts}" var="c">
 		<c:set var="even" scope="page" value="${!even}" />
 		<tr class="evenRow<c:out value='${even}' />">
 			<td><c:out value="${c.name}" /></td>
@@ -54,7 +54,7 @@
 	</c:forEach>
 	</tbody>
 </table>
-<a href="uploadContext.html">Upload context</a>
+<a href="uploadCtxt.html">Create context...</a>
 
 <h3>Subsets</h3>
 <table>
@@ -66,7 +66,7 @@
 	</thead>
 	<tbody>
 	<c:set var="even" scope="page" value="${true}" />
-	<c:forEach items="${artifacts}" var="a">
+	<c:forEach items="${subsets}" var="a">
 		<c:set var="even" scope="page" value="${!even}" />
 		<tr class="evenRow<c:out value='${even}' />">
 			<td><c:out value="${a.name}" /></td>
@@ -75,7 +75,7 @@
 	</c:forEach>
 	</tbody>
 </table>
-<a href="variant/create.html">Create artifact</a>
+<a href="subset.html">Create Subset...</a>
 
 <form action="deleteBranches.html" method="post" name="deleteBranches" id="deleteBranches">
 <h3>Branches</h3>
@@ -96,7 +96,7 @@
 			<td><c:out value="${HEAD.description}" /></td>
 			<td><c:out value="${HEAD.datum}" /></td>
 		</tr>
-	<c:forEach items="${versions}" var="v">
+	<c:forEach items="${branches}" var="v">
 		<c:set var="even" scope="page" value="${!even}" />
 		<tr class="evenRow<c:out value='${even}' />">
 			<td><input type="checkbox" name="versions" id="versions" value="<c:out value='${v.keyString}' />" /></td>
@@ -111,7 +111,7 @@
 	<input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected branches" />
 </c:if>
 </form>
-<a href="/proj/<c:out value="${project.name}"/>/branch/create.html">Create branch...</a>
+<a href="create.html">Create branch...</a>
 
 <h3>Users</h3>
 <form action="" method="post" name="deleteForm" id="deleteForm">
@@ -136,7 +136,7 @@
 </table>
 <input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected users" /><br />
 </form>
-<a href="/proj/<c:out value="${project.name}"/>/users/create.html">Add user...</a>
+<a href="user.html">Add user...</a>
 
 </body>
 </html>

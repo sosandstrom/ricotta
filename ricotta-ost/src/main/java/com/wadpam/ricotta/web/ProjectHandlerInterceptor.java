@@ -48,6 +48,8 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
     protected static final String KEY_BRANCHNAME     = "branchName";
     protected static final String KEY_CONTEXTNAME    = "ctxtName";
 
+    public static final String    NAME_TRUNK         = "trunk";
+
     static final Pattern          REGEXP_PROJECT     = Pattern.compile("\\A/projects/([^/]+)/");
     static final Pattern          REGEXP_TRANSLATION = Pattern.compile("\\A/projects/([^/]+)/languages/[^/]+/templates/[^/]+/");
 
@@ -134,7 +136,7 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
                     branchName = matcher.group(1);
                 }
                 else {
-                    branchName = "trunk";
+                    branchName = NAME_TRUNK;
                 }
                 if (null != branchName) {
                     request.setAttribute(KEY_BRANCHNAME, branchName);

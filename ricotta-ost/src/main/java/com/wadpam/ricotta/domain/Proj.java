@@ -16,7 +16,7 @@ public class Proj extends AEDPrimaryKeyEntity {
 
     @Override
     public String toString() {
-        return "Proj{" + getKeyString() + ',' + name + ',' + owner + '}';
+        return "Proj{" + name + ',' + owner + '}';
     }
 
     public String getName() {
