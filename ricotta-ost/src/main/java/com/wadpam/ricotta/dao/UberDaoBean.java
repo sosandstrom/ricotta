@@ -115,6 +115,17 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
                 + (null == languageKey ? "" : languageKey.toString() + (null != artifactKey ? artifactKey : ""));
     }
 
+    public void invalidateAll() {
+        LOG.debug("invalidating ALL");
+        try {
+            final Cache cache = getCache();
+            cache.clear();
+        }
+        catch (CacheException e) {
+            e.printStackTrace();
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void invalidateCache(Key projectKey, Key versionKey, Key languageKey, Key artifactKey) {
@@ -670,8 +681,8 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
             final Lang sv = langDao.persist("sv", "Swedish");
 
             // populate Templates
-            final Template androidStringsInherited = templateDao.persist(MALL_BODY_ANDROID,
-                    "Android strings.xml with parent default translations", "text/plain", "strings_android_inherit");
+            final Template androidStringsInherited = templateDao.persist("strings_android_inherit", MALL_BODY_ANDROID,
+                    "Android strings.xml with parent default translations", "text/plain");
 
             // Projects
             final Proj proj = projDao.persist("ricotta", "s.o.sandstrom@gmail.com");

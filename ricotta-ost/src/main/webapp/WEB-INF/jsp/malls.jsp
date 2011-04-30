@@ -11,7 +11,6 @@
 <table>
 		<thead>
 		<tr>
-			<th>Key</th>
 			<th>Name</th>
 			<th>Description</th>
 		</tr>
@@ -19,13 +18,12 @@
 	<tbody>
 	<c:forEach items="${malls}" var="m">
 		<tr>
-			<td><c:out value="${m.key}" /></td>
-			<td><a href="/templates/<c:out value='${m.name}' />/"><c:out value="${m.name}" /></a></td>
+			<td><a href="<c:out value='${m.name}' />/"><c:out value="${m.name}" /></a></td>
 			<td><c:out value="${m.description}" /></td>
 		</tr>
 	</c:forEach>
 	</tbody>
 </table>
-<a href="/templates/create.html">Create template...</a>
+<a href="create.html">Create template...</a>
 </body>
 </html>

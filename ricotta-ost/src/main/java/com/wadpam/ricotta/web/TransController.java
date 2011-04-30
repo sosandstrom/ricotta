@@ -1,12 +1,19 @@
 package com.wadpam.ricotta.web;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.exception.ParseErrorException;
+import org.apache.velocity.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -24,6 +31,7 @@ import com.wadpam.ricotta.domain.Tokn;
 import com.wadpam.ricotta.domain.Trans;
 import com.wadpam.ricotta.domain.Translation;
 import com.wadpam.ricotta.model.TransModel;
+import com.wadpam.ricotta.velocity.Encoder;
 
 @Controller
 @RequestMapping(value = "/proj/{projName}/branch/{branchName}/lang/{langCode}")
@@ -164,4 +172,43 @@ public class TransController extends AbstractDaoController {
         uberDao.importBody(request, branchKey, langCode, regexp, body);
         return "redirect:ctxt/index.html";
     }
+
+    // ------------------- generate --------------------
+
+    @RequestMapping(value = "templ/{templName}/index.html", method = RequestMethod.GET)
+    public String getTempl(HttpServletRequest request, HttpServletResponse response) throws ResourceNotFoundException,
+            ParseErrorException, Exception {
+        return renderTemplBySubset(request, response);
+    }
+
+    @RequestMapping(value = "templ/{templName}/subset/{subsetName}/index.html", method = RequestMethod.GET)
+    public String getTemplSubset(HttpServletRequest request, HttpServletResponse response) throws ResourceNotFoundException,
+            ParseErrorException, Exception {
+        return renderTemplBySubset(request, response);
+    }
+
+    protected String renderTemplBySubset(HttpServletRequest request, HttpServletResponse response)
+            throws ResourceNotFoundException, ParseErrorException, Exception {
+        final Key templKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_TEMPLKEY);
+        final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
+        final Key subsetKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_SUBSETKEY);
+        LOG.debug("rendering templ " + templKey.getName());
+        final VelocityContext model = new VelocityContext();
+        model.put("encoder", new Encoder());
+
+        final String langCode = (String) request.getAttribute(ProjectHandlerInterceptor.KEY_LANGCODE);
+        final ProjLang projLang = projLangDao.findByPrimaryKey(branchKey, langCode);
+        final Collection<TransModel> trans = uberDao.loadTrans(branchKey, subsetKey, projLang, null);
+        model.put("translations", trans);
+
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/plain; charset=UTF-8"); // mall.getMimeType());
+        final PrintWriter writer = response.getWriter();
+        Template template = Velocity.getTemplate(templKey.getName());
+        template.merge(model, writer);
+        writer.close();
+        response.setStatus(HttpServletResponse.SC_OK);
+        return null;
+    }
+
 }

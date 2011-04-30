@@ -53,6 +53,17 @@
 		<property name="projUserDao" ref="projUserDao" />
 	</bean>
 	
+	<bean id="templController" class="com.wadpam.ricotta.web.TemplController">
+		<property name="templateDao" ref="templateDao" />
+	</bean>
+	
+	<bean id="toknController" class="com.wadpam.ricotta.web.ToknController">
+		<property name="ctxtDao" ref="ctxtDao" />
+		<property name="subsetDao" ref="subsetDao" />
+		<property name="subsetToknDao" ref="subsetToknDao" />
+		<property name="toknDao" ref="toknDao" />
+	</bean>
+	
 	<bean id="transController" class="com.wadpam.ricotta.web.TransController">
 		<property name="ctxtDao" ref="ctxtDao" />
 		<property name="projDao" ref="projDao" />

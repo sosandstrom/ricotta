@@ -165,6 +165,12 @@ public class ProjectController {
         return "redirect:/index.html";
     }
 
+    @RequestMapping(value = "invalidateAll.html", method = RequestMethod.POST)
+    public String invalidateAll(HttpServletRequest request) throws IOException {
+        ((UberDaoBean) uberDao).invalidateAll();
+        return "redirect:/projects/";
+    }
+
     @RequestMapping(value = "{projectName}/index.html", method = RequestMethod.GET)
     public String getProject(HttpServletRequest request, Model model, @PathVariable String projectName) {
         LOGGER.debug("get project");

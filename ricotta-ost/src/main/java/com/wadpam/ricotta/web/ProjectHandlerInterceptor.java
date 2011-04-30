@@ -25,6 +25,8 @@ import com.wadpam.ricotta.domain.Proj;
 import com.wadpam.ricotta.domain.ProjLang;
 import com.wadpam.ricotta.domain.Project;
 import com.wadpam.ricotta.domain.ProjectUser;
+import com.wadpam.ricotta.domain.Subset;
+import com.wadpam.ricotta.domain.Template;
 import com.wadpam.ricotta.domain.Version;
 
 public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
@@ -44,6 +46,8 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
     protected static final String KEY_PROJLANGKEY    = "projLangKey";
     protected static final String KEY_BRANCHKEY      = "branchKey";
     protected static final String KEY_CONTEXTKEY     = "ctxtKey";
+    protected static final String KEY_TEMPLKEY       = "templKey";
+    protected static final String KEY_SUBSETKEY      = "subsetKey";
     protected static final String KEY_PROJNAME       = "projName";
     protected static final String KEY_BRANCHNAME     = "branchName";
     protected static final String KEY_CONTEXTNAME    = "ctxtName";
@@ -57,6 +61,8 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
     static final Pattern          REGEXP_BRANCH      = Pattern.compile("/branch/([^/]+)");
     static final Pattern          REGEXP_LANG        = Pattern.compile("/lang/([^/]+)");
     static final Pattern          REGEXP_CONTEXT     = Pattern.compile("/ctxt/([^/]+)");
+    static final Pattern          REGEXP_TEMPL       = Pattern.compile("/templ/([^/]+)");
+    static final Pattern          REGEXP_SUBSET      = Pattern.compile("/subset/([^/]+)");
 
     private ProjectDao            projectDao;
     private ProjectUserDao        projectUserDao;
@@ -161,6 +167,22 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
                         request.setAttribute(KEY_CONTEXTNAME, ctxtName);
                         final Key ctxtKey = KeyFactory.createKey(branchKey, Ctxt.class.getSimpleName(), ctxtName);
                         request.setAttribute(KEY_CONTEXTKEY, ctxtKey);
+                    }
+
+                    // templ available?
+                    matcher = REGEXP_TEMPL.matcher(request.getRequestURI());
+                    if (matcher.find()) {
+                        String templName = matcher.group(1);
+                        final Key templKey = KeyFactory.createKey(Template.class.getSimpleName(), templName);
+                        request.setAttribute(KEY_TEMPLKEY, templKey);
+                    }
+
+                    // subset available?
+                    matcher = REGEXP_SUBSET.matcher(request.getRequestURI());
+                    if (matcher.find()) {
+                        String subsetName = matcher.group(1);
+                        final Key subsetKey = KeyFactory.createKey(branchKey, Subset.class.getSimpleName(), subsetName);
+                        request.setAttribute(KEY_SUBSETKEY, subsetKey);
                     }
 
                 }
