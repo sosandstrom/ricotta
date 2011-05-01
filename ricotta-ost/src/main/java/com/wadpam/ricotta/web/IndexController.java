@@ -51,4 +51,16 @@ public class IndexController extends AbstractDaoController {
         return null;
     }
 
+    @RequestMapping(value = "/exportOld.html", method = RequestMethod.GET)
+    public String exportOld(HttpServletRequest request, HttpServletResponse response) throws ResourceNotFoundException,
+            ParseErrorException, Exception {
+        final VelocityContext model = new VelocityContext();
+        model.put("encoder", new Encoder());
+
+        model.put("uberDao", uberDao);
+
+        TransController.renderTemplate("ricotta-export-old", model, response);
+        return null;
+    }
+
 }

@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ricotta>
+   <languages>
+#foreach ($l in $uberDao.lang)
+      <language code="${l.code}" name="${l.name}" />
+#end
+   </languages>
    <projects>
 #foreach ($p in $uberDao.proj)
-      <project name="${p.name}">
+      <project name="${p.name}" owner="${p.owner}">
       </project>
 #end
    </projects>

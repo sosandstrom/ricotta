@@ -1,5 +1,8 @@
 package com.wadpam.ricotta.dao;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -56,6 +59,7 @@ import com.wadpam.ricotta.domain.Tokn;
 import com.wadpam.ricotta.domain.Trans;
 import com.wadpam.ricotta.domain.Translation;
 import com.wadpam.ricotta.domain.Version;
+import com.wadpam.ricotta.domain.ViewContext;
 import com.wadpam.ricotta.model.ProjectLanguageModel;
 import com.wadpam.ricotta.model.TransModel;
 import com.wadpam.ricotta.model.TranslationModel;
@@ -90,6 +94,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
     private TokenArtifactDao   tokenArtifactDao;
     private TranslationDao     translationDao;
     private VersionDao         versionDao;
+    private ViewContextDao     viewContextDao;
 
     private Version            _HEAD                         = null;
 
@@ -626,6 +631,25 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
 
     }
 
+    protected Template persistTemplate(String name, String description) {
+        Reader in = new InputStreamReader(getClass().getResourceAsStream("/" + name + ".xml"));
+        StringBuffer sb = new StringBuffer();
+        char buf[] = new char[256];
+        int count;
+        try {
+            while (0 < (count = in.read(buf))) {
+                sb.append(buf, 0, count);
+            }
+            in.close();
+            final Template template = templateDao.persist(name, sb.toString(), description, "text/plain");
+            return template;
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     /**
      * Populates the database with the basic project - ricotta-ost itself!
      */
@@ -683,8 +707,12 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
             // populate Templates
             final Template androidStringsInherited = templateDao.persist("strings_android_inherit", MALL_BODY_ANDROID,
                     "Android strings.xml with parent default translations", "text/plain");
-            final Template ricottaExportAll = templateDao.persist("ricotta-export-all",
-                    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "Export all ricotta projects to XML", "text/plain");
+            final Template ricottaExportAll = persistTemplate("ricotta-export-all", "Export all ricotta projects to XML");
+            final Template ricottaExportOld = persistTemplate("ricotta-export-old", "Export all old ricotta projects to XML");
+            final Template ricottaExportProject = persistTemplate("ricotta-export-project",
+                    "Export an old ricotta project to XML");
+            final Template ricottaExportVersion = persistTemplate("ricotta-export-version",
+                    "Export an old ricotta project version to XML");
 
             // Projects
             final Proj proj = projDao.persist("ricotta", "s.o.sandstrom@gmail.com");
@@ -902,8 +930,73 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         this.versionDao = versionDao;
     }
 
+    public final void setViewContextDao(ViewContextDao viewContextDao) {
+        this.viewContextDao = viewContextDao;
+    }
+
     // ------------------- export ---------------------
     public List<Proj> getProj() {
         return projDao.findAll();
+    }
+
+    public List<Lang> getLang() {
+        return langDao.findAll();
+    }
+
+    public List<Template> getTemplate() {
+        return templateDao.findAll();
+    }
+
+    // ------------------- export old ---------------------
+    public List<Project> getProjects() {
+        return projectDao.findAll();
+    }
+
+    public List<Language> getLanguages() {
+        return languageDao.findAll();
+    }
+
+    public Language language(Key languageKey) {
+        return languageDao.findByPrimaryKey(languageKey);
+    }
+
+    public List<Mall> getMalls() {
+        return mallDao.findAll();
+    }
+
+    public List<ProjectUser> users(Key projectKey) {
+        return projectUserDao.findByProject(projectKey);
+    }
+
+    public List<Version> versions(Key projectKey) {
+        return versionDao.findByProject(projectKey);
+    }
+
+    public List<ProjectLanguage> languages(Key projectKey, Key versionKey) {
+        return projectLanguageDao.findByProjectVersion(projectKey, versionKey);
+    }
+
+    public List<Token> tokens(Key projectKey, Key versionKey) {
+        return tokenDao.findByProjectVersion(projectKey, versionKey, true);
+    }
+
+    public List<Translation> translations(Key tokenKey) {
+        return translationDao.findByToken(tokenKey);
+    }
+
+    public List<Artifact> subsets(Key projectKey) {
+        return artifactDao.findByProject(projectKey);
+    }
+
+    public List<TokenArtifact> subTokens(Key artifactKey, Key versionKey) {
+        return tokenArtifactDao.findByArtifactVersion(artifactKey, versionKey);
+    }
+
+    public Map<Key, ViewContext> contexts(Key projectKey) {
+        Map<Key, ViewContext> contexts = new HashMap<Key, ViewContext>();
+        for(ViewContext vc : viewContextDao.findByProject(projectKey)) {
+            contexts.put(vc.getKey(), vc);
+        }
+        return contexts;
     }
 }

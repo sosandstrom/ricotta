@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ricotta>
+   <languages>
+#foreach ($l in $uberDao.languages)
+      <language code="${l.code}" name="${l.name}" />
+#end
+   </languages>
+   <templates>
+#foreach ($t in $uberDao.malls)
+      <template name="${t.name}" description="${t.description}"><![CDATA[${t.body}]]></template>
+#end
+   </templates>
+   <projects>
+#foreach ($p in $uberDao.projects)
+#parse("ricotta-export-project")
+#end
+   </projects>
+</ricotta>

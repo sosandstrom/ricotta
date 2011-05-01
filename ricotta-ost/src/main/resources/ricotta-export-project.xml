@@ -1,0 +1,21 @@
+      <project name="${p.name}" owner="${p.owner}">
+         <users>
+#foreach( $u in $uberDao.users($p.key) )
+            <user email="${u.user}" />
+#end
+         </users>
+         <branches>
+#set( $b = $uberDao.head )
+#set( $branchName = "trunk" )
+#set( $branchDescription = "the trunk" )
+#set( $branchKey = $b.key )
+#parse( "ricotta-export-version" )
+#foreach( $b in $uberDao.versions($p.key) )
+#set( $branchName = $b.name )
+#set( $branchDescription = $b.description )
+#set( $branchKey = $b.key )
+#parse( "ricotta-export-version" )
+#end
+         </branches>
+      </project>
+ 

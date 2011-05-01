@@ -1,0 +1,32 @@
+            <branch name="${branchName}" description="${branchDescription}">
+               <languages>
+#foreach( $l in $uberDao.languages($p.key, $branchKey) )
+                  <language code="${uberDao.language($l.language).code}"#if( $l.parent ) default="${uberDao.language($l.parent).code}"#end />
+#end
+               </languages>
+               <contexts>
+#set( $contexts = $uberDao.contexts($p.key))               
+#foreach( $c in $contexts.values() )
+                  <context name="${c.name}" description="${c.description}" blobKey="${c.blobKey.keyString}" />
+#end               
+               </contexts>
+               <tokens>
+#foreach( $t in $uberDao.tokens($p.key, $branchKey) )
+                  <token id="${t.key.id}" name="${t.name}" description="${t.description}" #if($t.viewContext)
+context="${contexts.get($t.viewContext).name}" #end>
+#foreach( $tr in $uberDao.translations($t.key))
+                     <translation code="${uberDao.language($tr.language).code}"><![CDATA[${tr.local}]]></translation> 
+#end
+                  </token>
+#end
+               </tokens>
+               <subsets>
+#foreach( $s in $uberDao.subsets($p.key))
+                  <subset name="${s.name}" description="${s.description}">
+#foreach( $t in $uberDao.subTokens($s.key, $branchKey))
+                     <token id="${t.token.id}" />
+#end                  
+                  </subset> 
+#end               
+               </subsets>
+            </branch>

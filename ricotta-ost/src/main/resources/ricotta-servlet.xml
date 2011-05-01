@@ -18,6 +18,7 @@
 		<property name="tokenArtifactDao" ref="tokenArtifactDao" />
 		<property name="translationDao" ref="translationDao" />
 		<property name="versionDao" ref="versionDao" />
+		<property name="viewContextDao" ref="viewContextDao" />
 		
 		<property name="langDao" ref="langDao" />
 		<property name="templateDao" ref="templateDao" />
