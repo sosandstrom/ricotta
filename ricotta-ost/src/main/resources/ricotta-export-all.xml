@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ricotta>
+   <projects>
+#foreach ($p in $uberDao.proj)
+      <project name="${p.name}">
+      </project>
+#end
+   </projects>
+</ricotta>

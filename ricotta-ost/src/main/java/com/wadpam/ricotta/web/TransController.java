@@ -201,14 +201,20 @@ public class TransController extends AbstractDaoController {
         final Collection<TransModel> trans = uberDao.loadTrans(branchKey, subsetKey, projLang, null);
         model.put("translations", trans);
 
+        renderTemplate(templKey.getName(), model, response);
+        return null;
+    }
+
+    protected static void renderTemplate(String templName, VelocityContext model, HttpServletResponse response)
+            throws ResourceNotFoundException, ParseErrorException, Exception {
+
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/plain; charset=UTF-8"); // mall.getMimeType());
         final PrintWriter writer = response.getWriter();
-        Template template = Velocity.getTemplate(templKey.getName());
+        Template template = Velocity.getTemplate(templName);
         template.merge(model, writer);
         writer.close();
         response.setStatus(HttpServletResponse.SC_OK);
-        return null;
     }
 
 }

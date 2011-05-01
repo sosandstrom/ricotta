@@ -683,6 +683,8 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
             // populate Templates
             final Template androidStringsInherited = templateDao.persist("strings_android_inherit", MALL_BODY_ANDROID,
                     "Android strings.xml with parent default translations", "text/plain");
+            final Template ricottaExportAll = templateDao.persist("ricotta-export-all",
+                    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "Export all ricotta projects to XML", "text/plain");
 
             // Projects
             final Proj proj = projDao.persist("ricotta", "s.o.sandstrom@gmail.com");
@@ -900,4 +902,8 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         this.versionDao = versionDao;
     }
 
+    // ------------------- export ---------------------
+    public List<Proj> getProj() {
+        return projDao.findAll();
+    }
 }

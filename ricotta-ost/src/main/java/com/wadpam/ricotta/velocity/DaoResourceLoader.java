@@ -9,10 +9,14 @@ import org.apache.velocity.runtime.resource.Resource;
 import org.apache.velocity.runtime.resource.loader.ResourceLoader;
 
 import com.wadpam.ricotta.dao.MallDao;
+import com.wadpam.ricotta.dao.TemplateDao;
 import com.wadpam.ricotta.domain.Mall;
+import com.wadpam.ricotta.domain.Template;
 
 public class DaoResourceLoader extends ResourceLoader {
-    private static MallDao mallDao = null;
+    private static MallDao     mallDao     = null;
+
+    private static TemplateDao templateDao = null;
 
     @Override
     public long getLastModified(Resource resource) {
@@ -22,11 +26,21 @@ public class DaoResourceLoader extends ResourceLoader {
 
     @Override
     public InputStream getResourceStream(String source) throws ResourceNotFoundException {
-        Mall mall = mallDao.findByName(source);
-        if (null == mall) {
-            throw new ResourceNotFoundException("No such template " + source);
+        byte buf[] = null;
+
+        Template templ = templateDao.findByPrimaryKey(source);
+        if (null != templ) {
+            buf = templ.getBody().getBytes();
         }
-        ByteArrayInputStream is = new ByteArrayInputStream(mall.getBody().getBytes());
+        else {
+            Mall mall = mallDao.findByName(source);
+            if (null == mall) {
+                throw new ResourceNotFoundException("No such template " + source);
+            }
+            buf = mall.getBody().getBytes();
+        }
+
+        ByteArrayInputStream is = new ByteArrayInputStream(buf);
         return is;
     }
 
@@ -44,4 +58,7 @@ public class DaoResourceLoader extends ResourceLoader {
         DaoResourceLoader.mallDao = mallDao;
     }
 
+    public void setTemplateDao(TemplateDao templateDao) {
+        DaoResourceLoader.templateDao = templateDao;
+    }
 }

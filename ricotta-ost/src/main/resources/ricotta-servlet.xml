@@ -73,7 +73,9 @@
 	</bean>
 
 	<!-- As auto-wiring does not work well in GAE, define controllers manually: -->
-	<bean id="indexController" class="com.wadpam.ricotta.web.IndexController" />
+	<bean id="indexController" class="com.wadpam.ricotta.web.IndexController">
+		<property name="uberDao" ref="uberDao" />
+	</bean>
 
 	<bean id="projectController" class="com.wadpam.ricotta.web.ProjectController">
 		<property name="projectDao" ref="projectDao" />
@@ -153,6 +155,7 @@
 
 	<bean id="dataResourceLoader" class="com.wadpam.ricotta.velocity.DaoResourceLoader">
 		<property name="mallDao" ref="mallDao" />
+		<property name="templateDao" ref="templateDao" />
 	</bean>
 
 	<bean
