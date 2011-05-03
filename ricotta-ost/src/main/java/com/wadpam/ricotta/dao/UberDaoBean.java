@@ -999,4 +999,24 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         }
         return contexts;
     }
+
+    // ---------------------- import XML ----------------------------
+
+    @Override
+    public Object createBranch(Object proj, String name, String description) {
+        final Branch b = branchDao.persist(proj, name, null, description);
+        return b.getPrimaryKey();
+    }
+
+    @Override
+    public Object createLang(String code, String name) {
+        final Lang l = langDao.persist(code, name);
+        return l.getPrimaryKey();
+    }
+
+    @Override
+    public Object createProj(String name, String owner) {
+        final Proj p = projDao.persist(name, owner);
+        return p.getPrimaryKey();
+    }
 }

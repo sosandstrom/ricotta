@@ -224,6 +224,12 @@
 			<version>${spring.version}</version>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymockclassextension</artifactId>
+            <version>2.5.2</version>
+            <scope>test</scope>
+        </dependency>
 		<!-- GAE libraries for local testing as described here: http://code.google.com/appengine/docs/java/howto/unittesting.html -->
 		<dependency>
 			<groupId>com.google.appengine</groupId>
@@ -251,18 +257,12 @@
 			<!-- base set of resources -->
 			<resource>
 				<directory>${project.basedir}/src/main/resources</directory>
-				<excludes>
-					<exclude>logging.properties</exclude>
-				</excludes>
 			</resource>
 
 			<!-- pick environment-specific files from server directory; excluded above -->
 			<resource>
-				<directory>${project.basedir}/src/main/resources</directory>
+				<directory>${project.basedir}/src/main/filtered</directory>
 				<filtering>true</filtering>
-				<includes>
-					<include>logging.properties</include>
-				</includes>
 			</resource>
 		</resources>
 

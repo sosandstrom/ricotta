@@ -44,4 +44,12 @@ public interface UberDao {
 
     void importBody(HttpServletRequest request, Key branchKey, String langCode, String regexp, String body);
 
+    // ---------------- import methods -----------------------
+
+    Object createLang(String code, String name);
+
+    Object createProj(String name, String owner);
+
+    Object createBranch(Object proj, String name, String description);
+
 }
