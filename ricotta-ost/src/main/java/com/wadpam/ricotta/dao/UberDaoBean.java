@@ -48,6 +48,7 @@ import com.wadpam.ricotta.domain.Language;
 import com.wadpam.ricotta.domain.Mall;
 import com.wadpam.ricotta.domain.Proj;
 import com.wadpam.ricotta.domain.ProjLang;
+import com.wadpam.ricotta.domain.ProjUser;
 import com.wadpam.ricotta.domain.Project;
 import com.wadpam.ricotta.domain.ProjectLanguage;
 import com.wadpam.ricotta.domain.ProjectUser;
@@ -1025,6 +1026,12 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
     public Object createProj(String name, String owner) {
         final Proj p = projDao.persist(name, owner);
         return p.getPrimaryKey();
+    }
+
+    @Override
+    public Object createUser(Object proj, String email) {
+        final ProjUser pu = projUserDao.persist(proj, email);
+        return pu.getPrimaryKey();
     }
 
     @Override

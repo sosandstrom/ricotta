@@ -20,6 +20,7 @@ public class RicottaImportHandler extends DefaultHandler {
     public static final String        SUBSET    = "subset";
     public static final String        TRANS     = "translation";
     public static final String        TEMPL     = "template";
+    public static final String        USER      = "user";
 
     static final Logger               LOG       = LoggerFactory.getLogger(RicottaImportHandler.class);
 
@@ -52,6 +53,7 @@ public class RicottaImportHandler extends DefaultHandler {
         final String blobKeyString = a.getValue("blobKey");
         final String context = a.getValue("context");
         final String id = a.getValue("id");
+        final String email = a.getValue("email");
 
         LOG.info("<{} name={}>", qName, name);
 
@@ -98,6 +100,9 @@ public class RicottaImportHandler extends DefaultHandler {
             templName = name;
             templDescription = description;
             // template is created in endElement, as cdata is required
+        }
+        else if (USER.equals(qName)) {
+            uberDao.createUser(proj, email);
         }
     }
 

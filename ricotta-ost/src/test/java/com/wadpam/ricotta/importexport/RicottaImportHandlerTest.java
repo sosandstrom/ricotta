@@ -52,6 +52,8 @@ public class RicottaImportHandlerTest {
 
         final Object KEY_PROJ = "Proj.ricotta";
         expect(uberMock.createProj("ricotta", "s.o.sandstrom@gmail.com")).andReturn(KEY_PROJ).once();
+        final Object KEY_USER_TEST = "User.test";
+        expect(uberMock.createUser(KEY_PROJ, "test@example.com")).andReturn(KEY_USER_TEST).once();
         final Object KEY_BRANCH = "Branch.trunk";
         expect(uberMock.createBranch(KEY_PROJ, "trunk", "the trunk")).andReturn(KEY_BRANCH).once();
 

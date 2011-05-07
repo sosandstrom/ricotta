@@ -66,4 +66,6 @@ public interface UberDao {
 
     Object createTempl(String name, String description, String body);
 
+    Object createUser(Object proj, String email);
+
 }

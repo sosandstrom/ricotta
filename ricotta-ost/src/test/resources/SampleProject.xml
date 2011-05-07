@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ricotta>
+   <languages>
+      <language code="en" name="English" />
+      <language code="en_GB" name="British English" />
+      <language code="sv" name="Swedish" />
+   </languages>
+   <templates>
+      <template name="java properties" description="Java properties file"><![CDATA[##Project: ${project.name}
+##Language: ${language.name} (${language.code}) -->
+##Template name: ${mall.name}
+##Subset: ${artifact.name}
+
+#foreach( $t in $translations )#if( $t.local )
+${t.token.name}=${t.local.local}
+#elseif( $t.parent )
+${t.token.name}=$t.parent.local}
+#end#end
+]]></template>
+   </templates>
+   <projects>
+      <project name="sample" owner="s.o.sandstrom@gmail.com">
+         <users>
+            <user email="test@example.com" />
+         </users>
+         <branches>
+            <branch name="trunk" description="the trunk">
+               <languages>
+                  <language code="en" />
+                  <language code="en_GB" default="en" />
+                  <language code="sv" default="en" />
+               </languages>
+               <contexts>
+                  <context name="login" description="The Login Form" blobKey="AMIfv97f5_9u972oyevGaylFV1EmbLg7Q7zd8VtuNhu8w5chE9Jj5W6tZwcnDebF9ORlzjUhc95c2GOj13R05rAQJZ90gME2fCA9dI-XMrVzvKfQLabaKSjTeMqK3X1-a-BYU-p8qBVS2tkoVLUr4rC-W8v1dj4GCw" />
+               </contexts>
+               <tokens>
+                  <token id="14" name="Project" description="The Project Entity" >
+                     <translation code="en_GB"><![CDATA[Project]]></translation> 
+                     <translation code="sv"><![CDATA[Projekt]]></translation> 
+                  </token>
+                  <token id="13" name="appTitle" description="The Application title as displayed to the user" context="login">
+                     <translation code="en"><![CDATA[Sample]]></translation> 
+                  </token>
+               </tokens>
+               <subsets>
+                  <subset name="android" description="Tokens for Android">
+                     <token id="13" />
+                     <token id="14" />
+                  </subset> 
+                  <subset name="iPhone" description="Tokens for iPhone">
+                     <token id="13" />
+                  </subset> 
+               </subsets>
+            </branch>
+         </branches>
+      </project>
+    </projects>
+</ricotta>

@@ -88,7 +88,7 @@ public class IndexController extends AbstractDaoController {
         // create upload URL for Blob
         model.addAttribute("action", blobstoreService.createUploadUrl("/import-XML.html"));
 
-        return "uploadContext";
+        return "uploadXML";
     }
 
     @RequestMapping(value = "/import-XML.html", method = RequestMethod.POST)
