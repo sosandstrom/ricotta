@@ -10,7 +10,6 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
 @Entity
-// @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"token", "artifact"})})
 public class SubsetTokn extends AEDPrimaryKeyEntity {
     private static final long serialVersionUID = -2998638040524758351L;
     @Parent(kind = "Subset")

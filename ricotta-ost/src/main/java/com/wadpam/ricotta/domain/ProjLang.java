@@ -10,7 +10,6 @@ import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
 import com.google.appengine.api.datastore.Key;
 
 @Entity
-// @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"project", "language", "version"})})
 public class ProjLang extends AEDPrimaryKeyEntity {
     private static final long serialVersionUID = -5999417886086767472L;
 

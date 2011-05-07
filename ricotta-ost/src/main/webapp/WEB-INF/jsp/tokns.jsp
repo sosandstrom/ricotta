@@ -18,7 +18,7 @@ function all_checkboxes(id, checked, artifactKey) {
 }
  
 </script>
-<a href="/index.html">Home</a> | <a href="/proj/index.html">Projects</a> | <a href="../index.html"><c:out value="${project.name}" /></a>
+<a href="/index.html">Home</a> | <a href="/proj/index.html">Projects</a> | <a href="../index.html"><c:out value="${projName}" /></a>
 <div class="pageHeading">Project Tokens</div>
 <form id="tokens" name="tokens" action="" method="post" >
 <input type="submit" name="Action" value="Delete selected tokens" />

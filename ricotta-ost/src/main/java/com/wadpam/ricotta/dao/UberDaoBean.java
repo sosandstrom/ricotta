@@ -365,19 +365,22 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         final Map<Long, TransModel> returnValue = new TreeMap<Long, TransModel>();
         Map<Long, Tokn> tokens;
         if (null == subsetKey) {
-            // find all tokens for branch:
-            tokens = new TreeMap<Long, Tokn>();
-            for(Tokn tokn : toknDao.findByBranch(branchKey)) {
-                tokens.put(tokn.getId(), tokn);
+            // cannot filter on ctxt and subset at same time
+            if (null != ctxtKey) {
+                final List<Long> tokenKeys = toknDao.findKeysByViewContext(ctxtKey);
+                tokens = toknDao.findByPrimaryKeys(branchKey, tokenKeys);
+            }
+            else {
+                // find all tokens for branch:
+                tokens = new TreeMap<Long, Tokn>();
+                for(Tokn tokn : toknDao.findByBranch(branchKey)) {
+                    tokens.put(tokn.getId(), tokn);
+                }
             }
         }
         else {
             // find tokens for subset:
-            final List<SubsetTokn> subTokens = subsetToknDao.findBySubset(subsetKey);
-            final List<Long> tokenKeys = new ArrayList<Long>();
-            for(SubsetTokn st : subTokens) {
-                tokenKeys.add(st.getTokn());
-            }
+            final List<Long> tokenKeys = subsetToknDao.findKeysBySubset(subsetKey);
             tokens = toknDao.findByPrimaryKeys(branchKey, tokenKeys);
         }
 
