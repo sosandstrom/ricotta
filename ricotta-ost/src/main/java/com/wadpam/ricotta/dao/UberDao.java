@@ -62,4 +62,8 @@ public interface UberDao {
 
     Object createTrans(Object projLangKey, Long toknId, String value);
 
+    Object createSubsetTokn(Object subsetKey, Long toknId);
+
+    Object createTempl(String name, String description, String body);
+
 }

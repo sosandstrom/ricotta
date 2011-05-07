@@ -19,6 +19,7 @@ public class RicottaImportHandler extends DefaultHandler {
     public static final String        TOKN      = "token";
     public static final String        SUBSET    = "subset";
     public static final String        TRANS     = "translation";
+    public static final String        TEMPL     = "template";
 
     static final Logger               LOG       = LoggerFactory.getLogger(RicottaImportHandler.class);
 
@@ -34,6 +35,7 @@ public class RicottaImportHandler extends DefaultHandler {
             projLangKey = null;
 
     private Long                      toknId    = null;
+    private String                    templName = null, templDescription = null;
 
     public RicottaImportHandler(UberDao uberDao) {
         this.uberDao = uberDao;
@@ -76,13 +78,13 @@ public class RicottaImportHandler extends DefaultHandler {
             ctxts.put(name, ctxt);
         }
         else if (TOKN.equals(qName)) {
+            toknId = Long.parseLong(id);
             if (null == subset) {
                 Object ctxtKey = (null != context) ? ctxts.get(context) : null;
-                toknId = Long.parseLong(id);
                 tokn = uberDao.createTokn(branch, toknId, name, description, ctxtKey);
             }
             else {
-
+                uberDao.createSubsetTokn(subset, toknId);
             }
         }
         else if (SUBSET.equals(qName)) {
@@ -91,6 +93,11 @@ public class RicottaImportHandler extends DefaultHandler {
         else if (TRANS.equals(qName)) {
             projLangKey = projLangs.get(code);
             // entity is created in endElement, as cdata is required
+        }
+        else if (TEMPL.equals(qName)) {
+            templName = name;
+            templDescription = description;
+            // template is created in endElement, as cdata is required
         }
     }
 
@@ -124,6 +131,9 @@ public class RicottaImportHandler extends DefaultHandler {
         }
         else if (TRANS.equals(qName)) {
             uberDao.createTrans(projLangKey, toknId, cdata.toString());
+        }
+        else if (TEMPL.equals(qName)) {
+            uberDao.createTempl(templName, templDescription, cdata.toString());
         }
 
         cdata.setLength(0);

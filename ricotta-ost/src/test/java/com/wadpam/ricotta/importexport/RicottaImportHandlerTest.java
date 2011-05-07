@@ -12,6 +12,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,6 +43,12 @@ public class RicottaImportHandlerTest {
         expect(uberMock.createLang("en_GB", "British English")).andReturn(KEY_EN_GB).once();
         final Object KEY_SV = "Lang.sv";
         expect(uberMock.createLang("sv", "Swedish")).andReturn(KEY_SV).once();
+
+        final Object KEY_TEMPL_SAI = "Templ.sai";
+        expect(
+                uberMock.createTempl(EasyMock.eq("strings_android_inherit"),
+                        EasyMock.eq("Android strings.xml with parent default translations"), (String) EasyMock.notNull()))
+                .andReturn(KEY_TEMPL_SAI).once();
 
         final Object KEY_PROJ = "Proj.ricotta";
         expect(uberMock.createProj("ricotta", "s.o.sandstrom@gmail.com")).andReturn(KEY_PROJ).once();
@@ -80,11 +87,17 @@ public class RicottaImportHandlerTest {
         final Object KEY_TRANS_13_EN = "Tokn.13.en";
         expect(uberMock.createTrans(KEY_PROJLANG_EN, 13L, "Ricotta")).andReturn(KEY_TRANS_13_EN).once();
 
+        // ricotta-ost subset
         final Object KEY_SUBSET_OST = "Subset.ost";
         expect(uberMock.createSubset(KEY_BRANCH, "ricotta-ost", "${s.description}")).andReturn(KEY_SUBSET_OST).once();
+        expect(uberMock.createSubsetTokn(KEY_SUBSET_OST, 13L)).andReturn("SubsetTokn.ost.13").once();
+        expect(uberMock.createSubsetTokn(KEY_SUBSET_OST, 14L)).andReturn("SubsetTokn.ost.14").once();
+
+        // maven-plugin subset
         final Object KEY_SUBSET_MAVEN_PLUGIN = "Subset.maven-plugin";
         expect(uberMock.createSubset(KEY_BRANCH, "ricotta-maven-plugin", "${s.description}")).andReturn(KEY_SUBSET_MAVEN_PLUGIN)
                 .once();
+        expect(uberMock.createSubsetTokn(KEY_SUBSET_MAVEN_PLUGIN, 13L)).andReturn("SubsetTokn.maven-plugin.13").once();
 
         replay(uberMock);
 

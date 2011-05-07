@@ -742,9 +742,9 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
             final Tokn tokenProject = toknDao.persist(branchKey, 2L, "The Project Entity", "Project", null);
 
             // subset tokens
-            final SubsetTokn appTitleOst = subsetToknDao.persist(ricottaOst.getPrimaryKey(), appTitle.getName(), 1L);
-            subsetToknDao.persist(ricottaOst.getPrimaryKey(), tokenProject.getName(), 2L);
-            subsetToknDao.persist(ricottaPlugin.getPrimaryKey(), appTitle.getName(), 1L);
+            final SubsetTokn appTitleOst = subsetToknDao.persist(ricottaOst.getPrimaryKey(), 1L);
+            subsetToknDao.persist(ricottaOst.getPrimaryKey(), 2L);
+            subsetToknDao.persist(ricottaPlugin.getPrimaryKey(), 1L);
 
             // Trans
             transDao.persist(plEN.getPrimaryKey(), appTitle.getId(), "Ricotta");
@@ -854,7 +854,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         for(TokenArtifact ta : tokenArtifactDao.findByToken(token.getKey())) {
             final Subset subset = artifactMap.get(ta.getArtifact());
             LOG.info("            SUBSET_TOKN {} for {}", subset.getName(), token.getName());
-            SubsetTokn subsetTokn = subsetToknDao.persist(subset.getPrimaryKey(), tokn.getName(), tokn.getId());
+            SubsetTokn subsetTokn = subsetToknDao.persist(subset.getPrimaryKey(), tokn.getId());
         }
 
         // translations
@@ -1016,6 +1016,12 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
     }
 
     @Override
+    public Object createTempl(String name, String description, String body) {
+        final Template t = templateDao.persist(name, body, description, null);
+        return t.getPrimaryKey();
+    }
+
+    @Override
     public Object createProj(String name, String owner) {
         final Proj p = projDao.persist(name, owner);
         return p.getPrimaryKey();
@@ -1050,5 +1056,11 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
     public Object createTrans(Object projLangKey, Long toknId, String value) {
         final Trans t = transDao.persist(projLangKey, toknId, value);
         return t.getPrimaryKey();
+    }
+
+    @Override
+    public Object createSubsetTokn(Object subsetKey, Long toknId) {
+        final SubsetTokn st = subsetToknDao.persist((Key) subsetKey, toknId);
+        return st.getPrimaryKey();
     }
 }

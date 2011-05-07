@@ -1,6 +1,5 @@
 package com.wadpam.ricotta.domain;
 
-import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -18,20 +17,16 @@ public class SubsetTokn extends AEDPrimaryKeyEntity {
     Key                       subset;
 
     @Id
-    String                    name;
-
-    // ManyToOne
-    @Basic
     Long                      tokn;
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '{' + name + '.' + subset + ',' + tokn + '}';
+        return getClass().getSimpleName() + '{' + subset + ',' + tokn + '}';
     }
 
     @Override
     public Object getSimpleKey() {
-        return name;
+        return tokn;
     }
 
     @Override
@@ -50,14 +45,6 @@ public class SubsetTokn extends AEDPrimaryKeyEntity {
 
     public void setSubset(Key subset) {
         this.subset = subset;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Long getTokn() {
