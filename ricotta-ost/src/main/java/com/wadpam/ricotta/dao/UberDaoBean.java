@@ -37,6 +37,7 @@ import net.sf.mardao.api.domain.PrimaryKeyEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.wadpam.ricotta.domain.Artifact;
@@ -1018,5 +1019,36 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
     public Object createProj(String name, String owner) {
         final Proj p = projDao.persist(name, owner);
         return p.getPrimaryKey();
+    }
+
+    @Override
+    public Object createProjLang(Object branchKey, String langCode, Object defaultLangKey, Object langKey) {
+        final ProjLang pl = projLangDao.persist(branchKey, langCode, (Key) defaultLangKey, (Key) langKey);
+        return pl.getPrimaryKey();
+    }
+
+    @Override
+    public Object createCtxt(Object branch, String name, String description, String blobKeyString) {
+        BlobKey blobKey = (null != blobKeyString) ? new BlobKey(blobKeyString) : null;
+        final Ctxt c = ctxtDao.persist(branch, name, blobKey, description);
+        return c.getPrimaryKey();
+    }
+
+    @Override
+    public Object createTokn(Object branch, Long id, String name, String description, Object ctxtKey) {
+        final Tokn t = toknDao.persist(branch, id, description, name, (Key) ctxtKey);
+        return t.getPrimaryKey();
+    }
+
+    @Override
+    public Object createSubset(Object branch, String name, String description) {
+        final Subset s = subsetDao.persist(branch, name, description);
+        return s.getPrimaryKey();
+    }
+
+    @Override
+    public Object createTrans(Object projLangKey, Long toknId, String value) {
+        final Trans t = transDao.persist(projLangKey, toknId, value);
+        return t.getPrimaryKey();
     }
 }

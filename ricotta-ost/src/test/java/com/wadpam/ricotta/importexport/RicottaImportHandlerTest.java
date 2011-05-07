@@ -48,6 +48,44 @@ public class RicottaImportHandlerTest {
         final Object KEY_BRANCH = "Branch.trunk";
         expect(uberMock.createBranch(KEY_PROJ, "trunk", "the trunk")).andReturn(KEY_BRANCH).once();
 
+        final Object KEY_PROJLANG_EN = "ProjLang.en";
+        expect(uberMock.createProjLang(KEY_BRANCH, "en", null, KEY_EN)).andReturn(KEY_PROJLANG_EN).once();
+        final Object KEY_PROJLANG_EN_GB = "ProjLang.en_GB";
+        expect(uberMock.createProjLang(KEY_BRANCH, "en_GB", KEY_EN, KEY_EN_GB)).andReturn(KEY_PROJLANG_EN_GB).once();
+        final Object KEY_PROJLANG_SV = "ProjLang.sv";
+        expect(uberMock.createProjLang(KEY_BRANCH, "sv", KEY_EN, KEY_SV)).andReturn(KEY_PROJLANG_SV).once();
+
+        final Object KEY_CONTEXT_LOGIN = "Ctxt.login";
+        expect(
+                uberMock.createCtxt(
+                        KEY_BRANCH,
+                        "login",
+                        "The Login Form",
+                        "AMIfv97f5_9u972oyevGaylFV1EmbLg7Q7zd8VtuNhu8w5chE9Jj5W6tZwcnDebF9ORlzjUhc95c2GOj13R05rAQJZ90gME2fCA9dI-XMrVzvKfQLabaKSjTeMqK3X1-a-BYU-p8qBVS2tkoVLUr4rC-W8v1dj4GCw"))
+                .andReturn(KEY_CONTEXT_LOGIN).once();
+
+        // Project tokn
+        final Object KEY_TOKN_14 = "Tokn.14";
+        expect(uberMock.createTokn(KEY_BRANCH, 14L, "Project", "The Project Entity", null)).andReturn(KEY_TOKN_14).once();
+        final Object KEY_TRANS_14_EN_GB = "Tokn.14.en_GB";
+        expect(uberMock.createTrans(KEY_PROJLANG_EN_GB, 14L, "Project")).andReturn(KEY_TRANS_14_EN_GB).once();
+        final Object KEY_TRANS_14_SV = "Tokn.14.sv";
+        expect(uberMock.createTrans(KEY_PROJLANG_SV, 14L, "Projekt")).andReturn(KEY_TRANS_14_SV).once();
+
+        // appTitle tokn
+        final Object KEY_TOKN_13 = "Tokn.13";
+        expect(
+                uberMock.createTokn(KEY_BRANCH, 13L, "appTitle", "The Application title as displayed to the user",
+                        KEY_CONTEXT_LOGIN)).andReturn(KEY_TOKN_13).once();
+        final Object KEY_TRANS_13_EN = "Tokn.13.en";
+        expect(uberMock.createTrans(KEY_PROJLANG_EN, 13L, "Ricotta")).andReturn(KEY_TRANS_13_EN).once();
+
+        final Object KEY_SUBSET_OST = "Subset.ost";
+        expect(uberMock.createSubset(KEY_BRANCH, "ricotta-ost", "${s.description}")).andReturn(KEY_SUBSET_OST).once();
+        final Object KEY_SUBSET_MAVEN_PLUGIN = "Subset.maven-plugin";
+        expect(uberMock.createSubset(KEY_BRANCH, "ricotta-maven-plugin", "${s.description}")).andReturn(KEY_SUBSET_MAVEN_PLUGIN)
+                .once();
+
         replay(uberMock);
 
         SAXParser parser = SAXParserFactory.newInstance().newSAXParser();

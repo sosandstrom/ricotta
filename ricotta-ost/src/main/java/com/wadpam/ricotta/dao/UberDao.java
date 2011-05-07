@@ -52,4 +52,14 @@ public interface UberDao {
 
     Object createBranch(Object proj, String name, String description);
 
+    Object createProjLang(Object branchKey, String langCode, Object defaultLangKey, Object langKey);
+
+    Object createCtxt(Object branch, String name, String description, String blobKeyString);
+
+    Object createTokn(Object branch, Long id, String name, String description, Object ctxtKey);
+
+    Object createSubset(Object branch, String name, String description);
+
+    Object createTrans(Object projLangKey, Long toknId, String value);
+
 }

@@ -33,13 +33,14 @@
                   <language code="sv" default="en" />
                </languages>
                <contexts>
+                  <context name="login" description="The Login Form" blobKey="AMIfv97f5_9u972oyevGaylFV1EmbLg7Q7zd8VtuNhu8w5chE9Jj5W6tZwcnDebF9ORlzjUhc95c2GOj13R05rAQJZ90gME2fCA9dI-XMrVzvKfQLabaKSjTeMqK3X1-a-BYU-p8qBVS2tkoVLUr4rC-W8v1dj4GCw" />
                </contexts>
                <tokens>
                   <token id="14" name="Project" description="The Project Entity" >
                      <translation code="en_GB"><![CDATA[Project]]></translation> 
                      <translation code="sv"><![CDATA[Projekt]]></translation> 
                   </token>
-                  <token id="13" name="appTitle" description="The Application title as displayed to the user" >
+                  <token id="13" name="appTitle" description="The Application title as displayed to the user" context="login">
                      <translation code="en"><![CDATA[Ricotta]]></translation> 
                   </token>
                </tokens>
