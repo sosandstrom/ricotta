@@ -58,7 +58,7 @@ public class IndexController extends AbstractDaoController {
         return "loggedout";
     }
 
-    @RequestMapping(value = "/export.html", method = RequestMethod.GET)
+    @RequestMapping(value = "/export.xml", method = RequestMethod.GET)
     public String exportAll(HttpServletRequest request, HttpServletResponse response) throws ResourceNotFoundException,
             ParseErrorException, Exception {
         final VelocityContext model = new VelocityContext();
@@ -66,11 +66,11 @@ public class IndexController extends AbstractDaoController {
 
         model.put("uberDao", uberDao);
 
-        TransController.renderTemplate("ricotta-export-all", model, response);
+        TransController.renderTemplate("ricotta-export-all", model, response, "text/xml; charset=UTF-8");
         return null;
     }
 
-    @RequestMapping(value = "/exportOld.html", method = RequestMethod.GET)
+    @RequestMapping(value = "/exportOld.xml", method = RequestMethod.GET)
     public String exportOld(HttpServletRequest request, HttpServletResponse response) throws ResourceNotFoundException,
             ParseErrorException, Exception {
         final VelocityContext model = new VelocityContext();
@@ -78,7 +78,7 @@ public class IndexController extends AbstractDaoController {
 
         model.put("uberDao", uberDao);
 
-        TransController.renderTemplate("ricotta-export-old", model, response);
+        TransController.renderTemplate("ricotta-export-old", model, response, "text/xml; charset=UTF-8");
         return null;
     }
 

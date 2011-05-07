@@ -40,6 +40,10 @@
 		<servlet-name>ricotta</servlet-name>
 		<url-pattern>*.html</url-pattern>
 	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>ricotta</servlet-name>
+		<url-pattern>/exportOld.xml</url-pattern>
+	</servlet-mapping>
 	
 	<servlet>
 		<servlet-name>blobstore</servlet-name>

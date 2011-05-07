@@ -6,7 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <jsp:include page="header.jsp" />
 <body>
-<a href="/index.html">Home</a>
+<a href="/index.html">Home</a> I <a href="/exportOld.xml">.</a>
 <div class="pageHeading">Projects</div>
 <table>
 		<thead>

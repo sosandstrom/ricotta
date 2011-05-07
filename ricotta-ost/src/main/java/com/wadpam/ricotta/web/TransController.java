@@ -207,9 +207,13 @@ public class TransController extends AbstractDaoController {
 
     protected static void renderTemplate(String templName, VelocityContext model, HttpServletResponse response)
             throws ResourceNotFoundException, ParseErrorException, Exception {
+        renderTemplate(templName, model, response, "text/plain; charset=UTF-8");
+    }
 
+    protected static void renderTemplate(String templName, VelocityContext model, HttpServletResponse response, String contentType)
+            throws ResourceNotFoundException, ParseErrorException, Exception {
         response.setCharacterEncoding("UTF-8");
-        response.setContentType("text/plain; charset=UTF-8"); // mall.getMimeType());
+        response.setContentType(contentType); // mall.getMimeType());
         final PrintWriter writer = response.getWriter();
         Template template = Velocity.getTemplate(templName);
         template.merge(model, writer);

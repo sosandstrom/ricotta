@@ -1,7 +1,7 @@
-      <project name="${p.name}" owner="${p.owner}">
+      <project name="${encoder.xml($p.name)}" owner="${p.owner}">
          <users>
 #foreach( $u in $uberDao.users($p.key) )
-            <user email="${u.user}" />
+            <user email="${encoder.xml($u.user)}" />
 #end
          </users>
          <branches>

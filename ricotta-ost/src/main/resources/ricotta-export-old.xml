@@ -2,12 +2,12 @@
 <ricotta>
    <languages>
 #foreach ($l in $uberDao.languages)
-      <language code="${l.code}" name="${l.name}" />
+      <language code="${encoder.xml($l.code)}" name="${encoder.xml($l.name)}" />
 #end
    </languages>
    <templates>
 #foreach ($t in $uberDao.malls)
-      <template name="${t.name}" description="${t.description}"><![CDATA[${t.body}]]></template>
+      <template name="${encoder.xml($t.name)}" description="${encoder.xml($t.description)}"><![CDATA[${t.body}]]></template>
 #end
    </templates>
    <projects>
