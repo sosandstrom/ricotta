@@ -190,7 +190,4 @@
 		<property name="suffix" value=".jsp" />
 	</bean>
 	
-	<bean id="importServlet" class="com.wadpam.ricotta.importexport.ImportServlet">
-		<property name="uberDao" ref="uberDao" />
-	</bean>
 </beans>
