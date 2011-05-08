@@ -63,6 +63,6 @@ function all_checkboxes(id, checked, artifactKey) {
 <input type="submit" name="Action" value="Delete selected tokens" />
 <input type="submit" value="Save" />
 </form>
-<a href="/projects/<c:out value="${project.name}"/>/tokens/create.html">Create token</a>
+<a href="create.html">Create token...</a>
 </body>
 </html>

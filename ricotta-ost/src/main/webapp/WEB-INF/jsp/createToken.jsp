@@ -6,6 +6,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <jsp:include page="header.jsp" />
 <body>
+<a href="/index.html">Home</a> | <a href="/proj/index.html">Projects</a> | <a href="../index.html"><c:out value="${projName}" /></a> | <a href="index.html">Tokens</a> 
+<div class="pageHeading">Create Token</div>
 <form id="token" name="token" action="" method="post">
 <table>
 	<tr>

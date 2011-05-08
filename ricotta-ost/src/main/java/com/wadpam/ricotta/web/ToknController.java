@@ -1,5 +1,6 @@
 package com.wadpam.ricotta.web;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,12 +11,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.google.appengine.api.datastore.Key;
 import com.wadpam.ricotta.domain.Ctxt;
 import com.wadpam.ricotta.domain.SubsetTokn;
+import com.wadpam.ricotta.domain.Tokn;
 
 /**
  * Created by Ola on Nov 12, 2010
@@ -27,19 +30,21 @@ public class ToknController extends AbstractDaoController {
 
     static final Logger LOGGER              = LoggerFactory.getLogger(ToknController.class);
 
-    // @RequestMapping(value = "create.html", method = RequestMethod.GET)
-    // public String createToken(Model model, @PathVariable String projectName) {
-    // // TODO: check project role
-    // LOGGER.debug("display create token form");
-    // Project project = projectDao.findByName(projectName);
-    // model.addAttribute("project", project);
-    //
-    // // fetch and add artifacts for this project
-    // model.addAttribute("artifacts", artifactDao.findByProject(project.getKey()));
-    //
-    // return "createToken";
-    // }
-    //
+    @RequestMapping(value = "create.html", method = RequestMethod.GET)
+    public String createTokenForm() {
+        return "createToken";
+    }
+
+    @RequestMapping(value = "create.html", method = RequestMethod.POST)
+    public String createToken(HttpServletRequest request, @ModelAttribute(value = "token") Tokn tokn) throws IOException {
+        LOGGER.debug("create token");
+        final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
+        tokn.setBranch(branchKey);
+        toknDao.persist(tokn);
+
+        return "redirect:index.html";
+    }
+
     // @RequestMapping(value = "{action}.html", method = RequestMethod.POST)
     // public String postToken(HttpServletRequest request, @PathVariable String projectName) throws IOException {
     // LOGGER.debug("create token");
