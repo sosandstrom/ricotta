@@ -189,6 +189,16 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
 
     // ------------------ methods managing the cache ------------------------------
 
+    public static List<Long> intersection(List<Long> a, List<Long> b) {
+        final List<Long> u = new ArrayList<Long>();
+        for(Long o : a) {
+            if (b.contains(o)) {
+                u.add(o);
+            }
+        }
+        return u;
+    }
+
     @Override
     public void cloneVersion(Project project, Key from, Version version) {
         LOG.info("--- cloning {} version {}", project.getName(), version.getName());
@@ -263,14 +273,14 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         for(Key tokenKey : keys) {
             // delete associated TokenArtifacts:
             taKeys = tokenArtifactDao.findKeysByToken(tokenKey);
-            tokenArtifactDao.delete(taKeys);
+            tokenArtifactDao.deleteByCore(taKeys);
 
             // delete associated translations:
             taKeys = translationDao.findKeysByToken(tokenKey);
-            translationDao.delete(taKeys);
+            translationDao.deleteByCore(taKeys);
         }
 
-        tokenDao.delete(keys);
+        tokenDao.deleteByCore(keys);
     }
 
     @Override
@@ -278,13 +288,13 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         final Key versionKey = KeyFactory.stringToKey(vk);
 
         // ProjectLanguages
-        projectLanguageDao.delete(projectLanguageDao.findKeysByVersion(versionKey));
+        projectLanguageDao.deleteByCore(projectLanguageDao.findKeysByVersion(versionKey));
 
         // Tokens (incl TokenArtifacts and Translations)
         deleteTokens(tokenDao.findKeysByVersion(versionKey));
 
         // and the version itself
-        versionDao.delete(Arrays.asList(versionKey));
+        versionDao.deleteByCore(Arrays.asList(versionKey));
     }
 
     @Override
@@ -1072,5 +1082,39 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
     public Object createSubsetTokn(Object subsetKey, Long toknId) {
         final SubsetTokn st = subsetToknDao.persist((Key) subsetKey, toknId);
         return st.getPrimaryKey();
+    }
+
+    // --------------------- delete methods ----------------------
+
+    @Override
+    public void deleteTokns(List<Key> keys) {
+        if (null != keys && !keys.isEmpty()) {
+            final Key branchKey = keys.get(0).getParent();
+
+            // prepare ids
+            final List<Long> ids = new ArrayList<Long>();
+            for(Key t : keys) {
+                ids.add(t.getId());
+            }
+
+            // delete all translations for branch's tokens
+            final List<String> projLangs = projLangDao.findKeysByBranch(branchKey);
+            for(String pl : projLangs) {
+                Key plKey = KeyFactory.createKey(branchKey, ProjLang.class.getSimpleName(), pl);
+                List<Long> transKeys = transDao.findKeysByProjLang(plKey);
+                transDao.delete(plKey, intersection(transKeys, ids));
+            }
+
+            // delete all subsetTokns for branch
+            final List<String> subsets = subsetDao.findKeysByBranch(branchKey);
+            for(String subsetName : subsets) {
+                Key sKey = KeyFactory.createKey(branchKey, Subset.class.getSimpleName(), subsetName);
+                List<Long> stKeys = subsetToknDao.findKeysBySubset(sKey);
+                subsetToknDao.delete(sKey, intersection(stKeys, ids));
+            }
+
+            // finally, delete the tokens
+            toknDao.delete(branchKey, ids);
+        }
     }
 }

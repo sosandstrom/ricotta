@@ -147,7 +147,7 @@ public class ProjectController {
             for(String keyString : values) {
                 keys.add(KeyFactory.stringToKey(keyString));
             }
-            projectUserDao.delete(keys);
+            projectUserDao.deleteByCore(keys);
         }
 
         return "redirect:/projects/" + project.getName() + '/';

@@ -23,6 +23,7 @@ function all_checkboxes(id, checked, artifactKey) {
 <form id="tokens" name="tokens" action="" method="post" >
 <input type="submit" name="Action" value="Delete selected tokens" />
 <input type="submit" value="Save" />
+<a href="create.html">Create token...</a>
 <table>
 		<thead>
 		<tr>
@@ -30,7 +31,7 @@ function all_checkboxes(id, checked, artifactKey) {
 			<th>Name</th>
 			<th>Description</th>
 			<th>Context</th>
-			<c:forEach items="${artifacts}" var="artifact">
+			<c:forEach items="${subsets}" var="artifact">
 				<th><input type="checkbox" id="<c:out value='${artifact.keyString}' />" name="<c:out value='${artifact.keyString}' />" 
 					onclick="all_checkboxes('mappings', this.checked, '<c:out value='${artifact.keyString}' />')"/><c:out value="${artifact.name}" /></th>
 			</c:forEach>
@@ -39,21 +40,21 @@ function all_checkboxes(id, checked, artifactKey) {
 	<tbody>
 	<c:set var="even" scope="page" value="${true}" />
 	<c:forEach items="${tokens}" var="token">
+		<input type="hidden" id="id" name="id" value="<c:out value='${token.id}'/>" />
 		<c:set var="even" scope="page" value="${!even}" />
 		<tr class="evenRow<c:out value='${even}' />">
 			<td><input type="checkbox" id="delete" name="delete" value="<c:out value='${token.keyString}' />" /></td>
-			<td><c:out value="${token.name}" /></td>
-			<td><c:out value="${token.description}" /></td>
-			<td><select name="viewContext.<c:out value='${token.keyString}' />" id="viewContext.<c:out value='${token.keyString}' />">
-				<c:forEach items="${viewContexts}" var="c">
+			<td><input type="text" id="name" name="name" value="<c:out value='${token.name}'/>" /></td>
+			<td><input type="text" id="description" name="description" value="<c:out value='${token.description}'/>" /></td>
+			<td><select name="ctxt" id="ctxt">
+				<c:forEach items="${viewContexts.values}" var="c">
 					<option value="<c:out value='${c.keyString}'/>" <c:if test="${token.viewContext == c.primaryKey}"> selected="selected" </c:if> >
 						<c:out value="${c.name}" /></option>
 				</c:forEach>
 			</select></td>
-			<c:forEach items="${artifacts}" var="artifact">
-				<td><c:set var="key" scope="page"><c:out value='${token.id}' />.<c:out value='${artifact.name}' /></c:set>
-					<input type="checkbox" id="mappings" name="mappings" value="<c:out value='${key}' />" title="<c:out value='${token.name}' />:<c:out value='${artifact.name}' />"
-						<c:if test="${null != mappings[key]}">checked="checked"</c:if> />
+			<c:forEach items="${token.subsets}" var="subset">
+				<td><input type="checkbox" id="mappings" name="mappings" value="<c:out value='${subset.keyString}' />" title="<c:out value='${token.name}' />:<c:out value='${subset.subset.name}' />"
+						<c:if test="${null != mappings[subset.keyString]}">checked="checked"</c:if> />
 				</td>
 			</c:forEach>
 		</tr>
@@ -62,7 +63,7 @@ function all_checkboxes(id, checked, artifactKey) {
 </table>
 <input type="submit" name="Action" value="Delete selected tokens" />
 <input type="submit" value="Save" />
-</form>
 <a href="create.html">Create token...</a>
+</form>
 </body>
 </html>

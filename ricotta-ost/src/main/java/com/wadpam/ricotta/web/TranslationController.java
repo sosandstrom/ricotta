@@ -190,7 +190,7 @@ public class TranslationController {
             }
             else if (delete) {
                 final List<Key> ts = translationDao.findKeysByTokenLanguageVersion(t.getToken(), t.getLanguage(), t.getVersion());
-                translationDao.delete(ts);
+                translationDao.deleteByCore(ts);
                 final String d = String.format("R %s %s", language.getCode(), token.getName());
                 LOG.debug(d);
                 returnValue.add(d);

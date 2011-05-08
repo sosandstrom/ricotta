@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -14,11 +16,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.wadpam.ricotta.domain.Ctxt;
+import com.wadpam.ricotta.domain.Subset;
 import com.wadpam.ricotta.domain.SubsetTokn;
 import com.wadpam.ricotta.domain.Tokn;
+import com.wadpam.ricotta.model.SubsetToknModel;
 
 /**
  * Created by Ola on Nov 12, 2010
@@ -28,10 +34,16 @@ import com.wadpam.ricotta.domain.Tokn;
 public class ToknController extends AbstractDaoController {
     static final String VIEW_CONTEXT_PREFIX = "viewContext.";
 
+    static final String NO_CONTEXT_NAME     = "_NO_CONTEXT_";
+
     static final Logger LOGGER              = LoggerFactory.getLogger(ToknController.class);
 
     @RequestMapping(value = "create.html", method = RequestMethod.GET)
-    public String createTokenForm() {
+    public String createTokenForm(Model model, HttpServletRequest request) {
+        final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
+
+        model.addAttribute("viewContexts", getContextMap(branchKey));
+
         return "createToken";
     }
 
@@ -42,6 +54,87 @@ public class ToknController extends AbstractDaoController {
         tokn.setBranch(branchKey);
         toknDao.persist(tokn);
 
+        return "redirect:index.html";
+    }
+
+    @RequestMapping(value = "index.html", method = RequestMethod.POST)
+    public String updateTokens(HttpServletRequest request, @RequestParam(value = "id") Long[] id,
+            @RequestParam(value = "name") String[] name, @RequestParam(value = "description") String[] description,
+            @RequestParam(value = "ctxt") String[] ctxt) throws IOException {
+        LOGGER.debug("create token");
+        final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
+
+        // update token details
+        for(int i = 0; i < id.length; i++) {
+            final Tokn t = toknDao.findByPrimaryKey(branchKey, id[i]);
+            // modified?
+            boolean changed = false;
+            if (null != t) {
+                if (!name[i].equals(t.getName())) {
+                    changed = true;
+                    t.setName(name[i]);
+                }
+                if (!description[i].equals(t.getDescription())) {
+                    changed = true;
+                    t.setDescription(description[i]);
+                }
+                // has context been cleared?
+                if (NO_CONTEXT_NAME.equals(ctxt[i]) && null != t.getViewContext()) {
+                    changed = true;
+                    t.setViewContext(null);
+                }
+                // has context been set?
+                else if (null == t.getViewContext() && !NO_CONTEXT_NAME.equals(ctxt[i])) {
+                    changed = true;
+                    t.setViewContext(KeyFactory.createKey(branchKey, Ctxt.class.getSimpleName(), ctxt[i]));
+                }
+                // has context changed?
+                else if (null != t.getViewContext()) {
+                    if (!ctxt[i].equals(t.getViewContext().getName())) {
+                        changed = true;
+                        t.setViewContext(KeyFactory.createKey(branchKey, Ctxt.class.getSimpleName(), ctxt[i]));
+                    }
+                }
+
+                if (changed) {
+                    toknDao.update(t);
+                }
+            }
+            t.setId(id[i]);
+            t.setName(name[i]);
+            t.setDescription(description[i]);
+        }
+
+        // process all SubsetTokns:
+        String[] mappings = request.getParameterValues("mappings");
+        if (null != mappings) {
+
+            // stored mappings
+            final Map<String, SubsetTokn> stMap = getSubsetToknMap(subsetDao.findByBranch(branchKey));
+            for(String stKeyString : mappings) {
+                SubsetTokn st = stMap.remove(stKeyString);
+                // create missing mappings
+                if (null == st) {
+                    Key stKey = KeyFactory.stringToKey(stKeyString);
+                    subsetToknDao.persist(stKey.getParent(), stKey.getId());
+                }
+            }
+            // remove unchecked mappings
+            List<SubsetTokn> remove = new ArrayList<SubsetTokn>(stMap.values());
+            subsetToknDao.delete(remove);
+        }
+
+        // delete selected project tokens:
+        String values[] = request.getParameterValues("delete");
+        if (null != values && "Delete selected tokens".equals(request.getParameter("Action"))) {
+            final List<Key> keys = new ArrayList<Key>();
+            Key key;
+            for(String keyString : values) {
+                key = KeyFactory.stringToKey(keyString);
+                keys.add(key);
+            }
+            uberDao.deleteTokns(keys);
+        }
         return "redirect:index.html";
     }
 
@@ -83,36 +176,63 @@ public class ToknController extends AbstractDaoController {
     // return "redirect:/projects/" + projectName + "/tokens/index.html";
     // }
 
+    protected Map<String, Ctxt> getContextMap(Key branchKey) {
+        // fetch and add viewContexts for this branch
+        Map<String, Ctxt> cMap = new TreeMap<String, Ctxt>();
+        for(Ctxt ctxt : ctxtDao.findByBranch(branchKey)) {
+            cMap.put(ctxt.getName(), ctxt);
+        }
+
+        Ctxt noContext = new Ctxt();
+        noContext.setName(NO_CONTEXT_NAME);
+        noContext.setDescription("Tokens in no specified context");
+        cMap.put(NO_CONTEXT_NAME, noContext);
+
+        return cMap;
+    }
+
+    public String createKeyString(Tokn tokn, Subset subset) {
+        return KeyFactory.createKeyString((Key) subset.getPrimaryKey(), SubsetTokn.class.getSimpleName(), tokn.getId());
+    }
+
+    protected Map<String, SubsetTokn> getSubsetToknMap(List<Subset> subsets) {
+        final HashMap<String, SubsetTokn> mappings = new HashMap<String, SubsetTokn>();
+        for(Subset s : subsets) {
+            for(SubsetTokn ta : subsetToknDao.findBySubset((Key) s.getPrimaryKey())) {
+                mappings.put(ta.getKeyString(), ta);
+            }
+        }
+        return mappings;
+    }
+
     @RequestMapping(value = "index.html", method = RequestMethod.GET)
     public String tokens(Model model, HttpServletRequest request) {
         LOGGER.debug("display tokens");
         final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
-        final Key subsetKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_SUBSETKEY);
-
-        // fetch and add tokens for this branch
-        model.addAttribute("tokens", toknDao.findByBranch(branchKey));
 
         // fetch and add subsets for this branch
-        model.addAttribute("artifacts", subsetDao.findByBranch(branchKey));
+        final List<Subset> subsets = subsetDao.findByBranch(branchKey);
 
-        // fetch and add viewContexts for this branch
-        List<Ctxt> viewContexts = new ArrayList<Ctxt>(ctxtDao.findByBranch(branchKey));
-        Ctxt noContext = new Ctxt();
-        noContext.setName("NO CONTEXT");
-        noContext.setDescription("Tokens in no specific context");
-        viewContexts.add(0, noContext);
-        model.addAttribute("viewContexts", viewContexts);
+        // fetch and add tokens for this branch
+        final List<Tokn> tokens = toknDao.findByBranch(branchKey);
+        final List<SubsetToknModel> stms = new ArrayList<SubsetToknModel>();
+        for(Tokn t : tokens) {
+            stms.add(new SubsetToknModel(t, subsets));
+        }
+        model.addAttribute("tokens", stms);
+
+        model.addAttribute("subsets", subsets);
+
+        model.addAttribute("viewContexts", getContextMap(branchKey));
+
+        model.addAttribute("keyFactory", this);
 
         // and TokenArtifact mappings
-        HashMap<String, SubsetTokn> mappings = new HashMap<String, SubsetTokn>();
-        for(SubsetTokn ta : subsetToknDao.findBySubset(subsetKey)) {
-            mappings.put(ta.getTokn() + "." + ta.getSubset().getName(), ta);
-        }
+        final Map<String, SubsetTokn> mappings = getSubsetToknMap(subsets);
         model.addAttribute("mappings", mappings);
 
         return "tokns";
     }
-
     // protected void updateArtifactTokens(HttpServletRequest request, Project project, Version version, Token token,
     // Artifact artifact) {
     // // <select name="viewContext.<c:out value='${token.keyString}' />

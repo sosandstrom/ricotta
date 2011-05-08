@@ -68,4 +68,8 @@ public interface UberDao {
 
     Object createUser(Object proj, String email);
 
+    // --------------------- delete methods ----------------------
+
+    void deleteTokns(List<Key> keys);
+
 }
