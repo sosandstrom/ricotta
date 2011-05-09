@@ -7,7 +7,6 @@ import net.sf.mardao.api.Parent;
 import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
 
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 
 @Entity
 public class SubsetTokn extends AEDPrimaryKeyEntity {
@@ -19,11 +18,6 @@ public class SubsetTokn extends AEDPrimaryKeyEntity {
     Long                      tokn;
 
     @Override
-    public String toString() {
-        return getClass().getSimpleName() + '{' + subset + ',' + tokn + '}';
-    }
-
-    @Override
     public Object getSimpleKey() {
         return tokn;
     }
@@ -31,11 +25,6 @@ public class SubsetTokn extends AEDPrimaryKeyEntity {
     @Override
     public Object getParentKey() {
         return subset;
-    }
-
-    @Override
-    public String getKeyString() {
-        return (null != tokn && null != subset) ? tokn.toString() + '.' + KeyFactory.keyToString(subset) : null;
     }
 
     public Key getSubset() {

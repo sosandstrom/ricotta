@@ -40,16 +40,16 @@ function all_checkboxes(id, checked, artifactKey) {
 	<tbody>
 	<c:set var="even" scope="page" value="${true}" />
 	<c:forEach items="${tokens}" var="token">
-		<input type="hidden" id="id" name="id" value="<c:out value='${token.id}'/>" />
+		<input type="hidden" id="id" name="id" value="<c:out value='${token.toknId}'/>" />
 		<c:set var="even" scope="page" value="${!even}" />
 		<tr class="evenRow<c:out value='${even}' />">
 			<td><input type="checkbox" id="delete" name="delete" value="<c:out value='${token.keyString}' />" /></td>
 			<td><input type="text" id="name" name="name" value="<c:out value='${token.name}'/>" /></td>
 			<td><input type="text" id="description" name="description" value="<c:out value='${token.description}'/>" /></td>
 			<td><select name="ctxt" id="ctxt">
-				<c:forEach items="${viewContexts.values}" var="c">
-					<option value="<c:out value='${c.keyString}'/>" <c:if test="${token.viewContext == c.primaryKey}"> selected="selected" </c:if> >
-						<c:out value="${c.name}" /></option>
+				<c:forEach items="${viewContexts}" var="c">
+					<option value="<c:out value='${c.key}'/>" <c:if test="${token.viewContext == c.value.primaryKey}"> selected="selected" </c:if> >
+						<c:out value="${c.value.name}" /></option>
 				</c:forEach>
 			</select></td>
 			<c:forEach items="${token.subsets}" var="subset">

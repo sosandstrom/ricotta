@@ -16,7 +16,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -58,15 +57,17 @@ public class ToknController extends AbstractDaoController {
     }
 
     @RequestMapping(value = "index.html", method = RequestMethod.POST)
-    public String updateTokens(HttpServletRequest request, @RequestParam(value = "id") Long[] id,
-            @RequestParam(value = "name") String[] name, @RequestParam(value = "description") String[] description,
-            @RequestParam(value = "ctxt") String[] ctxt) throws IOException {
-        LOGGER.debug("create token");
+    public String updateTokens(HttpServletRequest request) throws IOException {
+        String[] id = request.getParameterValues("id");
+        String[] name = request.getParameterValues("name");
+        String[] description = request.getParameterValues("description");
+        String[] ctxt = request.getParameterValues("ctxt");
+        LOGGER.debug("update tokens {}", id);
         final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
 
         // update token details
         for(int i = 0; i < id.length; i++) {
-            final Tokn t = toknDao.findByPrimaryKey(branchKey, id[i]);
+            final Tokn t = toknDao.findByPrimaryKey(branchKey, Long.parseLong(id[i]));
             // modified?
             boolean changed = false;
             if (null != t) {
@@ -100,19 +101,18 @@ public class ToknController extends AbstractDaoController {
                     toknDao.update(t);
                 }
             }
-            t.setId(id[i]);
-            t.setName(name[i]);
-            t.setDescription(description[i]);
         }
 
         // process all SubsetTokns:
         String[] mappings = request.getParameterValues("mappings");
+        LOGGER.debug("mappings {}", mappings);
         if (null != mappings) {
 
             // stored mappings
             final Map<String, SubsetTokn> stMap = getSubsetToknMap(subsetDao.findByBranch(branchKey));
             for(String stKeyString : mappings) {
                 SubsetTokn st = stMap.remove(stKeyString);
+                LOGGER.debug("existing for {} is {}", stKeyString, st);
                 // create missing mappings
                 if (null == st) {
                     Key stKey = KeyFactory.stringToKey(stKeyString);
