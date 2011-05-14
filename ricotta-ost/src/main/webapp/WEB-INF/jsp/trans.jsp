@@ -35,8 +35,7 @@
 		<c:set var="even" scope="page" value="${!even}" />
 		<tr id="<c:out value='${t.token.keyString}' />" class="evenRow<c:out value='${even}' />" title="<c:out value='${t.key.kind}' />">
 			<td><c:out value="${t.token.name}" /></td>
-			<td><input id="description.<c:out value='${t.token.id}' />" name="description.<c:out value='${t.token.id}' />" 
-				type="text" value="<c:out value='${t.token.description}' />" /></td>
+			<td><c:out value="${t.token.description}" /></td>
 			<td><textarea id="<c:out value='${t.keyString}' />"	name="<c:out value='${t.keyString}' />"
 				cols="80" rows="2" ><c:out value='${t.local.local}' /></textarea></td>
 			<td><c:out value="${t.parent.local}" /></td>

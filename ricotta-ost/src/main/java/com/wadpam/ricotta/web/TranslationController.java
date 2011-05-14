@@ -40,9 +40,8 @@ import com.wadpam.ricotta.model.TranslationModel;
 public class TranslationController {
     static final Logger        LOG                = LoggerFactory.getLogger(TranslationController.class);
 
-    static final String        PREFIX_DESCRIPTION = TransController.PREFIX_DESCRIPTION;
-
-    static final String        PREFIX_TOKEN       = TransController.PREFIX_TOKEN;
+    static final String        PREFIX_DESCRIPTION = "description.";
+    static final String        PREFIX_TOKEN       = "token.";
 
     private ProjectDao         projectDao;
 
@@ -131,8 +130,8 @@ public class TranslationController {
             value = request.getParameter(name);
             LOG.debug("{} = {}", name, value);
             try {
-                if (name.startsWith(TransController.PREFIX_DESCRIPTION)) {
-                    key = KeyFactory.stringToKey(name.substring(TransController.PREFIX_DESCRIPTION.length()));
+                if (name.startsWith(PREFIX_DESCRIPTION)) {
+                    key = KeyFactory.stringToKey(name.substring(PREFIX_DESCRIPTION.length()));
                     token = tokenDao.findByPrimaryKey(key);
                     if (false == value.equals(token.getDescription())) {
                         final String d = String.format("D %s %s, was ", token.getName(), value, token.getDescription());

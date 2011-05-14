@@ -62,11 +62,11 @@ public class ToknController extends AbstractDaoController {
         String[] name = request.getParameterValues("name");
         String[] description = request.getParameterValues("description");
         String[] ctxt = request.getParameterValues("ctxt");
-        LOGGER.debug("update tokens {}", id);
+        // LOGGER.debug("update tokens {} ({})", id, id.length);
         final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
 
         // update token details
-        for(int i = 0; i < id.length; i++) {
+        for(int i = 0; null != id && i < id.length; i++) {
             final Tokn t = toknDao.findByPrimaryKey(branchKey, Long.parseLong(id[i]));
             // modified?
             boolean changed = false;
@@ -105,14 +105,13 @@ public class ToknController extends AbstractDaoController {
 
         // process all SubsetTokns:
         String[] mappings = request.getParameterValues("mappings");
-        LOGGER.debug("mappings {}", mappings);
         if (null != mappings) {
 
             // stored mappings
             final Map<String, SubsetTokn> stMap = getSubsetToknMap(subsetDao.findByBranch(branchKey));
             for(String stKeyString : mappings) {
                 SubsetTokn st = stMap.remove(stKeyString);
-                LOGGER.debug("existing for {} is {}", stKeyString, st);
+                // LOGGER.debug("existing for {} is {}", stKeyString, st);
                 // create missing mappings
                 if (null == st) {
                     Key stKey = KeyFactory.stringToKey(stKeyString);

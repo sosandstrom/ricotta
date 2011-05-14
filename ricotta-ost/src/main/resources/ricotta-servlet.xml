@@ -63,6 +63,7 @@
 		<property name="subsetDao" ref="subsetDao" />
 		<property name="subsetToknDao" ref="subsetToknDao" />
 		<property name="toknDao" ref="toknDao" />
+		<property name="uberDao" ref="uberDao" />
 	</bean>
 	
 	<bean id="transController" class="com.wadpam.ricotta.web.TransController">

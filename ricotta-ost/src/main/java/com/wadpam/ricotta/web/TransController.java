@@ -36,9 +36,7 @@ import com.wadpam.ricotta.velocity.Encoder;
 @Controller
 @RequestMapping(value = "/proj/{projName}/branch/{branchName}/lang/{langCode}")
 public class TransController extends AbstractDaoController {
-    static final Logger LOG                = LoggerFactory.getLogger(TransController.class);
-    static final String PREFIX_DESCRIPTION = "description.";
-    static final String PREFIX_TOKEN       = "token.";
+    static final Logger LOG = LoggerFactory.getLogger(TransController.class);
 
     @RequestMapping(value = "index.html", method = RequestMethod.GET)
     public String getTrans(Model model, HttpServletRequest request) {
@@ -100,45 +98,31 @@ public class TransController extends AbstractDaoController {
         final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
         final Key projLangKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJLANGKEY);
 
-        String name, value, tokenId;
+        String name, value;
         Key key;
         Trans t;
         Tokn token;
         List<String> changes = new ArrayList<String>();
-        // iterate all posted parameters (descriptions and translations)
+        // iterate all posted parameters (translations)
         for(@SuppressWarnings("unchecked")
         Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
             name = e.nextElement();
             value = request.getParameter(name);
             LOG.debug("{} = {}", name, value);
             try {
-                // token description to update
-                if (name.startsWith(PREFIX_DESCRIPTION)) {
-                    tokenId = name.substring(PREFIX_DESCRIPTION.length());
-                    token = toknDao.findByPrimaryKey(branchKey, Long.parseLong(tokenId));
-                    if (false == value.equals(token.getDescription())) {
-                        final String d = String.format("D %s %s, was ", token.getName(), value, token.getDescription());
-                        token.setDescription(value);
-                        toknDao.update(token);
-                        LOG.debug(d);
-                        changes.add(d);
-                    }
+                // translation to update
+                key = KeyFactory.stringToKey(name);
+                t = null;
+                LOG.debug("field key kind for {} is {}", key.toString(), key.getKind());
+                if (Translation.class.getSimpleName().equals(key.getKind())) {
+                    // update or delete existing translation
+                    t = transDao.findByPrimaryKey(key.getParent(), key.getId());
+                    changes.addAll(uberDao.updateTrans(projLangKey, null, t, name, value, true));
                 }
                 else {
-                    // translation to update
-                    key = KeyFactory.stringToKey(name);
-                    t = null;
-                    LOG.debug("field key kind for {} is {}", key.toString(), key.getKind());
-                    if (Translation.class.getSimpleName().equals(key.getKind())) {
-                        // update or delete existing translation
-                        t = transDao.findByPrimaryKey(key.getParent(), key.getId());
-                        changes.addAll(uberDao.updateTrans(projLangKey, null, t, name, value, true));
-                    }
-                    else {
-                        // create new translation for token
-                        token = toknDao.findByPrimaryKey(branchKey, key.getId());
-                        changes.addAll(uberDao.updateTrans(projLangKey, token, null, name, value, false));
-                    }
+                    // create new translation for token
+                    token = toknDao.findByPrimaryKey(branchKey, key.getId());
+                    changes.addAll(uberDao.updateTrans(projLangKey, token, null, name, value, false));
                 }
             }
             catch (javax.persistence.PersistenceException pe) {
