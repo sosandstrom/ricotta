@@ -42,25 +42,37 @@ public class Downloader {
         ps.close();
     }
 
-    public static void download(String projectName, String version, String languageCode, String templateName,
-            String artifactName, PrintStream fos) throws ClientProtocolException, IOException {
-        StringBuffer url = new StringBuffer("http://ricotta-ost.appspot.com/projects/");
+    public static String buildUrl(String projectName, String version, String languageCode, String templateName,
+            String artifactName) {
+        StringBuffer url = new StringBuffer("http://ricotta-ost.appspot.com/proj/");
         url.append(projectName);
-        url.append("/languages/");
+
+        url.append("/branch/");
+        if (null != version && !"HEAD".equals(version)) {
+            url.append(version);
+        }
+        else {
+            url.append("trunk");
+        }
+
+        url.append("/lang/");
         url.append(languageCode);
-        url.append("/templates/");
+        url.append("/templ/");
         url.append(templateName);
         if (null != artifactName) {
-            url.append("/artifacts/");
+            url.append("/subset/");
             url.append(artifactName);
         }
         url.append('/');
-        if (null != version && 0 < version.length()) {
-            url.append("?version=");
-            url.append(version);
-        }
-        info("Download URL " + url.toString());
-        HttpGet method = new HttpGet(url.toString());
+        final String returnValue = url.toString();
+        info("Download URL " + returnValue);
+        return returnValue;
+    }
+
+    public static void download(String projectName, String version, String languageCode, String templateName,
+            String artifactName, PrintStream fos) throws ClientProtocolException, IOException {
+        final String url = buildUrl(projectName, version, languageCode, templateName, artifactName);
+        HttpGet method = new HttpGet(url);
 
         // TODO: add authentication
 
@@ -74,8 +86,8 @@ public class Downloader {
             warn("Retrying as HTTP " + status.getStatusCode() + " " + status.getReasonPhrase());
             method.abort();
             // retry once!
-            info("Download URL " + url.toString());
-            method = new HttpGet(url.toString());
+            info("Download URL " + url);
+            method = new HttpGet(url);
             // TODO: add authentication
             response = client.execute(method);
             status = response.getStatusLine();
@@ -115,17 +127,18 @@ public class Downloader {
                 String version = null;
                 String artifact = null;
                 for(int i = 3; i < args.length; i += 2) {
-                    if ("-artifact".equals(args[i])) {
+                    if ("-subset".equals(args[i])) {
                         artifact = args[i + 1];
                     }
-                    else if ("-version".equals(args[i])) {
+                    else if ("-branch".equals(args[i])) {
                         version = args[i + 1];
                     }
                 }
                 download(args[0], version, args[1], args[2], artifact, System.out);
                 break;
             default:
-                throw new IOException("Usage: <projectName> <languageCode> <templateName> [-artifact <artifactName>] [-version");
+                throw new IOException(
+                        "Usage: <projectName> <languageCode> <templateName> [-branch <branchName>] [-subset <subsetName>]");
         }
     }
 
