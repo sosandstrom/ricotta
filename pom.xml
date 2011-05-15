@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.wadpam.ricotta</groupId>
 	<artifactId>ricotta</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>${project.groupId}:${project.artifactId}</name>
 
@@ -11,4 +11,9 @@
 		<module>ricotta-maven-plugin</module>
 		<module>ricotta-ost</module>
 	</modules>
+	
+	<scm>
+		<developerConnection>scm:hg:https://bitbucket.org/f94os/ricotta-ost</developerConnection>
+		<url>https://bitbucket.org/f94os/ricotta-ost/src</url>
+	</scm>
 </project>
