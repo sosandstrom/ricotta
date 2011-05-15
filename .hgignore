@@ -33,3 +33,5 @@ syntax: regexp
 ^ricotta-plugin-test/\.classpath$
 syntax: regexp
 ^ricotta-plugin-test/\.project$
+syntax: regexp
+^bin$
