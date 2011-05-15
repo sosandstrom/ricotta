@@ -21,9 +21,9 @@ context="${encoder.xml($contexts.get($t.viewContext).name)}" #end>
 #end
                </tokens>
                <subsets>
-#foreach( $s in $uberDao.subsets($p.key))
+#foreach( $s in $uberDao.artifacts($p.key))
                   <subset name="${encoder.xml($s.name)}" description="${encoder.xml($s.description)}">
-#foreach( $t in $uberDao.subTokens($s.key, $branchKey))
+#foreach( $t in $uberDao.tokenArtifacts($s.key, $branchKey))
                      <token id="${t.token.id}" />
 #end                  
                   </subset> 

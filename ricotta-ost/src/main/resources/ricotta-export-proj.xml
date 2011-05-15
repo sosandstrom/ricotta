@@ -1,0 +1,16 @@
+      <project name="${encoder.xml($p.name)}" owner="${p.owner}">
+         <users>
+#foreach( $u in $uberDao.projUsers($p.primaryKey) )
+            <user email="${encoder.xml($u.user)}" />
+#end
+         </users>
+         <branches>
+#foreach( $b in $uberDao.branches($p.primaryKey) )
+#set( $branchName = $b.name )
+#set( $branchDescription = $b.description )
+#set( $branchKey = $b.primaryKey )
+#parse( "ricotta-export-branch" )
+#end
+         </branches>
+      </project>
+ 

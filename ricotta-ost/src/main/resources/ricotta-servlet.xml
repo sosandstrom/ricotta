@@ -54,6 +54,7 @@
 	<bean id="projController" class="com.wadpam.ricotta.web.ProjController">
 		<property name="projDao" ref="projDao" />
 		<property name="projUserDao" ref="projUserDao" />
+		<property name="uberDao" ref="uberDao" />
 	</bean>
 	
 	<bean id="templController" class="com.wadpam.ricotta.web.TemplController">

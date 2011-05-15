@@ -9,6 +9,7 @@
 <a href="/index.html">Home</a> 
 <c:if test="$pageContext.request.userPrincipal.name == 'test@example.com' || $pageContext.request.userPrincipal.name == 's.o.sandstrom@gmail.com'">
 | <a href="/exportOld.xml">Export Old DB to XML</a>
+| <a href="/import-XML.html">Import XML (to new DB)</a>
 </c:if>
 <div class="pageHeading">Projects</div>
 <table>
@@ -16,6 +17,7 @@
 		<tr>
 			<th>Name</th>
 			<th>Owner</th>
+			<th>Actions</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -25,6 +27,13 @@
 		<tr class="evenRow<c:out value='${even}' />">
 			<td><a href="<c:out value="${p.name}" />/branch/trunk/"><c:out value="${p.name}" /></a></td>
 			<td><c:out value="${p.owner}" /></td>
+			<td><form name="proj" action="<c:out value='${p.name}'/>/action.html" method="get">
+					<input type="submit" id="export" name="export" value="Export project" />
+<c:if test="$pageContext.request.userPrincipal.name == $p.owner">
+					<input type="submit" id="delete" name="delete" value="Delete project" />
+</c:if>
+				</form>
+			</td>
 		</tr>
 	</c:forEach>
 	</tbody>

@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.exception.ParseErrorException;
+import org.apache.velocity.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -12,11 +16,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.wadpam.ricotta.domain.Branch;
 import com.wadpam.ricotta.domain.Proj;
+import com.wadpam.ricotta.velocity.Encoder;
 
 @Controller
 @RequestMapping(value = "/proj")
@@ -70,4 +76,25 @@ public class ProjController extends AbstractDaoController {
         return "redirect:/proj/" + project.getName() + "/branch/" + trunk.getName() + '/';
     }
 
+    @RequestMapping(value = "{projName}/action.html", method = RequestMethod.GET)
+    public String actionProj(HttpServletRequest request, HttpServletResponse response,
+            @RequestParam(value = "delete", required = false) String delete,
+            @RequestParam(value = "export", required = false) String export) throws ResourceNotFoundException,
+            ParseErrorException, Exception {
+        String viewName = null;
+        if (null != delete && 5 < delete.length()) {
+            viewName = "confirm";
+        }
+        else if (null != export && 5 < export.length()) {
+            final VelocityContext model = new VelocityContext();
+            model.put("encoder", new Encoder());
+            final String projName = (String) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJNAME);
+            final Proj proj = projDao.findByPrimaryKey(projName);
+            model.put("p", proj);
+            model.put("uberDao", uberDao);
+
+            GenerateController.renderTemplate("ricotta-export-proj", model, response, "text/xml; charset=UTF-8");
+        }
+        return viewName;
+    }
 }

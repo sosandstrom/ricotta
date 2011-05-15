@@ -1,0 +1,33 @@
+            <branch name="${encoder.xml($branchName)}" description="${encoder.xml($branchDescription)}">
+               <languages>
+#set( $langs = $uberDao.langs($branchKey) )
+#foreach( $l in $langs )
+                  <language code="${l.langCode}"#if( $l.defaultLang ) default="${l.defaultLang.name}"#end />
+#end
+               </languages>
+               <contexts>
+#foreach( $c in $uberDao.ctxts($branchKey) )
+                  <context name="${encoder.xml($c.name)}" description="${encoder.xml($c.description)}" blobKey="${c.blobKey.keyString}" />
+#end               
+               </contexts>
+               <tokens>
+#set( $trans = $uberDao.trans($branchKey))
+#foreach( $t in $uberDao.tokns($branchKey) )
+                  <token id="${t.id}" name="${encoder.xml($t.name)}" description="${encoder.xml($t.description)}" #if($t.viewContext)
+context="${encoder.xml($t.viewContext.name)}" #end>
+#foreach( $tr in $trans.get($t.id))
+                     <translation code="${tr.projLang.name}"><![CDATA[${tr.local}]]></translation> 
+#end
+                  </token>
+#end
+               </tokens>
+               <subsets>
+#foreach( $s in $uberDao.subsets($branchKey))
+                  <subset name="${encoder.xml($s.name)}" description="${encoder.xml($s.description)}">
+#foreach( $id in $uberDao.subTokns($s.primaryKey))
+                     <token id="${id}" />
+#end                  
+                  </subset> 
+#end               
+               </subsets>
+            </branch>

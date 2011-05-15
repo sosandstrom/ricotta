@@ -728,6 +728,9 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
                     "Export an old ricotta project to XML");
             final Template ricottaExportVersion = persistTemplate("ricotta-export-version",
                     "Export an old ricotta project version to XML");
+            final Template ricottaExportProj = persistTemplate("ricotta-export-proj", "Export a ricotta project to XML");
+            final Template ricottaExportBranch = persistTemplate("ricotta-export-branch",
+                    "Export a ricotta project branch to XML");
 
             // Projects
             final Proj proj = projDao.persist("ricotta", "s.o.sandstrom@gmail.com");
@@ -962,6 +965,49 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         return templateDao.findAll();
     }
 
+    public List<ProjUser> projUsers(Object projKey) {
+        return projUserDao.findByProj((Key) projKey);
+    }
+
+    public List<Branch> branches(Object projKey) {
+        return branchDao.findByProject((Key) projKey);
+    }
+
+    public List<ProjLang> langs(Key branchKey) {
+        return projLangDao.findByBranch(branchKey);
+    }
+
+    public List<Tokn> tokns(Key branchKey) {
+        return toknDao.findByBranch(branchKey);
+    }
+
+    public List<Ctxt> ctxts(Key branchKey) {
+        return ctxtDao.findByBranch(branchKey);
+    }
+
+    public Map<Long, List<Trans>> trans(Key branchKey) {
+        final Map<Long, List<Trans>> trans = new TreeMap<Long, List<Trans>>();
+        for(ProjLang pl : projLangDao.findByBranch(branchKey)) {
+            for(Trans t : transDao.findByProjLang((Key) pl.getPrimaryKey())) {
+                List<Trans> ts = trans.get(t.getToken());
+                if (null == ts) {
+                    ts = new ArrayList<Trans>();
+                    trans.put(t.getToken(), ts);
+                }
+                ts.add(t);
+            }
+        }
+        return trans;
+    }
+
+    public List<Subset> subsets(Key branchKey) {
+        return subsetDao.findByBranch(branchKey);
+    }
+
+    public List<Long> subTokns(Key subsetKey) {
+        return subsetToknDao.findKeysBySubset(subsetKey);
+    }
+
     // ------------------- export old ---------------------
     public List<Project> getProjects() {
         return projectDao.findAll();
@@ -999,11 +1045,11 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         return translationDao.findByToken(tokenKey);
     }
 
-    public List<Artifact> subsets(Key projectKey) {
+    public List<Artifact> artifacts(Key projectKey) {
         return artifactDao.findByProject(projectKey);
     }
 
-    public List<TokenArtifact> subTokens(Key artifactKey, Key versionKey) {
+    public List<TokenArtifact> tokenArtifacts(Key artifactKey, Key versionKey) {
         return tokenArtifactDao.findByArtifactVersion(artifactKey, versionKey);
     }
 

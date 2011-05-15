@@ -2,13 +2,17 @@
 <ricotta>
    <languages>
 #foreach ($l in $uberDao.lang)
-      <language code="${l.code}" name="${l.name}" />
+      <language code="${encoder.xml($l.code)}" name="${encoder.xml($l.name)}" />
 #end
    </languages>
+   <templates>
+#foreach ($t in $uberDao.template)
+      <template name="${encoder.xml($t.name)}" description="${encoder.xml($t.description)}"><![CDATA[${t.body}]]></template>
+#end
+   </templates>
    <projects>
 #foreach ($p in $uberDao.proj)
-      <project name="${p.name}" owner="${p.owner}">
-      </project>
+#parse("ricotta-export-proj")
 #end
    </projects>
 </ricotta>
