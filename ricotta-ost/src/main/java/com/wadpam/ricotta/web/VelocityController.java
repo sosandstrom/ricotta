@@ -39,7 +39,7 @@ import com.wadpam.ricotta.velocity.Encoder;
  * Created by Ola on Nov 12, 2010
  */
 @Controller
-@RequestMapping("/projects/{projectName}/languages/{languageCode}/templates/{templateName}")
+@RequestMapping("/projects_disabled/{projectName}/languages/{languageCode}/templates/{templateName}")
 public class VelocityController {
     static final Logger        LOG = LoggerFactory.getLogger(VelocityController.class);
 

@@ -34,10 +34,12 @@
 	</bean>
 
 	<bean id="projectHandlerInterceptor" class="com.wadpam.ricotta.web.ProjectHandlerInterceptor">
-		<property name="projectDao" ref="projectDao" />
-		<property name="projectUserDao" ref="projectUserDao" />
+		<property name="projDao" ref="projDao" />
+		<property name="projUserDao" ref="projUserDao" />
+		<!-- 
 		<property name="versionDao" ref="versionDao" />
 		<property name="uberDao" ref="uberDao" />
+		 -->
 	</bean>
 	
 	<bean id="branchController" class="com.wadpam.ricotta.web.BranchController">
@@ -72,6 +74,18 @@
 		<property name="projLangDao" ref="projLangDao" />
 		<property name="toknDao" ref="toknDao" />
 		<property name="uberDao" ref="uberDao" />
+	</bean>
+
+	<bean id="generateController" class="com.wadpam.ricotta.web.GenerateController">
+		<property name="ctxtDao" ref="ctxtDao" />
+		<property name="projDao" ref="projDao" />
+		<property name="projLangDao" ref="projLangDao" />
+		<property name="toknDao" ref="toknDao" />
+		<property name="uberDao" ref="uberDao" />
+	</bean>
+
+	<bean id="langController" class="com.wadpam.ricotta.web.LangController">
+		<property name="langDao" ref="langDao" />
 	</bean>
 
 	<!-- As auto-wiring does not work well in GAE, define controllers manually: -->

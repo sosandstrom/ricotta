@@ -13,9 +13,9 @@
 <ul>
 <c:choose>
 <c:when test="${null != pageContext.request.userPrincipal}">
-	<li><a href="/projects/">Projects</a></li>
-	<li><a href="/languages/">Languages</a></li>
-	<li><a href="/templates/">Templates</a></li>
+	<li><a href="/proj/">Projects</a></li>
+	<li><a href="/lang/">Languages</a></li>
+	<li><a href="/templ/">Templates</a></li>
 </c:when>
 <c:otherwise>
 	<li><a href="<c:out value='${loginURL}' />">Login</a></li>

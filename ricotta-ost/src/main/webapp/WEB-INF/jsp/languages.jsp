@@ -6,12 +6,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <jsp:include page="header.jsp" />
 <body>
-<a href="/index.html">Home</a>
+<a href="/">Home</a>
 <div class="pageHeading">Languages</div>
 <table>
 		<thead>
 		<tr>
-			<th>Key</th>
 			<th>Code</th>
 			<th>Name</th>
 		</tr>
@@ -19,13 +18,12 @@
 	<tbody>
 	<c:forEach items="${languages}" var="language">
 		<tr>
-			<td><c:out value="${language.key}" /></td>
 			<td><c:out value="${language.code}" /></td>
 			<td><c:out value="${language.name}" /></td>
 		</tr>
 	</c:forEach>
 	</tbody>
 </table>
-<a href="/languages/create.html">Create language...</a>
+<a href="create.html">Create language...</a>
 </body>
 </html>

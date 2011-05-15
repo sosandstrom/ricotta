@@ -66,7 +66,7 @@ public class IndexController extends AbstractDaoController {
 
         model.put("uberDao", uberDao);
 
-        TransController.renderTemplate("ricotta-export-all", model, response, "text/xml; charset=UTF-8");
+        GenerateController.renderTemplate("ricotta-export-all", model, response, "text/xml; charset=UTF-8");
         return null;
     }
 
@@ -78,7 +78,7 @@ public class IndexController extends AbstractDaoController {
 
         model.put("uberDao", uberDao);
 
-        TransController.renderTemplate("ricotta-export-old", model, response, "text/xml; charset=UTF-8");
+        GenerateController.renderTemplate("ricotta-export-old", model, response, "text/xml; charset=UTF-8");
         return null;
     }
 
