@@ -1,5 +1,7 @@
 package com.wadpam.ricotta.web;
 
+import static com.google.appengine.api.labs.taskqueue.TaskOptions.Builder.url;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -15,10 +17,13 @@ import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -26,8 +31,11 @@ import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreInputStream;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
+import com.google.appengine.api.labs.taskqueue.Queue;
+import com.google.appengine.api.labs.taskqueue.QueueFactory;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.wadpam.ricotta.importexport.RicottaImportHandler;
+import com.wadpam.ricotta.importexport.TokensImportHandler;
 import com.wadpam.ricotta.velocity.Encoder;
 
 /**
@@ -91,20 +99,63 @@ public class IndexController extends AbstractDaoController {
         return "uploadXML";
     }
 
+    @RequestMapping(value = "/import-blobKey.html", method = RequestMethod.GET)
+    public String importBlob() {
+        return "importBlobKey";
+    }
+
+    @RequestMapping(value = "/import-blobKey.html", method = RequestMethod.POST)
+    public String uploadedImportBlob(HttpServletRequest request) throws IOException, ParserConfigurationException, SAXException {
+        LOG.debug("upload retry GET");
+        final String blobKeyString = request.getParameter("blobKeyString");
+        BlobKey blobKey = new BlobKey(blobKeyString);
+        return uploadedImport(blobKey);
+    }
+
     @RequestMapping(value = "/import-XML.html", method = RequestMethod.POST)
     public String uploadedImportXML(HttpServletRequest request) throws IOException, ParserConfigurationException, SAXException {
-        LOG.debug("create context details");
+        LOG.debug("upload callback POST");
         Map<String, BlobKey> blobs = blobstoreService.getUploadedBlobs(request);
         BlobKey blobKey = blobs.get("ricottaXML");
-        InputStream in = new BlobstoreInputStream(blobKey);
-        importXML(in);
+        return uploadedImport(blobKey);
+    }
+
+    protected String uploadedImport(BlobKey blobKey) {
+        Queue queue = QueueFactory.getDefaultQueue();
+        queue.add(url("/blobWorker.html").param("blobKey", blobKey.getKeyString()));
         return "redirect:/index.html";
     }
 
-    protected void importXML(InputStream in) throws ParserConfigurationException, SAXException, IOException {
+    @RequestMapping(value = "/blobWorker.html", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void blobWorker(@RequestParam(value = "blobKey") String blobKey) throws IOException, ParserConfigurationException,
+            SAXException {
+        BlobKey key = new BlobKey(blobKey);
+        InputStream in = new BlobstoreInputStream(key);
+        importXML(blobKey, in);
+    }
+
+    protected void importXML(String blobKey, InputStream in) throws ParserConfigurationException, SAXException, IOException {
         SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 
-        DefaultHandler dh = new RicottaImportHandler(uberDao);
+        DefaultHandler dh = new RicottaImportHandler(blobKey, uberDao);
+        parser.parse(in, dh);
+    }
+
+    @RequestMapping(value = "/tokensWorker.html", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void tokensWorker(@RequestParam(value = "blobKey") String blobKey, @RequestParam(value = "proj") String projName,
+            @RequestParam(value = "branch") String branchName) throws IOException, ParserConfigurationException, SAXException {
+        BlobKey key = new BlobKey(blobKey);
+        InputStream in = new BlobstoreInputStream(key);
+        importXML(in, projName, branchName);
+    }
+
+    protected void importXML(InputStream in, String projName, String branchName) throws ParserConfigurationException,
+            SAXException, IOException {
+        SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+
+        DefaultHandler dh = new TokensImportHandler(uberDao, projName, branchName);
         parser.parse(in, dh);
     }
 

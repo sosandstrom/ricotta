@@ -1,7 +1,5 @@
 package com.wadpam.ricotta.importexport;
 
-import static com.google.appengine.api.labs.taskqueue.TaskOptions.Builder.url;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,29 +9,31 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.google.appengine.api.labs.taskqueue.Queue;
-import com.google.appengine.api.labs.taskqueue.QueueFactory;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.wadpam.ricotta.dao.UberDao;
+import com.wadpam.ricotta.domain.Branch;
+import com.wadpam.ricotta.domain.Ctxt;
+import com.wadpam.ricotta.domain.Proj;
+import com.wadpam.ricotta.domain.ProjLang;
 
-public class RicottaImportHandler extends DefaultHandler {
+public class TokensImportHandler extends DefaultHandler {
     public static final String        BRANCH    = "branch";
     public static final String        LANGUAGE  = "language";
     public static final String        PROJ      = "project";
     public static final String        CTXT      = "context";
     public static final String        TOKN      = "token";
-    public static final String        SUBSET    = "subset";
-    // public static final String TRANS = "translation";
-    public static final String        TEMPL     = "template";
-    public static final String        USER      = "user";
     public static final String        TOKENS    = "tokens";
+    public static final String        TRANS     = "translation";
 
-    static final Logger               LOG       = LoggerFactory.getLogger(RicottaImportHandler.class);
+    static final Logger               LOG       = LoggerFactory.getLogger(TokensImportHandler.class);
 
     private final StringBuffer        cdata     = new StringBuffer();
 
     private final UberDao             uberDao;
-    private final String              blobKey;
-    private boolean                   active    = true;
+    private final String              projName;
+    private final String              branchName;
+    private boolean                   active    = false;
 
     private final Map<String, Object> langs     = new HashMap<String, Object>();
     private final Map<String, Object> ctxts     = new HashMap<String, Object>();
@@ -41,14 +41,14 @@ public class RicottaImportHandler extends DefaultHandler {
 
     private Object                    proj      = null, lang = null, branch = null, tokn = null, subset = null,
             projLangKey = null;
-    private String                    projName, branchName;
 
     private Long                      toknId    = null;
     private String                    templName = null, templDescription = null;
 
-    public RicottaImportHandler(String blobKey, UberDao uberDao) {
+    public TokensImportHandler(UberDao uberDao, String projName, String branchName) {
         this.uberDao = uberDao;
-        this.blobKey = blobKey;
+        this.projName = projName;
+        this.branchName = branchName;
     }
 
     @Override
@@ -60,59 +60,51 @@ public class RicottaImportHandler extends DefaultHandler {
         final String owner = a.getValue("owner");
         final String defaultLang = a.getValue("default");
         final String blobKeyString = a.getValue("blobKey");
+        final String context = a.getValue("context");
         final String id = a.getValue("id");
         final String email = a.getValue("email");
 
-        LOG.info("<{} name={}>", qName, name);
+        if (active) {
+            LOG.info("<{} name={}>", qName, name);
+        }
 
-        if (LANGUAGE.equals(qName)) {
+        if (!active && LANGUAGE.equals(qName)) {
             if (null == branch) {
-                lang = uberDao.createLang(code, name);
-                langs.put(code, lang);
+                // lang = uberDao.createLang(code, name);
+                // langs.put(code, lang);
             }
             else {
-                Object defaultLangKey = (null != defaultLang) ? langs.get(defaultLang) : null;
-                Object langKey = langs.get(code);
-                Object projLang = uberDao.createProjLang(branch, code, defaultLangKey, langKey);
+                Object projLang = KeyFactory.createKey((Key) branch, ProjLang.class.getSimpleName(), code);
                 projLangs.put(code, projLang);
             }
         }
-        else if (PROJ.equals(qName)) {
-            projName = name;
-            proj = uberDao.createProj(name, owner);
+        else if (!active && PROJ.equals(qName)) {
+            if (projName.equals(name)) {
+                proj = KeyFactory.createKey(Proj.class.getSimpleName(), name);
+            }
         }
-        else if (BRANCH.equals(qName)) {
-            branchName = name;
-            branch = uberDao.createBranch(proj, name, description);
+        else if (!active && BRANCH.equals(qName)) {
+            if (null != proj && branchName.equals(name)) {
+                branch = KeyFactory.createKey((Key) proj, Branch.class.getSimpleName(), name);
+            }
         }
-        else if (CTXT.equals(qName)) {
-            Object ctxt = uberDao.createCtxt(branch, name, description, blobKeyString);
+        else if (!active && TOKENS.equals(qName)) {
+            active = (null != proj && null != branch);
+        }
+        else if (!active && CTXT.equals(qName)) {
+            Object ctxt = KeyFactory.createKey((Key) branch, Ctxt.class.getSimpleName(), name);
             ctxts.put(name, ctxt);
         }
-        else if (TOKN.equals(qName)) {
+        else if (active && TOKN.equals(qName)) {
             toknId = Long.parseLong(id);
             if (null == subset) {
-                // done in task.
-            }
-            else {
-                uberDao.createSubsetTokn(subset, toknId);
+                Object ctxtKey = (null != context) ? ctxts.get(context) : null;
+                tokn = uberDao.createTokn(branch, toknId, name, description, ctxtKey);
             }
         }
-        else if (SUBSET.equals(qName)) {
-            subset = uberDao.createSubset(branch, name, description);
-        }
-        else if (TEMPL.equals(qName)) {
-            templName = name;
-            templDescription = description;
-            // template is created in endElement, as cdata is required
-        }
-        else if (USER.equals(qName)) {
-            uberDao.createUser(proj, email);
-        }
-        else if (TOKENS.equals(qName)) {
-            active = false;
-            Queue queue = QueueFactory.getDefaultQueue();
-            queue.add(url("/tokensWorker.html").param("blobKey", blobKey).param("proj", projName).param("branch", branchName));
+        else if (active && TRANS.equals(qName)) {
+            projLangKey = projLangs.get(code);
+            // entity is created in endElement, as cdata is required
         }
     }
 
@@ -141,14 +133,11 @@ public class RicottaImportHandler extends DefaultHandler {
 
             }
         }
-        else if (SUBSET.equals(qName)) {
-            subset = null;
-        }
-        else if (TEMPL.equals(qName)) {
-            uberDao.createTempl(templName, templDescription, cdata.toString());
+        else if (TRANS.equals(qName)) {
+            uberDao.createTrans(projLangKey, toknId, cdata.toString());
         }
         else if (TOKENS.equals(qName)) {
-            active = true;
+            active = false;
         }
 
         cdata.setLength(0);

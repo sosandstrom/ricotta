@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.wadpam.ricotta</groupId>
@@ -90,19 +91,10 @@
 			<artifactId>spring-security-web</artifactId>
 			<version>3.0.3.RELEASE</version>
 		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-tx</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjweaver</artifactId>
-			<version>1.6.2</version>
-			<scope>runtime</scope>
-		</dependency>
-		 -->
+		<!-- <dependency> <groupId>org.springframework</groupId> <artifactId>spring-tx</artifactId> 
+			<version>${spring.version}</version> </dependency> <dependency> <groupId>org.aspectj</groupId> 
+			<artifactId>aspectjweaver</artifactId> <version>1.6.2</version> <scope>runtime</scope> 
+			</dependency> -->
 
 		<!-- Google App Engine meta-package dependency cannot be used -->
 		<!-- as it collides with datanucleus enhancement. -->
@@ -112,14 +104,13 @@
 			<version>${gae.version}</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- 
+		<!-- <dependency> <groupId>com.google.appengine.orm</groupId> <artifactId>jdo2-api</artifactId> 
+			<version>2.3-eb</version> <scope>runtime</scope> </dependency> -->
 		<dependency>
-			<groupId>com.google.appengine.orm</groupId>
-			<artifactId>jdo2-api</artifactId>
-			<version>2.3-eb</version>
-			<scope>runtime</scope>
+			<groupId>com.google.appengine</groupId>
+			<artifactId>appengine-api-labs</artifactId>
+			<version>${gae.version}</version>
 		</dependency>
-		 -->
 		<dependency>
 			<groupId>com.google.appengine</groupId>
 			<artifactId>appengine-tools-sdk</artifactId>
@@ -131,32 +122,14 @@
 			<artifactId>geronimo-jpa_3.0_spec</artifactId>
 			<version>1.1.1</version>
 		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>org.apache.geronimo.specs</groupId>
-			<artifactId>geronimo-jta_1.1_spec</artifactId>
-			<version>1.1.1</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.google.appengine.orm</groupId>
-			<artifactId>datanucleus-appengine</artifactId>
-			<version>1.0.7</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.google.appengine.orm</groupId>
-			<artifactId>datanucleus-core</artifactId>
-			<version>1.1.5</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.google.appengine.orm</groupId>
-			<artifactId>datanucleus-jpa</artifactId>
-			<version>1.1.5</version>
-			<scope>runtime</scope>
-		</dependency>
-		  -->
+		<!-- <dependency> <groupId>org.apache.geronimo.specs</groupId> <artifactId>geronimo-jta_1.1_spec</artifactId> 
+			<version>1.1.1</version> <scope>runtime</scope> </dependency> <dependency> 
+			<groupId>com.google.appengine.orm</groupId> <artifactId>datanucleus-appengine</artifactId> 
+			<version>1.0.7</version> <scope>runtime</scope> </dependency> <dependency> 
+			<groupId>com.google.appengine.orm</groupId> <artifactId>datanucleus-core</artifactId> 
+			<version>1.1.5</version> <scope>runtime</scope> </dependency> <dependency> 
+			<groupId>com.google.appengine.orm</groupId> <artifactId>datanucleus-jpa</artifactId> 
+			<version>1.1.5</version> <scope>runtime</scope> </dependency> -->
 
 		<!-- These dependencies are here just for enabling logging -->
 		<dependency>
@@ -223,24 +196,19 @@
 			<version>${spring.version}</version>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymockclassextension</artifactId>
-            <version>2.5.2</version>
-            <scope>test</scope>
-        </dependency>
-		<!-- GAE libraries for local testing as described here: http://code.google.com/appengine/docs/java/howto/unittesting.html -->
 		<dependency>
-			<groupId>com.google.appengine</groupId>
-			<artifactId>appengine-api-labs</artifactId>
-			<version>${gae.version}</version>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymockclassextension</artifactId>
+			<version>2.5.2</version>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- GAE libraries for local testing as described here: http://code.google.com/appengine/docs/java/howto/unittesting.html -->
 		<dependency>
 			<groupId>com.google.appengine</groupId>
 			<artifactId>appengine-api-stubs</artifactId>
 			<version>${gae.version}</version>
-			<scope>provided</scope>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google.appengine</groupId>

@@ -12,6 +12,9 @@
 		<security:intercept-url pattern="/index.html" filters="none" />
 		<security:intercept-url pattern="/logout.html" filters="none" />
 		<security:intercept-url pattern="/loggedout.html" filters="none" />
+		<!-- For queued worker calls -->
+		<security:intercept-url pattern="/blobWorker.html" filters="none" />
+		<security:intercept-url pattern="/tokensWorker.html" filters="none" />
 		<security:intercept-url pattern="/**"
 			access="hasRole('USER')" />
 		<security:custom-filter position="PRE_AUTH_FILTER"
