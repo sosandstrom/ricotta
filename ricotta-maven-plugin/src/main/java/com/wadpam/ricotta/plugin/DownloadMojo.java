@@ -42,10 +42,10 @@ public class DownloadMojo extends AbstractMojo {
      */
     private ResourceItem resourceItems[];
 
-    // /**
-    // * @parameter expression="${download.filePath}" required
-    // */
-    // private String filePath;
+    /**
+     * @parameter expression="${download.baseUrl}" default-value="http://ricotta-ost.appspot.com/"
+     */
+    private String       baseUrl;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -55,8 +55,8 @@ public class DownloadMojo extends AbstractMojo {
         for(ResourceItem item : resourceItems) {
             File output = new File(destination, item.getFilePath());
             try {
-                Downloader.download(projectName, version, item.getLanguageCode(), item.getTemplateName(), item.getArtifactName(),
-                        output);
+                Downloader.download(baseUrl, projectName, version, item.getLanguageCode(), item.getTemplateName(),
+                        item.getArtifactName(), output);
             }
             catch (ClientProtocolException e) {
                 // TODO Auto-generated catch block

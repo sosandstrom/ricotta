@@ -30,21 +30,10 @@ public class Downloader {
         }
     }
 
-    public static void download(String projectName, String version, String languageCode, String templateName,
-            String artifactName, File destination) throws ClientProtocolException, IOException {
-        File folder = destination.getParentFile();
-        if (false == folder.exists()) {
-            folder.mkdirs();
-        }
-        FileOutputStream fos = new FileOutputStream(destination);
-        PrintStream ps = new PrintStream(fos);
-        download(projectName, version, languageCode, templateName, artifactName, ps);
-        ps.close();
-    }
-
-    public static String buildUrl(String projectName, String version, String languageCode, String templateName,
+    public static String buildUrl(String baseUrl, String projectName, String version, String languageCode, String templateName,
             String artifactName) {
-        StringBuffer url = new StringBuffer("http://ricotta-ost.appspot.com/proj/");
+        StringBuffer url = new StringBuffer(baseUrl);
+        url.append("proj/");
         url.append(projectName);
 
         url.append("/branch/");
@@ -69,9 +58,9 @@ public class Downloader {
         return returnValue;
     }
 
-    public static void download(String projectName, String version, String languageCode, String templateName,
+    public static void download(String baseUrl, String projectName, String version, String languageCode, String templateName,
             String artifactName, PrintStream fos) throws ClientProtocolException, IOException {
-        final String url = buildUrl(projectName, version, languageCode, templateName, artifactName);
+        final String url = buildUrl(baseUrl, projectName, version, languageCode, templateName, artifactName);
         HttpGet method = new HttpGet(url);
 
         // TODO: add authentication
@@ -112,15 +101,28 @@ public class Downloader {
         method.abort();
     }
 
+    public static void download(String baseUrl, String projectName, String version, String languageCode, String templateName,
+            String artifactName, File destination) throws ClientProtocolException, IOException {
+        File folder = destination.getParentFile();
+        if (false == folder.exists()) {
+            folder.mkdirs();
+        }
+        FileOutputStream fos = new FileOutputStream(destination);
+        PrintStream ps = new PrintStream(fos);
+        download(baseUrl, projectName, version, languageCode, templateName, artifactName, ps);
+        ps.close();
+    }
+
     /**
      * @param args
      * @throws IOException
      * @throws ClientProtocolException
      */
     public static void main(String[] args) throws ClientProtocolException, IOException {
+        String baseUrl = "http://ricotta-ost.appspot.com/";
         switch (args.length) {
             case 3:
-                download(args[0], null, args[1], args[2], null, System.out);
+                download(baseUrl, args[0], null, args[1], args[2], null, System.out);
                 break;
             case 5:
             case 7:
@@ -133,12 +135,15 @@ public class Downloader {
                     else if ("-branch".equals(args[i])) {
                         version = args[i + 1];
                     }
+                    else if ("-baseUrl".equals(args[i])) {
+                        baseUrl = args[i + 1];
+                    }
                 }
-                download(args[0], version, args[1], args[2], artifact, System.out);
+                download(baseUrl, args[0], version, args[1], args[2], artifact, System.out);
                 break;
             default:
                 throw new IOException(
-                        "Usage: <projectName> <languageCode> <templateName> [-branch <branchName>] [-subset <subsetName>]");
+                        "Usage: <projectName> <languageCode> <templateName> [-branch <branchName>] [-subset <subsetName>] [-baseUrl <baseUrl>]");
         }
     }
 

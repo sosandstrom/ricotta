@@ -18,7 +18,12 @@
 				<artifactId>ricotta-maven-plugin</artifactId>
 				<version>1.0</version>
 				<configuration>
+					<!-- default projectName is ${project.artifactId} -->
 					<projectName>ricotta-maven-plugin</projectName>
+					<!-- default baseUrl is http://ricotta-ost.appspot.com/ -->
+					<!--
+					<baseUrl>http://myapp-id.appspot.com/</baseUrl> 
+					 -->
 					<resourceItems>
 						<resourceItem>
 							<languageCode>sv</languageCode>
@@ -33,6 +38,7 @@
 					</resourceItems>
 				</configuration>
 				<executions>
+					<!-- optional, to download for each build: -->
 					<execution>
 						<phase>generate-resources</phase>
 						<goals>
