@@ -1,7 +1,5 @@
 package com.wadpam.ricotta.importexport;
 
-import static com.google.appengine.api.labs.taskqueue.TaskOptions.Builder.url;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,8 +9,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.google.appengine.api.labs.taskqueue.Queue;
-import com.google.appengine.api.labs.taskqueue.QueueFactory;
 import com.wadpam.ricotta.dao.UberDao;
 
 public class RicottaImportHandler extends DefaultHandler {
@@ -63,7 +59,9 @@ public class RicottaImportHandler extends DefaultHandler {
         final String id = a.getValue("id");
         final String email = a.getValue("email");
 
-        LOG.info("<{} name={}>", qName, name);
+        if (active) {
+            LOG.debug("<{} name={}>", qName, name);
+        }
 
         if (LANGUAGE.equals(qName)) {
             if (null == branch) {
@@ -111,8 +109,8 @@ public class RicottaImportHandler extends DefaultHandler {
         }
         else if (TOKENS.equals(qName)) {
             active = false;
-            Queue queue = QueueFactory.getDefaultQueue();
-            queue.add(url("/tokensWorker.html").param("blobKey", blobKey).param("proj", projName).param("branch", branchName));
+            // Queue queue = QueueFactory.getDefaultQueue();
+            // queue.add(url("/tokensWorker.html").param("blobKey", blobKey).param("proj", projName).param("branch", branchName));
         }
     }
 
