@@ -24,6 +24,7 @@
 </ul>
 <h3>Ricotta Overview</h3>
 Ricotta is a translation management tool, with complimentary build tools, to efficiently manage localised resources in your software project.
+<div><iframe src="http://www.facebook.com/plugins/like.php?app_id=202783656429603&amp;href=http%3A%2F%2Fricotta-ost.appspot.com%2F&amp;send=true&amp;layout=standard&amp;width=450&amp;show_faces=true&amp;action=like&amp;colorscheme=light&amp;font&amp;height=80" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:450px; height:80px;" allowTransparency="true"></iframe></div>
 <div><img src="/static/RicottaOverview.2.png" alt="Ricotta Overview" /></div>
 <div>Source repository: <a href="https://bitbucket.org/f94os/ricotta-ost">https://bitbucket.org/f94os/ricotta-ost</a></div>
 <div>Contact: <a href="mailto:s.o.sandstrom@gmail.com">s.o.sandstrom@gmail.com</a</div>

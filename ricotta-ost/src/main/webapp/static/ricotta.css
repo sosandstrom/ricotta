@@ -1,5 +1,9 @@
 @CHARSET "UTF-8";
 
+body {
+	font-family: "Liberation Sans", sans-serif;
+}
+
 table {
 	border-style: solid;
 	border-color: gray;
