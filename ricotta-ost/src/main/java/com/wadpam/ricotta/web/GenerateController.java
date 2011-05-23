@@ -52,12 +52,16 @@ public class GenerateController extends AbstractDaoController {
 
     protected String renderTemplBySubset(HttpServletRequest request, HttpServletResponse response)
             throws ResourceNotFoundException, ParseErrorException, Exception {
-        final Key templKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_TEMPLKEY);
-        final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
-        final Key subsetKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_SUBSETKEY);
-        LOG.debug("rendering templ " + templKey.getName());
         final VelocityContext model = new VelocityContext();
         model.put("encoder", new Encoder());
+        model.put(ProjectHandlerInterceptor.KEY_PROJKEY, request.getAttribute(ProjectHandlerInterceptor.KEY_PROJKEY));
+        final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
+        model.put(ProjectHandlerInterceptor.KEY_BRANCHKEY, branchKey);
+        final Key templKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_TEMPLKEY);
+        model.put(ProjectHandlerInterceptor.KEY_TEMPLKEY, templKey);
+        final Key subsetKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_SUBSETKEY);
+        model.put(ProjectHandlerInterceptor.KEY_SUBSETKEY, subsetKey);
+        LOG.debug("rendering templ " + templKey.getName());
 
         final String langCode = (String) request.getAttribute(ProjectHandlerInterceptor.KEY_LANGCODE);
         final ProjLang projLang = projLangDao.findByPrimaryKey(branchKey, langCode);

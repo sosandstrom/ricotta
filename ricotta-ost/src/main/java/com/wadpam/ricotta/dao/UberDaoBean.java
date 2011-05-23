@@ -418,7 +418,11 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
             }
         }
 
-        return returnValue.values();
+        // order by name
+        List<TransModel> unsorted = new ArrayList<TransModel>(returnValue.values());
+        Collections.sort(unsorted);
+
+        return unsorted;
     }
 
     @SuppressWarnings("unchecked")
