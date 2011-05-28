@@ -147,7 +147,7 @@ public class TokensImportHandler extends DefaultHandler {
     public void characters(char[] ch, int start, int length) throws SAXException {
         if (active) {
             String s = new String(ch, start, length);
-            cdata.append(s.trim());
+            cdata.append(s);
             if (0 < cdata.length()) {
                 LOG.info("appended to {}", cdata.toString());
             }

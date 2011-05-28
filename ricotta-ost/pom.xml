@@ -32,7 +32,7 @@
 			<id>test</id>
 			<properties>
 				<gae.application.version>test</gae.application.version>
-				<logging.level>ALL</logging.level>
+				<logging.level>INFO</logging.level>
 			</properties>
 		</profile>
 

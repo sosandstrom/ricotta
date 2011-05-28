@@ -37,6 +37,8 @@ public class GaeAuthenticationFilter extends GenericFilterBean {
             ServletException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        LOG.debug("Authentication {}, principal {}", authentication, ((HttpServletRequest) request).getUserPrincipal());
+
         if (authentication == null) {
             // User isn't authenticated. Check if there is a Google Accounts user
             User googleUser = UserServiceFactory.getUserService().getCurrentUser();

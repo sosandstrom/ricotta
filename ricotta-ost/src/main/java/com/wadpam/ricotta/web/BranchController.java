@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -23,6 +24,7 @@ import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.datastore.Key;
 import com.wadpam.ricotta.domain.Branch;
 import com.wadpam.ricotta.domain.Ctxt;
+import com.wadpam.ricotta.domain.Lang;
 import com.wadpam.ricotta.domain.ProjLang;
 import com.wadpam.ricotta.domain.ProjUser;
 import com.wadpam.ricotta.domain.Subset;
@@ -74,6 +76,42 @@ public class BranchController extends AbstractDaoController {
         model.addAttribute("users", users);
 
         return "branch";
+    }
+
+    // --------- projlang part ----------------
+
+    @RequestMapping(value = "branch/{branchName}/lang/create.html", method = RequestMethod.GET)
+    public String createProjLang(HttpServletRequest request, Model model) {
+        final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
+        final Map<String, Lang> langs = new TreeMap<String, Lang>();
+        for(Lang l : langDao.findAll()) {
+            langs.put(l.getCode(), l);
+        }
+        List<Lang> parentLangs = new ArrayList<Lang>();
+        for(ProjLang pl : projLangDao.findByBranch(branchKey)) {
+            Lang l = langDao.findByPrimaryKey(pl.getLangCode());
+            parentLangs.add(l);
+            langs.remove(l.getCode());
+        }
+        model.addAttribute("languages", langs.values());
+        model.addAttribute("parentLanguages", parentLangs);
+        return "createProjectLanguage";
+    }
+
+    @RequestMapping(value = "branch/{branchName}/lang/create.html", method = RequestMethod.POST)
+    public String postSubset(HttpServletRequest request, @ModelAttribute("projLang") ProjLang projLang) throws IOException {
+        final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
+        final ProjLang existing = projLangDao.findByPrimaryKey(branchKey, projLang.getLangCode());
+        if (null != existing) {
+            LOG.warn("ProjLang {} already exists", existing);
+        }
+        else {
+            projLang.setBranch(branchKey);
+            projLang.setLang((Key) langDao.findByPrimaryKey(projLang.getLangCode()).getPrimaryKey());
+            projLangDao.persist(projLang);
+        }
+
+        return "redirect:../index.html";
     }
 
     // --------- subset part ----------------

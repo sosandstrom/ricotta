@@ -10,6 +10,7 @@ import com.wadpam.ricotta.domain.AppUser;
 
 public class GaeUserAuthentication implements Authentication {
 
+    private static final long            serialVersionUID = 2202566926652181196L;
     private final AppUser                user;
     private final List<GrantedAuthority> authorities;
     private final Object                 details;

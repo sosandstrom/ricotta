@@ -6,25 +6,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <jsp:include page="header.jsp" />
 <body>
-<form id="project" name="project" action="" method="post">
+<form id="projLang" name="projLang" action="" method="post">
 <table>
-	<tr>
-		<td>Project Name:</td>
-		<td><c:out value="${project.name}" /></td>
-	</tr>
+	<h3>Add language to project</h3>
 	<tr>
 		<td>Default language:</td>
-		<td><select id="parent" name="parent">
+		<td><select id="defaultLang" name="defaultLang">
 			<c:forEach items="${parentLanguages}" var="parent">
-				<option value="<c:out value='${parent.language.keyString}' />"><c:out value="${parent.language.name}" /> (<c:out value="${parent.language.code}" />)</option>
+				<option value="<c:out value='${parent.keyString}' />"><c:out value="${parent.name}" /> (<c:out value="${parent.code}" />)</option>
 			</c:forEach>
 		</select></td>
 	</tr>
 	<tr>
 		<td>Language:</td>
-		<td><select id="language" name="language">
+		<td><select id="langCode" name="langCode">
 			<c:forEach items="${languages}" var="language">
-				<option value="<c:out value='${language.keyString}' />"><c:out value="${language.name}" /> (<c:out value="${language.code}" />)</option>
+				<option value="<c:out value='${language.code}' />"><c:out value="${language.name}" /> (<c:out value="${language.code}" />)</option>
 			</c:forEach>
 		</select></td>
 	</tr>

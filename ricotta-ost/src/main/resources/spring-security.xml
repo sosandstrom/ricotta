@@ -9,16 +9,24 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
 	<security:http use-expressions="true" entry-point-ref="gaeEntryPoint">
+		<security:intercept-url pattern="/" filters="none" />
 		<security:intercept-url pattern="/index.html" filters="none" />
 		<security:intercept-url pattern="/logout.html" filters="none" />
 		<security:intercept-url pattern="/loggedout.html" filters="none" />
+		<security:intercept-url pattern="/_ah/**" filters="none" />
+		<security:intercept-url pattern="/static/**" filters="none" />
 		<!-- For queued worker calls -->
 		<security:intercept-url pattern="/blobWorker.html" filters="none" />
 		<security:intercept-url pattern="/tokensWorker.html" filters="none" />
+		<security:intercept-url pattern="/projects/**/patch1Worker.html" filters="none" />
+		<!-- Remaining resources should be authenticated -->
 		<security:intercept-url pattern="/**"
 			access="hasRole('USER')" />
 		<security:custom-filter position="PRE_AUTH_FILTER"
 			ref="gaeFilter" />
+		<!-- 
+		<security:remember-me key="ricotta_top_secret"/>
+		 -->
 	</security:http>
 
 	<bean id="gaeEntryPoint"

@@ -66,6 +66,7 @@ import com.wadpam.ricotta.model.ProjectLanguageModel;
 import com.wadpam.ricotta.model.TransModel;
 import com.wadpam.ricotta.model.TranslationModel;
 import com.wadpam.ricotta.web.AbstractDaoController;
+import com.wadpam.ricotta.web.ProjectHandlerInterceptor;
 
 public class UberDaoBean extends AbstractDaoController implements UberDao {
     static final Logger        LOG                           = LoggerFactory.getLogger(UberDaoBean.class);
@@ -650,6 +651,61 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
 
     }
 
+    @Override
+    public void patchTrimmedTranslations(String projectName) {
+        final Project project = projectDao.findByName(projectName);
+        final Version version = getHead();
+        final Key projKey = KeyFactory.createKey(Proj.class.getSimpleName(), projectName);
+        final Key branchKey = KeyFactory.createKey(projKey, Branch.class.getSimpleName(), ProjectHandlerInterceptor.NAME_TRUNK);
+
+        final List<Translation> oldTrans = translationDao.findByProject(project.getKey());
+
+        for(Translation t : oldTrans) {
+            if (version.getKey().equals(t.getVersion())) {
+                // find the new translation
+                Language l = languageDao.findByPrimaryKey(t.getLanguage());
+                Key projLangKey = KeyFactory.createKey(branchKey, ProjLang.class.getSimpleName(), l.getCode());
+                Trans trans = transDao.findByPrimaryKey(projLangKey, t.getToken().getId());
+                if (null != trans) {
+                    if (false == t.getLocal().equals(trans.getLocal())) {
+                        // new string must exist within old one to overwrite
+                        if (t.getLocal().contains(trans.getLocal())) {
+                            LOG.info("Different old={}, new={}", t.getLocal(), trans.getLocal());
+                            trans.setLocal(t.getLocal());
+                            transDao.update(trans);
+                        }
+                        else {
+                            // see if new represents the first in the list below.
+                            Translation first = null, last = null;
+                            final List<Translation> allTrans = translationDao.findByToken(t.getToken());
+                            for(Translation tt : allTrans) {
+                                if (tt.getLanguage().equals(t.getLanguage())) {
+                                    if (null == first) {
+                                        first = tt;
+                                    }
+                                    else {
+                                        last = tt;
+                                    }
+                                }
+                            }
+                            // if equal to first in list, replace with last
+                            if (trans.getLocal().equals(first.getLocal()) && null != last) {
+                                trans.setLocal(last.getLocal());
+                                transDao.update(trans);
+                                LOG.warn("Using last={}, first={}", last.getLocal(), first.getLocal());
+                            }
+
+                            LOG.warn("Different old={}, new={}", t.getLocal(), trans.getLocal());
+                        }
+                    }
+                }
+                else {
+                    LOG.warn("No new trans found for tokn {} and lang {} old=" + t.getLocal(), t.getToken().getId(), l.getCode());
+                }
+            }
+        }
+    }
+
     protected Template persistTemplate(String name, String description) {
         Reader in = new InputStreamReader(getClass().getResourceAsStream("/" + name + ".xml"));
         StringBuffer sb = new StringBuffer();
@@ -677,45 +733,45 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         _HEAD = versionDao.persist(null, "2011-01-28 10:10 GMT+7", "Latest version", VALUE_HEAD, null);
         final Key HEAD = _HEAD.getKey();
 
-        {
-            // populate Languages
-            final Language en = languageDao.persist("en", "English");
-            final Language en_GB = languageDao.persist("en_GB", "British English");
-            final Language sv = languageDao.persist("sv", "Swedish");
-
-            // populate Templates
-            final Mall androidStringsInherited = mallDao.persist(MALL_BODY_ANDROID,
-                    "Android strings.xml with parent default translations", "text/plain", "strings_android_inherit");
-
-            // Projects
-            final Project project = projectDao.persist("ricotta", "s.o.sandstrom@gmail.com");
-            projectUserDao.persist(project.getKey(), "test@example.com");
-
-            // ProjectLanguages
-            ProjectLanguage root = projectLanguageDao.persist(null, en.getKey(), null, project.getKey(), HEAD);
-            projectLanguageDao.persist(null, en_GB.getKey(), en.getKey(), project.getKey(), HEAD);
-            projectLanguageDao.persist(null, sv.getKey(), en.getKey(), project.getKey(), HEAD);
-
-            // Artifact
-            final Artifact ricottaOst = artifactDao.persist(project.getKey(), "ricotta-ost");
-            final Artifact ricottaPlugin = artifactDao.persist(project.getKey(), "ricotta-maven-plugin");
-
-            // Tokens
-            final Token appTitle = tokenDao.persist(null, "The Application title as displayed to the user", "appTitle",
-                    project.getKey(), HEAD, null);
-            final Token tokenProject = tokenDao.persist(null, "The Project Entity", "Project", project.getKey(), HEAD, null);
-
-            // Artifact tokens
-            final TokenArtifact appTitleOst = tokenArtifactDao.persist(null, ricottaOst.getKey(), project.getKey(),
-                    appTitle.getKey(), HEAD);
-            tokenArtifactDao.persist(null, ricottaOst.getKey(), project.getKey(), tokenProject.getKey(), HEAD);
-            tokenArtifactDao.persist(null, ricottaPlugin.getKey(), project.getKey(), appTitle.getKey(), HEAD);
-
-            // Translations
-            translationDao.persist(null, en.getKey(), "Ricotta", project.getKey(), appTitle.getKey(), HEAD);
-            translationDao.persist(null, en_GB.getKey(), "Project", project.getKey(), tokenProject.getKey(), HEAD);
-            translationDao.persist(null, sv.getKey(), "Projekt", project.getKey(), tokenProject.getKey(), HEAD);
-        }
+        // {
+        // // populate Languages
+        // final Language en = languageDao.persist("en", "English");
+        // final Language en_GB = languageDao.persist("en_GB", "British English");
+        // final Language sv = languageDao.persist("sv", "Swedish");
+        //
+        // // populate Templates
+        // final Mall androidStringsInherited = mallDao.persist(MALL_BODY_ANDROID,
+        // "Android strings.xml with parent default translations", "text/plain", "strings_android_inherit");
+        //
+        // // Projects
+        // final Project project = projectDao.persist("ricotta", "s.o.sandstrom@gmail.com");
+        // projectUserDao.persist(project.getKey(), "test@example.com");
+        //
+        // // ProjectLanguages
+        // ProjectLanguage root = projectLanguageDao.persist(null, en.getKey(), null, project.getKey(), HEAD);
+        // projectLanguageDao.persist(null, en_GB.getKey(), en.getKey(), project.getKey(), HEAD);
+        // projectLanguageDao.persist(null, sv.getKey(), en.getKey(), project.getKey(), HEAD);
+        //
+        // // Artifact
+        // final Artifact ricottaOst = artifactDao.persist(project.getKey(), "ricotta-ost");
+        // final Artifact ricottaPlugin = artifactDao.persist(project.getKey(), "ricotta-maven-plugin");
+        //
+        // // Tokens
+        // final Token appTitle = tokenDao.persist(null, "The Application title as displayed to the user", "appTitle",
+        // project.getKey(), HEAD, null);
+        // final Token tokenProject = tokenDao.persist(null, "The Project Entity", "Project", project.getKey(), HEAD, null);
+        //
+        // // Artifact tokens
+        // final TokenArtifact appTitleOst = tokenArtifactDao.persist(null, ricottaOst.getKey(), project.getKey(),
+        // appTitle.getKey(), HEAD);
+        // tokenArtifactDao.persist(null, ricottaOst.getKey(), project.getKey(), tokenProject.getKey(), HEAD);
+        // tokenArtifactDao.persist(null, ricottaPlugin.getKey(), project.getKey(), appTitle.getKey(), HEAD);
+        //
+        // // Translations
+        // translationDao.persist(null, en.getKey(), "Ricotta", project.getKey(), appTitle.getKey(), HEAD);
+        // translationDao.persist(null, en_GB.getKey(), "Project", project.getKey(), tokenProject.getKey(), HEAD);
+        // translationDao.persist(null, sv.getKey(), "Projekt", project.getKey(), tokenProject.getKey(), HEAD);
+        // }
         {
             // populate Lang
             final Lang en = langDao.persist("en", "English");
@@ -1166,5 +1222,41 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
             // finally, delete the tokens
             toknDao.delete(branchKey, ids);
         }
+    }
+
+    public void deleteBranch(Key branchKey) {
+        // tokens
+        List<Long> ids = toknDao.findKeysByBranch(branchKey);
+        List<Key> keys = new ArrayList<Key>();
+        for(Long id : ids) {
+            keys.add(KeyFactory.createKey(branchKey, Tokn.class.getSimpleName(), id));
+        }
+        deleteTokns(keys);
+
+        // contexts
+        List<String> names = ctxtDao.findKeysByBranch(branchKey);
+        ctxtDao.delete(branchKey, names);
+
+        // subsets
+        List<String> subsets = subsetDao.findKeysByBranch(branchKey);
+        subsetDao.delete(branchKey, subsets);
+
+        // and itself
+        branchDao.delete(branchKey);
+    }
+
+    public void deleteProj(Key projKey) {
+        // users
+        for(String u : projUserDao.findKeysByProj(projKey)) {
+            projUserDao.delete(projKey, u);
+        }
+
+        // branches
+        for(String branchName : branchDao.findKeysByProject(projKey)) {
+            deleteBranch(KeyFactory.createKey(projKey, Branch.class.getSimpleName(), branchName));
+        }
+
+        // the proj
+        projDao.delete(projKey);
     }
 }

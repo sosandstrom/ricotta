@@ -47,6 +47,7 @@ public class ProjController extends AbstractDaoController {
             }
         }
         model.addAttribute("projs", projects);
+
         return "projs";
     }
 
@@ -77,15 +78,13 @@ public class ProjController extends AbstractDaoController {
     }
 
     @RequestMapping(value = "{projName}/action.html", method = RequestMethod.GET)
-    public String actionProj(HttpServletRequest request, HttpServletResponse response,
-            @RequestParam(value = "delete", required = false) String delete,
-            @RequestParam(value = "export", required = false) String export) throws ResourceNotFoundException,
-            ParseErrorException, Exception {
+    public String actionProjConfirm(HttpServletRequest request, HttpServletResponse response,
+            @RequestParam(value = "action") String action) throws ResourceNotFoundException, ParseErrorException, Exception {
         String viewName = null;
-        if (null != delete && 5 < delete.length()) {
+        if ("Delete project".equals(action)) {
             viewName = "confirm";
         }
-        else if (null != export && 5 < export.length()) {
+        else if ("Export project".equals(action)) {
             final VelocityContext model = new VelocityContext();
             model.put("encoder", new Encoder());
             final String projName = (String) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJNAME);
@@ -94,6 +93,19 @@ public class ProjController extends AbstractDaoController {
             model.put("uberDao", uberDao);
 
             GenerateController.renderTemplate("ricotta-export-proj", model, response, "text/xml; charset=UTF-8");
+        }
+        return viewName;
+    }
+
+    @RequestMapping(value = "{projName}/action.html", method = RequestMethod.POST)
+    public String actionProjConfirmed(HttpServletRequest request, HttpServletResponse response,
+            @RequestParam(value = "confirmed") String confirmed) throws ResourceNotFoundException, ParseErrorException, Exception {
+        String viewName = null;
+        final Key projKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJKEY);
+        LOG.debug("action is {}", confirmed);
+        if ("Delete project".equals(confirmed)) {
+            uberDao.deleteProj(projKey);
+            viewName = "redirect:/proj/index.html";
         }
         return viewName;
     }

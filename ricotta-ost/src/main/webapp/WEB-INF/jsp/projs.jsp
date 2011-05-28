@@ -7,7 +7,7 @@
 <jsp:include page="header.jsp" />
 <body>
 <a href="/index.html">Home</a> 
-<c:if test="$pageContext.request.userPrincipal.name == 'test@example.com' || $pageContext.request.userPrincipal.name == 's.o.sandstrom@gmail.com'">
+<c:if test="${ principal.name == 'test@example.com' || principal.name == 's.o.sandstrom@gmail.com'}">
 | <a href="/exportOld.xml">Export Old DB to XML</a>
 | <a href="/import-XML.html">Import XML (to new DB)</a>
 </c:if>
@@ -28,9 +28,9 @@
 			<td><a href="<c:out value="${p.name}" />/branch/trunk/"><c:out value="${p.name}" /></a></td>
 			<td><c:out value="${p.owner}" /></td>
 			<td><form name="proj" action="<c:out value='${p.name}'/>/action.html" method="get">
-					<input type="submit" id="export" name="export" value="Export project" />
-<c:if test="$pageContext.request.userPrincipal.name == $p.owner">
-					<input type="submit" id="delete" name="delete" value="Delete project" />
+					<input type="submit" id="action" name="action" value="Export project" />
+<c:if test="${principal.name == p.owner || principal.name == 'test@example.com'}">
+					<input type="submit" id="action" name="action" value="Delete project" />
 </c:if>
 				</form>
 			</td>

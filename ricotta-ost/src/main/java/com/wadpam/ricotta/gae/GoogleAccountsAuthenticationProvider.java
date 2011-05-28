@@ -3,7 +3,8 @@ package com.wadpam.ricotta.gae;
 import java.util.Arrays;
 import java.util.List;
 
-import org.mortbay.log.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -17,6 +18,8 @@ import com.wadpam.ricotta.dao.AppUserDao;
 import com.wadpam.ricotta.domain.AppUser;
 
 public class GoogleAccountsAuthenticationProvider implements AuthenticationProvider {
+    static final Logger           LOG       = LoggerFactory.getLogger(GoogleAccountsAuthenticationProvider.class);
+
     static final GrantedAuthority ROLE_USER = new GrantedAuthorityImpl("USER");
     private AppUserDao            appUserDao;
     private HandlerInterceptor    handlerInterceptor;
@@ -24,18 +27,8 @@ public class GoogleAccountsAuthenticationProvider implements AuthenticationProvi
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         User googleUser = (User) authentication.getPrincipal();
 
-        // must create an EntityManager
-        // if (null != handlerInterceptor) {
-        // try {
-        // handlerInterceptor.preHandle(null, null, null);
-        // }
-        // catch (Exception e) {
-        // e.printStackTrace();
-        // }
-        // }
-
         AppUser user = appUserDao.findByUserId(googleUser.getUserId());
-        Log.debug("Loaded appUser {} by {}", user, googleUser.getUserId());
+        LOG.debug("Loaded appUser {} by {}", user, googleUser.getUserId());
 
         if (user == null) {
             // User not in registry. Needs to register
@@ -44,16 +37,6 @@ public class GoogleAccountsAuthenticationProvider implements AuthenticationProvi
             user.setUserId(googleUser.getUserId());
             appUserDao.persist(user);
         }
-
-        // must close the EntityManager
-        // if (null != handlerInterceptor) {
-        // try {
-        // handlerInterceptor.afterCompletion(null, null, null, null);
-        // }
-        // catch (Exception e) {
-        // e.printStackTrace();
-        // }
-        // }
 
         // FIXME: load ROLEs
         List<GrantedAuthority> authorities = Arrays.asList(ROLE_USER);

@@ -46,6 +46,7 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
     protected static final String KEY_PROJNAME        = "projName";
     protected static final String KEY_BRANCHNAME      = "branchName";
     protected static final String KEY_CONTEXTNAME     = "ctxtName";
+    protected static final String KEY_PRINCIPAL       = "principal";
 
     public static final String    NAME_TRUNK          = "trunk";
 

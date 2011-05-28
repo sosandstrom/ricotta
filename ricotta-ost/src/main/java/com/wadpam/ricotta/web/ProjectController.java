@@ -1,5 +1,7 @@
 package com.wadpam.ricotta.web;
 
+import static com.google.appengine.api.labs.taskqueue.TaskOptions.Builder.url;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -16,12 +19,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.labs.taskqueue.Queue;
+import com.google.appengine.api.labs.taskqueue.QueueFactory;
 import com.wadpam.ricotta.dao.ArtifactDao;
 import com.wadpam.ricotta.dao.ProjectDao;
 import com.wadpam.ricotta.dao.ProjectUserDao;
@@ -206,6 +212,28 @@ public class ProjectController {
         model.addAttribute("tokens", tokens);
 
         return "project";
+    }
+
+    /**
+     * To patch for incorrectly updated tokens when migrating to AED
+     */
+    @RequestMapping(value = "patch1.html", method = RequestMethod.GET)
+    public String patchTrans() {
+        for(Project p : projectDao.findAll()) {
+            Queue queue = QueueFactory.getDefaultQueue();
+            queue.add(url("/projects/" + p.getName() + "/patch1Worker.html"));
+        }
+        return "index";
+    }
+
+    /**
+     * Worker to patch for incorrectly updated tokens when migrating to AED
+     */
+    @RequestMapping(value = "{projectName}/patch1Worker.html", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void patchTrans(HttpServletRequest request, @PathVariable(value = "projectName") String projectName) {
+
+        uberDao.patchTrimmedTranslations(projectName);
     }
 
     public void setProjectDao(ProjectDao projectDao) {

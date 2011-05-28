@@ -2,6 +2,8 @@ package com.wadpam.ricotta.web;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.wadpam.ricotta.dao.BranchDao;
@@ -46,6 +48,14 @@ public abstract class AbstractDaoController {
     @ModelAttribute(ProjectHandlerInterceptor.KEY_LANGCODE)
     public Object populateLangCode(HttpServletRequest request) {
         return request.getAttribute(ProjectHandlerInterceptor.KEY_LANGCODE);
+    }
+
+    @ModelAttribute(ProjectHandlerInterceptor.KEY_PRINCIPAL)
+    public Authentication populatePrincipal(HttpServletRequest request) {
+        Authentication returnValue = SecurityContextHolder.getContext().getAuthentication();
+        System.out
+                .println(getClass().getSimpleName() + ": principal=" + ((null != returnValue) ? returnValue.getName() : "null"));
+        return returnValue;
     }
 
     // -------------- Getters and Setters ------------------------

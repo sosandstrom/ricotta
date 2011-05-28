@@ -44,6 +44,8 @@ public interface UberDao {
 
     void importBody(HttpServletRequest request, Key branchKey, String langCode, String regexp, String body);
 
+    void patchTrimmedTranslations(String projectName);
+
     // ---------------- import methods -----------------------
 
     Object createLang(String code, String name);
@@ -71,5 +73,7 @@ public interface UberDao {
     // --------------------- delete methods ----------------------
 
     void deleteTokns(List<Key> keys);
+
+    void deleteProj(Key projKey);
 
 }
