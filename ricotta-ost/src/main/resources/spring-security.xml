@@ -15,6 +15,9 @@
 		<security:intercept-url pattern="/loggedout.html" filters="none" />
 		<security:intercept-url pattern="/_ah/**" filters="none" />
 		<security:intercept-url pattern="/static/**" filters="none" />
+		<!-- For generating calls -->
+		<security:intercept-url pattern="/proj/**/branch/**/lang/**/templ/**" filters="none" />
+		<security:intercept-url pattern="/projects/**/languages/**/templates/**" filters="none" />
 		<!-- For queued worker calls -->
 		<security:intercept-url pattern="/blobWorker.html" filters="none" />
 		<security:intercept-url pattern="/tokensWorker.html" filters="none" />

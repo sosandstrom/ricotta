@@ -3,11 +3,11 @@
 	<parent>
 		<groupId>com.wadpam.ricotta</groupId>
 		<artifactId>ricotta</artifactId>
-		<version>10-SNAPSHOT</version>
+		<version>11-SNAPSHOT</version>
 	</parent>
 	<groupId>com.wadpam.ricotta</groupId>
 	<artifactId>ricotta-ost</artifactId>
-	<version>10-SNAPSHOT</version>
+	<version>11-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>${project.groupId}:${project.artifactId}</name>
 
@@ -32,7 +32,7 @@
 			<id>test</id>
 			<properties>
 				<gae.application.version>test</gae.application.version>
-				<logging.level>ALL</logging.level>
+				<logging.level>INFO</logging.level>
 			</properties>
 		</profile>
 
