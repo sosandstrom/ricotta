@@ -325,12 +325,16 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
                     token.setBranch(branchKey);
                     toknDao.persist(token);
                 }
-                else {
+                else if (1 == tokens.size()) {
                     token = tokens.get(0);
                 }
+                // if we have multiple tokens with same name, we should ignore this import,
+                // as we cannot resolve which token to update.
 
-                Trans translation = transDao.findByPrimaryKey(projLangKey, token.getId());
-                changes.addAll(updateTrans(projLangKey, token, translation, tokenName, value, true));
+                if (null != token) {
+                    Trans translation = transDao.findByPrimaryKey(projLangKey, token.getId());
+                    changes.addAll(updateTrans(projLangKey, token, translation, tokenName, value, true));
+                }
             }
             catch (RuntimeException e) {
                 LOG.error("Problems importing translation " + value + " for token " + tokenName, e);
