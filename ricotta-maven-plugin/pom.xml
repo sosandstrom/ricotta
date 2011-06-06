@@ -16,7 +16,22 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
-
+			
+			<plugin>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>${project.artifactId}</artifactId>
+				<version>${project.version}</version>
+				<configuration>
+					<projectName>ricotta</projectName>
+					<resourceItems>
+						<resourceItem>
+							<languageCode>en</languageCode>
+							<templateName>strings_android_inherit</templateName>
+							<filePath>strings_en.xml</filePath>
+						</resourceItem>
+					</resourceItems>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 

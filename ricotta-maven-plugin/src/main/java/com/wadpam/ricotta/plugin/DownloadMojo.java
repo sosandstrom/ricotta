@@ -59,12 +59,10 @@ public class DownloadMojo extends AbstractMojo {
                         item.getArtifactName(), output);
             }
             catch (ClientProtocolException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new MojoExecutionException("Error downloading language file: " + item.getLanguageCode(), e);
             }
             catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new MojoExecutionException("Error downloading language file: " + item.getLanguageCode(), e);
             }
         }
         getLog().info("Done downloading ricotta language files.");

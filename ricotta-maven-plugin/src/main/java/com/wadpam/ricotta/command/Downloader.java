@@ -63,42 +63,45 @@ public class Downloader {
         final String url = buildUrl(baseUrl, projectName, version, languageCode, templateName, artifactName);
         HttpGet method = new HttpGet(url);
 
-        // TODO: add authentication
-
-        HttpClient client = new DefaultHttpClient();
-        HttpResponse response = client.execute(method);
-
-        StatusLine status = response.getStatusLine();
-
-        // warming request?
-        if (status.getStatusCode() == 500) {
-            warn("Retrying as HTTP " + status.getStatusCode() + " " + status.getReasonPhrase());
-            method.abort();
-            // retry once!
-            info("Download URL " + url);
-            method = new HttpGet(url);
+        try {
             // TODO: add authentication
-            response = client.execute(method);
-            status = response.getStatusLine();
-        }
 
-        if (status.getStatusCode() == 200) {
-            InputStream is = response.getEntity().getContent();
+            HttpClient client = new DefaultHttpClient();
+            HttpResponse response = client.execute(method);
 
-            byte buf[] = new byte[1024];
-            int count;
-            while (0 < (count = is.read(buf))) {
-                fos.write(buf, 0, count);
+            StatusLine status = response.getStatusLine();
+
+            // warming request?
+            if (status.getStatusCode() == 500) {
+                warn("Retrying as HTTP " + status.getStatusCode() + " " + status.getReasonPhrase());
+                method.abort();
+                // retry once!
+                info("Download URL " + url);
+                method = new HttpGet(url);
+                // TODO: add authentication
+                response = client.execute(method);
+                status = response.getStatusLine();
             }
 
-            is.close();
-            info("Downloaded " + projectName + '/' + languageCode + '/' + templateName);
-        }
-        else {
-            warn("HTTP " + status.getStatusCode() + " " + status.getReasonPhrase());
-        }
+            if (status.getStatusCode() == 200) {
+                InputStream is = response.getEntity().getContent();
 
-        method.abort();
+                byte buf[] = new byte[1024];
+                int count;
+                while (0 < (count = is.read(buf))) {
+                    fos.write(buf, 0, count);
+                }
+
+                is.close();
+                info("Downloaded " + projectName + '/' + languageCode + '/' + templateName);
+            }
+            else {
+                throw new IOException("HTTP " + status.getStatusCode() + " " + status.getReasonPhrase());
+            }
+        }
+        finally {
+            method.abort();
+        }
     }
 
     public static void download(String baseUrl, String projectName, String version, String languageCode, String templateName,
