@@ -77,7 +77,6 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         boolean hasAccess = false;
-        request.setAttribute("link", new LinkBuilder(request));
         String requestURI = request.getRequestURI();
 
         // generate request, old format?

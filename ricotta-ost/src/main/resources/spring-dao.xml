@@ -11,44 +11,20 @@
 <!-- Bean managed transactions -->
 
 	<!-- ============== DaoBeans for entities in package com.wadpam.ricotta.domain ============ -->
-	<bean id="projLangDao" 
-		class="com.wadpam.ricotta.dao.ProjLangDaoBean">
+	<bean id="subsetToknDao" 
+		class="com.wadpam.ricotta.dao.SubsetToknDaoBean">
 	</bean>
 	<bean id="langDao" 
 		class="com.wadpam.ricotta.dao.LangDaoBean">
 	</bean>
-	<bean id="translationDao" 
-		class="com.wadpam.ricotta.dao.TranslationDaoBean">
-	</bean>
-	<bean id="branchDao" 
-		class="com.wadpam.ricotta.dao.BranchDaoBean">
-	</bean>
-	<bean id="templateDao" 
-		class="com.wadpam.ricotta.dao.TemplateDaoBean">
-	</bean>
-	<bean id="tokenArtifactDao" 
-		class="com.wadpam.ricotta.dao.TokenArtifactDaoBean">
-	</bean>
-	<bean id="projDao" 
-		class="com.wadpam.ricotta.dao.ProjDaoBean">
-	</bean>
-	<bean id="mallDao" 
-		class="com.wadpam.ricotta.dao.MallDaoBean">
-	</bean>
-	<bean id="toknDao" 
-		class="com.wadpam.ricotta.dao.ToknDaoBean">
-	</bean>
-	<bean id="tokenDao" 
-		class="com.wadpam.ricotta.dao.TokenDaoBean">
-	</bean>
-	<bean id="projectLanguageDao" 
-		class="com.wadpam.ricotta.dao.ProjectLanguageDaoBean">
-	</bean>
-	<bean id="subsetToknDao" 
-		class="com.wadpam.ricotta.dao.SubsetToknDaoBean">
+	<bean id="projLangDao" 
+		class="com.wadpam.ricotta.dao.ProjLangDaoBean">
 	</bean>
 	<bean id="projUserDao" 
 		class="com.wadpam.ricotta.dao.ProjUserDaoBean">
+	</bean>
+	<bean id="branchDao" 
+		class="com.wadpam.ricotta.dao.BranchDaoBean">
 	</bean>
 	<bean id="ctxtDao" 
 		class="com.wadpam.ricotta.dao.CtxtDaoBean">
@@ -56,29 +32,20 @@
 	<bean id="transDao" 
 		class="com.wadpam.ricotta.dao.TransDaoBean">
 	</bean>
-	<bean id="artifactDao" 
-		class="com.wadpam.ricotta.dao.ArtifactDaoBean">
+	<bean id="templateDao" 
+		class="com.wadpam.ricotta.dao.TemplateDaoBean">
 	</bean>
-	<bean id="viewContextDao" 
-		class="com.wadpam.ricotta.dao.ViewContextDaoBean">
+	<bean id="projDao" 
+		class="com.wadpam.ricotta.dao.ProjDaoBean">
 	</bean>
-	<bean id="projectDao" 
-		class="com.wadpam.ricotta.dao.ProjectDaoBean">
-	</bean>
-	<bean id="languageDao" 
-		class="com.wadpam.ricotta.dao.LanguageDaoBean">
-	</bean>
-	<bean id="versionDao" 
-		class="com.wadpam.ricotta.dao.VersionDaoBean">
+	<bean id="toknDao" 
+		class="com.wadpam.ricotta.dao.ToknDaoBean">
 	</bean>
 	<bean id="subsetDao" 
 		class="com.wadpam.ricotta.dao.SubsetDaoBean">
 	</bean>
 	<bean id="appUserDao" 
 		class="com.wadpam.ricotta.dao.AppUserDaoBean">
-	</bean>
-	<bean id="projectUserDao" 
-		class="com.wadpam.ricotta.dao.ProjectUserDaoBean">
 	</bean>
 	
 

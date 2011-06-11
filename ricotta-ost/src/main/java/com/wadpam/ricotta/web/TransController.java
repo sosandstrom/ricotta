@@ -22,7 +22,6 @@ import com.wadpam.ricotta.domain.Proj;
 import com.wadpam.ricotta.domain.ProjLang;
 import com.wadpam.ricotta.domain.Tokn;
 import com.wadpam.ricotta.domain.Trans;
-import com.wadpam.ricotta.domain.Translation;
 import com.wadpam.ricotta.model.TransModel;
 
 @Controller
@@ -106,7 +105,7 @@ public class TransController extends AbstractDaoController {
                 key = KeyFactory.stringToKey(name);
                 t = null;
                 LOG.debug("field key kind for {} is {}", key.toString(), key.getKind());
-                if (Translation.class.getSimpleName().equals(key.getKind())) {
+                if (Trans.class.getSimpleName().equals(key.getKind())) {
                     // update or delete existing translation
                     t = transDao.findByPrimaryKey(key.getParent(), key.getId());
                     changes.addAll(uberDao.updateTrans(projLangKey, null, t, name, value, true));

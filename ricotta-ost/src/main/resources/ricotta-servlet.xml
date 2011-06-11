@@ -8,18 +8,6 @@
 
 	<bean id="uberDao" class="com.wadpam.ricotta.dao.UberDaoBean"
 		init-method="init" depends-on="dataResourceLoader">
-		<property name="artifactDao" ref="artifactDao" />
-		<property name="languageDao" ref="languageDao" />
-		<property name="mallDao" ref="mallDao" />
-		<property name="projectDao" ref="projectDao" />
-		<property name="projectLanguageDao" ref="projectLanguageDao" />
-		<property name="projectUserDao" ref="projectUserDao" />
-		<property name="tokenDao" ref="tokenDao" />
-		<property name="tokenArtifactDao" ref="tokenArtifactDao" />
-		<property name="translationDao" ref="translationDao" />
-		<property name="versionDao" ref="versionDao" />
-		<property name="viewContextDao" ref="viewContextDao" />
-		
 		<property name="langDao" ref="langDao" />
 		<property name="templateDao" ref="templateDao" />
 		<property name="projDao" ref="projDao" />
@@ -36,11 +24,9 @@
 	<bean id="projectHandlerInterceptor" class="com.wadpam.ricotta.web.ProjectHandlerInterceptor">
 		<property name="projDao" ref="projDao" />
 		<property name="projUserDao" ref="projUserDao" />
-		<!-- 
-		<property name="versionDao" ref="versionDao" />
-		<property name="uberDao" ref="uberDao" />
-		 -->
 	</bean>
+	
+	<!-- As auto-wiring does not work well in GAE, define controllers manually: -->
 	
 	<bean id="branchController" class="com.wadpam.ricotta.web.BranchController">
 		<property name="ctxtDao" ref="ctxtDao" />
@@ -89,89 +75,11 @@
 		<property name="langDao" ref="langDao" />
 	</bean>
 
-	<!-- As auto-wiring does not work well in GAE, define controllers manually: -->
 	<bean id="indexController" class="com.wadpam.ricotta.web.IndexController">
 		<property name="uberDao" ref="uberDao" />
 	</bean>
 
-	<bean id="projectController" class="com.wadpam.ricotta.web.ProjectController">
-		<property name="projectDao" ref="projectDao" />
-		<property name="artifactDao" ref="artifactDao" />
-		<property name="projectUserDao" ref="projectUserDao" />
-		<property name="tokenDao" ref="tokenDao" />
-		<property name="versionDao" ref="versionDao" />
-		<property name="uberDao" ref="uberDao" />
-		<property name="viewContextDao" ref="viewContextDao" />
-	</bean>
-
-	<bean id="languageController" class="com.wadpam.ricotta.web.LanguageController">
-		<property name="languageDao" ref="languageDao" />
-	</bean>
-
-	<bean id="mallController" class="com.wadpam.ricotta.web.MallController">
-		<property name="mallDao" ref="mallDao" />
-	</bean>
-
-	<bean id="artifactController" class="com.wadpam.ricotta.web.ArtifactController">
-		<property name="projectDao" ref="projectDao" />
-		<property name="artifactDao" ref="artifactDao" />
-	</bean>
-
-	<bean id="versionController" class="com.wadpam.ricotta.web.VersionController">
-		<property name="versionDao" ref="versionDao" />
-		<property name="uberDao" ref="uberDao" />
-	</bean>
-
-	<bean id="userController" class="com.wadpam.ricotta.web.UserController">
-		<property name="projectUserDao" ref="projectUserDao" />
-	</bean>
-
-	<bean id="importController" class="com.wadpam.ricotta.web.ImportController">
-		<property name="tokenDao" ref="tokenDao" />
-		<property name="languageDao" ref="languageDao" />
-		<property name="translationDao" ref="translationDao" />
-		<property name="uberDao" ref="uberDao" />
-		<property name="translationController" ref="translationController" />
-	</bean>
-
-	<bean id="tokenController" class="com.wadpam.ricotta.web.TokenController">
-		<property name="projectDao" ref="projectDao" />
-		<property name="artifactDao" ref="artifactDao" />
-		<property name="tokenDao" ref="tokenDao" />
-		<property name="tokenArtifactDao" ref="tokenArtifactDao" />
-		<property name="uberDao" ref="uberDao" />
-		<property name="viewContextDao" ref="viewContextDao" />
-	</bean>
-
-	<bean id="projectLanguageController" class="com.wadpam.ricotta.web.ProjectLanguageController">
-		<property name="projectDao" ref="projectDao" />
-		<property name="languageDao" ref="languageDao" />
-		<property name="projectLanguageDao" ref="projectLanguageDao" />
-		<property name="uberDao" ref="uberDao" />
-	</bean>
-
-	<bean id="translationController" class="com.wadpam.ricotta.web.TranslationController">
-		<property name="projectDao" ref="projectDao" />
-		<property name="languageDao" ref="languageDao" />
-		<property name="projectLanguageDao" ref="projectLanguageDao" />
-		<property name="tokenDao" ref="tokenDao" />
-		<property name="translationDao" ref="translationDao" />
-		<property name="uberDao" ref="uberDao" />
-		<property name="viewContextDao" ref="viewContextDao" />
-	</bean>
-
-	<bean id="velocityController" class="com.wadpam.ricotta.web.VelocityController"
-		init-method="init" depends-on="dataResourceLoader">
-		<property name="languageDao" ref="languageDao" />
-		<property name="mallDao" ref="mallDao" />
-		<property name="artifactDao" ref="artifactDao" />
-		<property name="projectLanguageDao" ref="projectLanguageDao" />
-		<property name="translationDao" ref="translationDao" />
-		<property name="uberDao" ref="uberDao" />
-	</bean>
-
 	<bean id="dataResourceLoader" class="com.wadpam.ricotta.velocity.DaoResourceLoader">
-		<property name="mallDao" ref="mallDao" />
 		<property name="templateDao" ref="templateDao" />
 	</bean>
 

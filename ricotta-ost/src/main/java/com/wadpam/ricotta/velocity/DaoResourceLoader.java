@@ -8,13 +8,10 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.resource.Resource;
 import org.apache.velocity.runtime.resource.loader.ResourceLoader;
 
-import com.wadpam.ricotta.dao.MallDao;
 import com.wadpam.ricotta.dao.TemplateDao;
-import com.wadpam.ricotta.domain.Mall;
 import com.wadpam.ricotta.domain.Template;
 
 public class DaoResourceLoader extends ResourceLoader {
-    private static MallDao     mallDao     = null;
 
     private static TemplateDao templateDao = null;
 
@@ -33,11 +30,7 @@ public class DaoResourceLoader extends ResourceLoader {
             buf = templ.getBody().getBytes();
         }
         else {
-            Mall mall = mallDao.findByName(source);
-            if (null == mall) {
-                throw new ResourceNotFoundException("No such template " + source);
-            }
-            buf = mall.getBody().getBytes();
+            throw new ResourceNotFoundException("No such template " + source);
         }
 
         ByteArrayInputStream is = new ByteArrayInputStream(buf);
@@ -52,10 +45,6 @@ public class DaoResourceLoader extends ResourceLoader {
     public boolean isSourceModified(Resource arg0) {
         // TODO Auto-generated method stub
         return false;
-    }
-
-    public void setMallDao(MallDao mallDao) {
-        DaoResourceLoader.mallDao = mallDao;
     }
 
     public void setTemplateDao(TemplateDao templateDao) {
