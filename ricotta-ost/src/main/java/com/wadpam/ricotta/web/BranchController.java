@@ -226,4 +226,11 @@ public class BranchController extends AbstractDaoController {
         return "redirect:../" + branch.getName() + "/index.html";
     }
 
+    @RequestMapping(value = "branch/{branchName}/deleteBranches.html", method = RequestMethod.POST)
+    public String deleteBranches(HttpServletRequest request) {
+        final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
+        final Key projKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJKEY);
+
+        return "redirect:../" + branchKey.getName() + "/index.html";
+    }
 }

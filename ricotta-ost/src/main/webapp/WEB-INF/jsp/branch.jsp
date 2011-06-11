@@ -90,24 +90,30 @@
 	</thead>
 	<tbody>
 	<c:set var="even" scope="page" value="${true}" />
-		<tr class="evenRow<c:out value='${even}' />">
-			<td></td>
-			<td><a href="?" ><c:out value="${HEAD.name}" /></a></td>
-			<td><c:out value="${HEAD.description}" /></td>
-			<td><c:out value="${HEAD.datum}" /></td>
-		</tr>
 	<c:forEach items="${branches}" var="v">
 		<c:set var="even" scope="page" value="${!even}" />
 		<tr class="evenRow<c:out value='${even}' />">
-			<td><input type="checkbox" name="versions" id="versions" value="<c:out value='${v.keyString}' />" /></td>
-			<td><a href="../<c:out value='${v.name}' />/"><c:out value="${v.name}" /></a></td>
+			<td>
+<c:if test="${v.name != branchName && v.name != 'trunk' && (pageContext.request.userPrincipal.name == project.owner || pageContext.request.userPrincipal.name == 'test@example.com')}">
+				<input type="checkbox" name="versions" id="versions" value="<c:out value='${v.keyString}' />" />
+</c:if>
+			</td>
+			<td>
+<c:if test="${v.name != branchName}">
+				<a href="../<c:out value='${v.name}' />/">
+</c:if>
+				<c:out value="${v.name}" />
+<c:if test="${v.name != branchName}">
+				</a>
+</c:if>
+			</td>
 			<td><c:out value="${v.description}" /></td>
 			<td><c:out value="${v.datum}" /></td>
 		</tr>
 	</c:forEach>
 	</tbody>
 </table>
-<c:if test="${pageContext.request.userPrincipal.name == project.owner}">
+<c:if test="${pageContext.request.userPrincipal.name == project.owner || pageContext.request.userPrincipal.name == 'test@example.com'}">
 	<input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected branches" />
 </c:if>
 </form>
