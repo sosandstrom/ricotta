@@ -6,21 +6,23 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <jsp:include page="header.jsp" />
 <body>
-<a href="/index.html">Home</a> | <a href="/projects/index.html">Projects</a> | <a href="/projects/<c:out value='${project.name}' />/index.html"><c:out value="${project.name}" /></a>
-<div class="pageHeading">Versions - <c:out value="${project.name}" /></div>
-<form id="version" name="version" action="" method="post">
+<a href="/index.html">Home</a> | 
+<a href="/proj/index.html">Projects</a> | 
+<a href="/proj/<c:out value='${projName}' />/index.html"><c:out value="${projName}" /></a>
+<div class="pageHeading">Create branch of project <c:out value="${projName}" /></div>
+<form id="branch" name="branch" action="" method="post">
 <table>
 	<tr>
-		<td>Version Name:</td>
+		<td>Branch Name:</td>
 		<td><input id="name" name="name" type="text" value="" /></td>
 	</tr>
 	<tr>
-		<td>Version Description:</td>
+		<td>Branch Description:</td>
 		<td><input id="description" name="description" type="text" value="" /></td>
 	</tr>
 	<tr>
 		<td></td>
-		<td><input id="create" name="create" type="submit" value="Create version" /></td>
+		<td><input id="create" name="create" type="submit" value="Create branch" /></td>
 	</tr>
 </table>
 </form>

@@ -35,6 +35,7 @@
 		<property name="projLangDao" ref="projLangDao" />
 		<property name="projUserDao" ref="projUserDao" />
 		<property name="subsetDao" ref="subsetDao" />
+		<property name="uberDao" ref="uberDao" />
 	</bean>
 	
 	<bean id="projController" class="com.wadpam.ricotta.web.ProjController">
@@ -60,6 +61,7 @@
 		<property name="projDao" ref="projDao" />
 		<property name="projLangDao" ref="projLangDao" />
 		<property name="toknDao" ref="toknDao" />
+		<property name="transDao" ref="transDao" />
 		<property name="uberDao" ref="uberDao" />
 	</bean>
 

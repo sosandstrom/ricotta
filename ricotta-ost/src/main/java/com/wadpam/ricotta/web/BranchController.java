@@ -204,4 +204,26 @@ public class BranchController extends AbstractDaoController {
         return "redirect:index.html";
     }
 
+    // ---------------------- branch part -------------------------------------
+
+    @RequestMapping(value = "branch/{branchName}/create.html", method = RequestMethod.GET)
+    public String getBranchForm(HttpServletRequest request, Model model) {
+        return "createBranch";
+    }
+
+    @RequestMapping(value = "branch/{branchName}/create.html", method = RequestMethod.POST)
+    public String createBranch(HttpServletRequest request, @ModelAttribute("branch") Branch branch) throws IOException {
+        final Key fromKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
+        final Key projKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJKEY);
+        final Branch existing = branchDao.findByPrimaryKey(projKey, branch.getName());
+        if (null != existing) {
+            LOG.warn("Branch {} already exists", existing);
+        }
+        else {
+            uberDao.copyBranch(fromKey, branch.getName(), branch.getDescription());
+        }
+
+        return "redirect:../" + branch.getName() + "/index.html";
+    }
+
 }

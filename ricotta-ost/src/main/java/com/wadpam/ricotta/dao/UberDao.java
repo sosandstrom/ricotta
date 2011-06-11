@@ -54,4 +54,6 @@ public interface UberDao {
 
     void deleteProj(Key projKey);
 
+    void copyBranch(Key fromKey, String name, String description);
+
 }

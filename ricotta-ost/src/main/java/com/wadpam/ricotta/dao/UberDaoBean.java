@@ -52,8 +52,6 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         populate();
     }
 
-    // ------------------ methods managing the cache ------------------------------
-
     public static List<Long> intersection(List<Long> a, List<Long> b) {
         final List<Long> u = new ArrayList<Long>();
         for(Long o : a) {
@@ -237,6 +235,63 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
             }
         }
         return returnValue;
+    }
+
+    @Override
+    public void copyBranch(Key fromKey, String name, String description) {
+        final Key projKey = fromKey.getParent();
+        final Key toKey = (Key) createBranch(projKey, name, description);
+
+        // contexts
+        for(Ctxt c : ctxtDao.findByBranch(fromKey)) {
+            String blobKeyString = null;
+            if (null != c.getBlobKey()) {
+                blobKeyString = c.getBlobKey().getKeyString();
+            }
+            createCtxt(toKey, c.getName(), c.getDescription(), blobKeyString);
+        }
+
+        // projLang
+        for(ProjLang pl : projLangDao.findByBranch(fromKey)) {
+            createProjLang(toKey, pl.getLangCode(), pl.getDefaultLang(), pl.getLang());
+        }
+
+        // tokens
+        for(Tokn t : toknDao.findByBranch(fromKey)) {
+            copyTokn(t, toKey);
+        }
+
+        // subsets
+        for(Subset s : subsetDao.findByBranch(fromKey)) {
+            copySubset(s, toKey);
+        }
+    }
+
+    private void copyTokn(Tokn from, Key branchKey) {
+        final Key fromBranch = from.getBranch();
+        Object ctxtKey = null;
+        if (null != from.getViewContext()) {
+            final String ctxtName = from.getViewContext().getName();
+            ctxtKey = ctxtDao.createKey(branchKey, ctxtName);
+        }
+        final Key toKey = (Key) createTokn(branchKey, from.getId(), from.getName(), from.getDescription(), ctxtKey);
+
+        for(ProjLang pl : projLangDao.findByBranch(fromBranch)) {
+            final Key projLangKey = (Key) pl.getPrimaryKey();
+            Trans t = transDao.findByPrimaryKey(projLangKey, from.getId());
+            if (null != t) {
+                final Object toPL = projLangDao.createKey(branchKey, pl.getLangCode());
+                createTrans(toPL, toKey.getId(), t.getLocal());
+            }
+        }
+    }
+
+    private void copySubset(Subset from, Key branchKey) {
+        final Key toKey = (Key) createSubset(branchKey, from.getName(), from.getDescription());
+        final Key fromKey = (Key) from.getPrimaryKey();
+        for(SubsetTokn st : subsetToknDao.findBySubset(fromKey)) {
+            createSubsetTokn(toKey, st.getTokn());
+        }
     }
 
     public static List<Object> getKeys(List entities) {
@@ -490,6 +545,10 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
             keys.add(KeyFactory.createKey(branchKey, Tokn.class.getSimpleName(), id));
         }
         deleteTokns(keys);
+
+        // projLangs
+        List<String> codes = projLangDao.findKeysByBranch(branchKey);
+        projLangDao.delete(branchKey, codes);
 
         // contexts
         List<String> names = ctxtDao.findKeysByBranch(branchKey);
