@@ -10,6 +10,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.wadpam.ricotta.dao.UberDao;
+import com.wadpam.ricotta.domain.Role;
 
 public class RicottaImportHandler extends DefaultHandler {
     public static final String        BRANCH    = "branch";
@@ -18,7 +19,6 @@ public class RicottaImportHandler extends DefaultHandler {
     public static final String        CTXT      = "context";
     public static final String        TOKN      = "token";
     public static final String        SUBSET    = "subset";
-    // public static final String TRANS = "translation";
     public static final String        TEMPL     = "template";
     public static final String        USER      = "user";
     public static final String        TOKENS    = "tokens";
@@ -58,6 +58,7 @@ public class RicottaImportHandler extends DefaultHandler {
         final String blobKeyString = a.getValue("blobKey");
         final String id = a.getValue("id");
         final String email = a.getValue("email");
+        final String role = a.getValue("role");
 
         if (active) {
             LOG.debug("<{} name={}>", qName, name);
@@ -105,7 +106,7 @@ public class RicottaImportHandler extends DefaultHandler {
             // template is created in endElement, as cdata is required
         }
         else if (USER.equals(qName)) {
-            uberDao.createUser(proj, email);
+            uberDao.createUser(proj, email, null != role ? Long.parseLong(role) : Role.ROLE_DEVELOPER);
         }
         else if (TOKENS.equals(qName)) {
             active = false;

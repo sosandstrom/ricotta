@@ -12,6 +12,7 @@ import com.wadpam.ricotta.dao.LangDao;
 import com.wadpam.ricotta.dao.ProjDao;
 import com.wadpam.ricotta.dao.ProjLangDao;
 import com.wadpam.ricotta.dao.ProjUserDao;
+import com.wadpam.ricotta.dao.RoleDao;
 import com.wadpam.ricotta.dao.SubsetDao;
 import com.wadpam.ricotta.dao.SubsetToknDao;
 import com.wadpam.ricotta.dao.TemplateDao;
@@ -31,6 +32,7 @@ public abstract class AbstractDaoController {
     protected TransDao      transDao;
     protected SubsetDao     subsetDao;
     protected SubsetToknDao subsetToknDao;
+    protected RoleDao       roleDao;
     protected UberDao       uberDao;
 
     // ----------------- Populate Model ----------------------
@@ -56,6 +58,11 @@ public abstract class AbstractDaoController {
         System.out
                 .println(getClass().getSimpleName() + ": principal=" + ((null != returnValue) ? returnValue.getName() : "null"));
         return returnValue;
+    }
+
+    @ModelAttribute(ProjectHandlerInterceptor.KEY_PROJUSER)
+    public Object populateProjUser(HttpServletRequest request) {
+        return request.getAttribute(ProjectHandlerInterceptor.KEY_PROJUSER);
     }
 
     // -------------- Getters and Setters ------------------------
@@ -106,5 +113,9 @@ public abstract class AbstractDaoController {
 
     public final void setCtxtDao(CtxtDao ctxtDao) {
         this.ctxtDao = ctxtDao;
+    }
+
+    public final void setRoleDao(RoleDao roleDao) {
+        this.roleDao = roleDao;
     }
 }

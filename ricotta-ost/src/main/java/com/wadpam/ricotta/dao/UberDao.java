@@ -28,6 +28,15 @@ public interface UberDao {
 
     Object createLang(String code, String name);
 
+    /**
+     * Creates the project and the owner ProjUser with Role OWNER
+     * 
+     * @param name
+     *            project name, must be unique
+     * @param owner
+     *            email address of the project owner
+     * @return the primary key for the project
+     */
     Object createProj(String name, String owner);
 
     Object createBranch(Object proj, String name, String description);
@@ -46,13 +55,15 @@ public interface UberDao {
 
     Object createTempl(String name, String description, String body);
 
-    Object createUser(Object proj, String email);
+    Object createUser(Object proj, String email, long role);
 
     // --------------------- delete methods ----------------------
 
     void deleteTokns(List<Key> keys);
 
     void deleteProj(Key projKey);
+
+    void deleteBranch(Key branchKey);
 
     void copyBranch(Key fromKey, String name, String description);
 

@@ -19,6 +19,7 @@
 		<property name="transDao" ref="transDao" />
 		<property name="subsetDao" ref="subsetDao" />
 		<property name="subsetToknDao" ref="subsetToknDao" />
+		<property name="roleDao" ref="roleDao" />
 	</bean>
 
 	<bean id="projectHandlerInterceptor" class="com.wadpam.ricotta.web.ProjectHandlerInterceptor">
@@ -34,6 +35,7 @@
 		<property name="branchDao" ref="branchDao" />
 		<property name="projLangDao" ref="projLangDao" />
 		<property name="projUserDao" ref="projUserDao" />
+		<property name="roleDao" ref="roleDao" />
 		<property name="subsetDao" ref="subsetDao" />
 		<property name="uberDao" ref="uberDao" />
 	</bean>

@@ -11,26 +11,14 @@
 <!-- Bean managed transactions -->
 
 	<!-- ============== DaoBeans for entities in package com.wadpam.ricotta.domain ============ -->
-	<bean id="subsetToknDao" 
-		class="com.wadpam.ricotta.dao.SubsetToknDaoBean">
+	<bean id="projLangDao" 
+		class="com.wadpam.ricotta.dao.ProjLangDaoBean">
 	</bean>
 	<bean id="langDao" 
 		class="com.wadpam.ricotta.dao.LangDaoBean">
 	</bean>
-	<bean id="projLangDao" 
-		class="com.wadpam.ricotta.dao.ProjLangDaoBean">
-	</bean>
-	<bean id="projUserDao" 
-		class="com.wadpam.ricotta.dao.ProjUserDaoBean">
-	</bean>
 	<bean id="branchDao" 
 		class="com.wadpam.ricotta.dao.BranchDaoBean">
-	</bean>
-	<bean id="ctxtDao" 
-		class="com.wadpam.ricotta.dao.CtxtDaoBean">
-	</bean>
-	<bean id="transDao" 
-		class="com.wadpam.ricotta.dao.TransDaoBean">
 	</bean>
 	<bean id="templateDao" 
 		class="com.wadpam.ricotta.dao.TemplateDaoBean">
@@ -40,6 +28,21 @@
 	</bean>
 	<bean id="toknDao" 
 		class="com.wadpam.ricotta.dao.ToknDaoBean">
+	</bean>
+	<bean id="projUserDao" 
+		class="com.wadpam.ricotta.dao.ProjUserDaoBean">
+	</bean>
+	<bean id="subsetToknDao" 
+		class="com.wadpam.ricotta.dao.SubsetToknDaoBean">
+	</bean>
+	<bean id="ctxtDao" 
+		class="com.wadpam.ricotta.dao.CtxtDaoBean">
+	</bean>
+	<bean id="transDao" 
+		class="com.wadpam.ricotta.dao.TransDaoBean">
+	</bean>
+	<bean id="roleDao" 
+		class="com.wadpam.ricotta.dao.RoleDaoBean">
 	</bean>
 	<bean id="subsetDao" 
 		class="com.wadpam.ricotta.dao.SubsetDaoBean">

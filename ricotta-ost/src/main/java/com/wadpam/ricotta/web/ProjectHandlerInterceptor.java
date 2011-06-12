@@ -21,6 +21,7 @@ import com.wadpam.ricotta.domain.Ctxt;
 import com.wadpam.ricotta.domain.Lang;
 import com.wadpam.ricotta.domain.Proj;
 import com.wadpam.ricotta.domain.ProjLang;
+import com.wadpam.ricotta.domain.ProjUser;
 import com.wadpam.ricotta.domain.Subset;
 import com.wadpam.ricotta.domain.Template;
 
@@ -35,6 +36,7 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
     protected static final String KEY_LANG            = Lang.class.getSimpleName();
     protected static final String KEY_PROJLANG        = ProjLang.class.getSimpleName();
     protected static final String KEY_CONTEXT         = Ctxt.class.getSimpleName();
+    protected static final String KEY_PROJUSER        = "projUser";                                                                   // .class.getSimpleName();
     protected static final String KEY_LANGCODE        = "langCode";
     protected static final String KEY_PROJKEY         = "projKey";
     protected static final String KEY_LANGKEY         = "langKey";
@@ -123,6 +125,7 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
                     // owner?
                     String user = request.getUserPrincipal().getName();
                     final Proj proj = projDao.findByPrimaryKey(projName);
+                    request.setAttribute(KEY_PROJ, proj);
                     if (proj.getOwner().equals(user)) {
                         hasAccess = true;
                     }
@@ -130,6 +133,11 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
                         // member?
                         List<String> users = projUserDao.findKeysByProj(projKey);
                         hasAccess = users.contains(user);
+                    }
+
+                    if (hasAccess) {
+                        final ProjUser projUser = projUserDao.findByPrimaryKey(projKey, user);
+                        request.setAttribute(KEY_PROJUSER, projUser);
                     }
                 }
 

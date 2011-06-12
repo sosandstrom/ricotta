@@ -1,5 +1,6 @@
 package com.wadpam.ricotta.domain;
 
+import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -17,6 +18,9 @@ public class ProjUser extends AEDPrimaryKeyEntity {
     @Id
     String                    user;
 
+    @Basic
+    Long                      role;
+
     @Override
     public String toString() {
         return getClass().getSimpleName() + '{' + proj + ',' + user + '}';
@@ -27,6 +31,31 @@ public class ProjUser extends AEDPrimaryKeyEntity {
         return proj;
     }
 
+    @Override
+    public Object getSimpleKey() {
+        return user;
+    }
+
+    public boolean isTrans() {
+        return null != role && 0 != (role & Role.GRANT_TRANS);
+    }
+
+    public boolean isTokn() {
+        return null != role && 0 != (role & Role.GRANT_TOKN);
+    }
+
+    public boolean isManage() {
+        return null != role && 0 != (role & Role.GRANT_MANAGE);
+    }
+
+    public boolean isDestroy() {
+        return null != role && 0 != (role & Role.GRANT_DESTROY);
+    }
+
+    public boolean isEverything() {
+        return null != role && 0 != (role & Role.GRANT_ALL);
+    }
+
     public String getUser() {
         return user;
     }
@@ -35,17 +64,20 @@ public class ProjUser extends AEDPrimaryKeyEntity {
         this.user = user;
     }
 
-    @Override
-    public Object getSimpleKey() {
-        return user;
-    }
-
     public Key getProj() {
         return proj;
     }
 
     public void setProj(Key proj) {
         this.proj = proj;
+    }
+
+    public final Long getRole() {
+        return role;
+    }
+
+    public final void setRole(Long role) {
+        this.role = role;
     }
 
 }

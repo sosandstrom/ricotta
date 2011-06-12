@@ -37,6 +37,7 @@ import com.wadpam.ricotta.domain.Lang;
 import com.wadpam.ricotta.domain.Proj;
 import com.wadpam.ricotta.domain.ProjLang;
 import com.wadpam.ricotta.domain.ProjUser;
+import com.wadpam.ricotta.domain.Role;
 import com.wadpam.ricotta.domain.Subset;
 import com.wadpam.ricotta.domain.SubsetTokn;
 import com.wadpam.ricotta.domain.Template;
@@ -50,6 +51,23 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
 
     public void init() {
         populate();
+        // patchRoles();
+    }
+
+    private void patchRoles() {
+        for(Proj proj : projDao.findAll()) {
+            final Key projKey = (Key) proj.getPrimaryKey();
+            // add owner just in case
+            createUser(projKey, proj.getOwner(), Role.ROLE_OWNER);
+
+            // add Role.DEVELOPER to all users without role
+            for(ProjUser pu : projUserDao.findByProj(projKey)) {
+                if (null == pu.getRole()) {
+                    pu.setRole(Role.ROLE_DEVELOPER);
+                    projUserDao.update(pu);
+                }
+            }
+        }
     }
 
     public static List<Long> intersection(List<Long> a, List<Long> b) {
@@ -340,10 +358,16 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         final Template ricottaExportProj = persistTemplate("ricotta-export-proj", "Export a ricotta project to XML");
         final Template ricottaExportBranch = persistTemplate("ricotta-export-branch", "Export a ricotta project branch to XML");
 
+        // populate Roles
+        roleDao.persist(Role.ROLE_VIEWER, "Viewer; read-only user");
+        roleDao.persist(Role.ROLE_TRANSLATOR, "Translator; can add and edit translations");
+        roleDao.persist(Role.ROLE_DEVELOPER, "Developer; can add and edit tokens");
+        roleDao.persist(Role.ROLE_OWNER, "Owner; can edit and delete project");
+
         // Projects
         final Proj proj = projDao.persist("ricotta", "s.o.sandstrom@gmail.com");
         final Key projKey = (Key) proj.getPrimaryKey();
-        projUserDao.persist(projKey, "test@example.com");
+        projUserDao.persist(projKey, "test@example.com", Role.ROLE_DEVELOPER);
 
         // trunk per project
         final Branch trunk = branchDao.persist(projKey, "trunk", "2011-01-28 10:10 GMT+7", "Latest version");
@@ -457,12 +481,13 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
     @Override
     public Object createProj(String name, String owner) {
         final Proj p = projDao.persist(name, owner);
+        createUser(p.getPrimaryKey(), owner, Role.ROLE_OWNER);
         return p.getPrimaryKey();
     }
 
     @Override
-    public Object createUser(Object proj, String email) {
-        final ProjUser pu = projUserDao.persist(proj, email);
+    public Object createUser(Object proj, String email, long role) {
+        final ProjUser pu = projUserDao.persist(proj, email, role);
         return pu.getPrimaryKey();
     }
 
@@ -537,6 +562,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         }
     }
 
+    @Override
     public void deleteBranch(Key branchKey) {
         // tokens
         List<Long> ids = toknDao.findKeysByBranch(branchKey);

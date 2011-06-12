@@ -30,11 +30,16 @@
 	</c:forEach>
 	</tbody>
 </table>
+<c:if test="${projUser.manage}">
 <a href="lang/create.html">Add language</a>
+</c:if>
 
+<c:if test="${projUser.tokn}">
 <h3>Tokens</h3>
 <a href="tokn/">Edit tokens...</a>
+</c:if>
 
+<c:if test="${null != ctxts}">
 <h3>Contexts</h3>
 <table>
 		<thead>
@@ -55,7 +60,10 @@
 	</tbody>
 </table>
 <a href="uploadCtxt.html">Create context...</a>
+</c:if>
 
+
+<c:if test="${projUser.manage}">
 <h3>Subsets</h3>
 <table>
 		<thead>
@@ -76,6 +84,7 @@
 	</tbody>
 </table>
 <a href="subset.html">Create Subset...</a>
+</c:if>
 
 <form action="deleteBranches.html" method="post" name="deleteBranches" id="deleteBranches">
 <h3>Branches</h3>
@@ -94,7 +103,7 @@
 		<c:set var="even" scope="page" value="${!even}" />
 		<tr class="evenRow<c:out value='${even}' />">
 			<td>
-<c:if test="${v.name != branchName && v.name != 'trunk' && (pageContext.request.userPrincipal.name == project.owner || pageContext.request.userPrincipal.name == 'test@example.com')}">
+<c:if test="${v.name != branchName && v.name != 'trunk' && projUser.destroy}">
 				<input type="checkbox" name="versions" id="versions" value="<c:out value='${v.keyString}' />" />
 </c:if>
 			</td>
@@ -113,12 +122,15 @@
 	</c:forEach>
 	</tbody>
 </table>
-<c:if test="${pageContext.request.userPrincipal.name == project.owner || pageContext.request.userPrincipal.name == 'test@example.com'}">
+<c:if test="${projUser.destroy}">
 	<input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected branches" />
 </c:if>
 </form>
+<c:if test="${projUser.manage}">
 <a href="create.html">Create branch...</a>
+</c:if>
 
+<c:if test="${null != users}">
 <h3>Users</h3>
 <form action="" method="post" name="deleteForm" id="deleteForm">
 <input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected users" />
@@ -143,6 +155,7 @@
 <input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected users" /><br />
 </form>
 <a href="user.html">Add user...</a>
+</c:if>
 
 </body>
 </html>

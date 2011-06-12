@@ -22,6 +22,7 @@ import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.wadpam.ricotta.domain.Branch;
 import com.wadpam.ricotta.domain.Ctxt;
 import com.wadpam.ricotta.domain.Lang;
@@ -46,8 +47,9 @@ public class BranchController extends AbstractDaoController {
     @RequestMapping(value = "branch/{branchName}/index.html")
     public String getBranch(Model model, HttpServletRequest request) {
         final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
+        final ProjUser user = (ProjUser) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJUSER);
 
-        // project languages
+        // project languages (for ALL roles)
         List<ProjLangModel> languages = new ArrayList<ProjLangModel>();
         for(ProjLang pl : projLangDao.findByBranch(branchKey)) {
             ProjLangModel plm = new ProjLangModel();
@@ -60,20 +62,26 @@ public class BranchController extends AbstractDaoController {
         model.addAttribute("languages", languages);
 
         // contexts
-        List<Ctxt> ctxts = ctxtDao.findByBranch(branchKey);
-        model.addAttribute("ctxts", ctxts);
+        if (user.isManage()) {
+            List<Ctxt> ctxts = ctxtDao.findByBranch(branchKey);
+            model.addAttribute("ctxts", ctxts);
+        }
 
         // subsets
-        List<Subset> subsets = subsetDao.findByBranch(branchKey);
-        model.addAttribute("subsets", subsets);
+        if (user.isTokn()) {
+            List<Subset> subsets = subsetDao.findByBranch(branchKey);
+            model.addAttribute("subsets", subsets);
+        }
 
-        // branches
+        // branches (is for all)
         List<Branch> branches = branchDao.findByProject(branchKey.getParent());
         model.addAttribute("branches", branches);
 
         // project users
-        List<ProjUser> users = projUserDao.findByProj(branchKey.getParent());
-        model.addAttribute("users", users);
+        if (user.isDestroy()) {
+            List<ProjUser> users = projUserDao.findByProj(branchKey.getParent());
+            model.addAttribute("users", users);
+        }
 
         return "branch";
     }
@@ -230,6 +238,15 @@ public class BranchController extends AbstractDaoController {
     public String deleteBranches(HttpServletRequest request) {
         final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
         final Key projKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJKEY);
+
+        String deleteIds[] = request.getParameterValues("versions");
+        if (null != deleteIds) {
+            Key key;
+            for(String keyString : deleteIds) {
+                key = KeyFactory.stringToKey(keyString);
+                uberDao.deleteBranch(key);
+            }
+        }
 
         return "redirect:../" + branchKey.getName() + "/index.html";
     }
