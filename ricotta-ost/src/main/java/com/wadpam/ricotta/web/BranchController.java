@@ -28,6 +28,7 @@ import com.wadpam.ricotta.domain.Ctxt;
 import com.wadpam.ricotta.domain.Lang;
 import com.wadpam.ricotta.domain.ProjLang;
 import com.wadpam.ricotta.domain.ProjUser;
+import com.wadpam.ricotta.domain.Role;
 import com.wadpam.ricotta.domain.Subset;
 import com.wadpam.ricotta.model.ProjLangModel;
 
@@ -73,12 +74,20 @@ public class BranchController extends AbstractDaoController {
             model.addAttribute("subsets", subsets);
         }
 
-        // branches (is for all)
-        List<Branch> branches = branchDao.findByProject(branchKey.getParent());
-        model.addAttribute("branches", branches);
+        // branches (is for developers and higher)
+        if (user.isTokn()) {
+            List<Branch> branches = branchDao.findByProject(branchKey.getParent());
+            model.addAttribute("branches", branches);
+        }
 
         // project users
         if (user.isDestroy()) {
+            List<Role> roleList = roleDao.findAll();
+            Map<Long, String> roles = new TreeMap<Long, String>();
+            for(Role r : roleList) {
+                roles.put(r.getGrants(), r.getName());
+            }
+            model.addAttribute("roles", roles);
             List<ProjUser> users = projUserDao.findByProj(branchKey.getParent());
             model.addAttribute("users", users);
         }

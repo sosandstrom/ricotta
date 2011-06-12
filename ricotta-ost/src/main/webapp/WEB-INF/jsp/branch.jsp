@@ -86,6 +86,7 @@
 <a href="subset.html">Create Subset...</a>
 </c:if>
 
+<c:if test="${null != branches}">
 <form action="deleteBranches.html" method="post" name="deleteBranches" id="deleteBranches">
 <h3>Branches</h3>
 <table>
@@ -129,6 +130,7 @@
 <c:if test="${projUser.manage}">
 <a href="create.html">Create branch...</a>
 </c:if>
+</c:if>
 
 <c:if test="${null != users}">
 <h3>Users</h3>
@@ -139,6 +141,7 @@
 		<tr>
 			<th>Delete</th>
 			<th>Email</th>
+			<th>Role</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -146,8 +149,13 @@
 	<c:forEach items="${users}" var="u">
 		<c:set var="even" scope="page" value="${!even}" />
 		<tr class="evenRow<c:out value='${even}' />">
-			<td><input type="checkbox" name="users" id="users" value="<c:out value='${u.keyString}' />" /></td>
+			<td>
+<c:if test="${projUser.user != u.user}">
+				<input type="checkbox" name="users" id="users" value="<c:out value='${u.keyString}' />" />
+</c:if>
+			</td>
 			<td><c:out value="${u.user}" /></td>
+			<td><c:out value="${roles[u.role]}" /></td>
 		</tr>
 	</c:forEach>
 	</tbody>

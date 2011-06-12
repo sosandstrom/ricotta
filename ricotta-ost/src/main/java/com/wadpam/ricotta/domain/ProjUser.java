@@ -23,7 +23,7 @@ public class ProjUser extends AEDPrimaryKeyEntity {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '{' + proj + ',' + user + '}';
+        return getClass().getSimpleName() + '{' + proj + ',' + user + ", 0b" + Long.toBinaryString(role) + '}';
     }
 
     @Override

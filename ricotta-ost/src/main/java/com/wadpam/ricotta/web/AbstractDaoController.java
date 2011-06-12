@@ -55,14 +55,13 @@ public abstract class AbstractDaoController {
     @ModelAttribute(ProjectHandlerInterceptor.KEY_PRINCIPAL)
     public Authentication populatePrincipal(HttpServletRequest request) {
         Authentication returnValue = SecurityContextHolder.getContext().getAuthentication();
-        System.out
-                .println(getClass().getSimpleName() + ": principal=" + ((null != returnValue) ? returnValue.getName() : "null"));
         return returnValue;
     }
 
     @ModelAttribute(ProjectHandlerInterceptor.KEY_PROJUSER)
     public Object populateProjUser(HttpServletRequest request) {
-        return request.getAttribute(ProjectHandlerInterceptor.KEY_PROJUSER);
+        final Object returnValue = request.getAttribute(ProjectHandlerInterceptor.KEY_PROJUSER);
+        return returnValue;
     }
 
     // -------------- Getters and Setters ------------------------
