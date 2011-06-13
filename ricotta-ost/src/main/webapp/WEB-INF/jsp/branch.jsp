@@ -136,6 +136,7 @@
 <h3>Users</h3>
 <form action="" method="post" name="deleteForm" id="deleteForm">
 <input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected users" />
+<input type="submit" id="updateRoles" name="updateRoles" value="Save user roles" />
 <table>
 		<thead>
 		<tr>
@@ -147,21 +148,35 @@
 	<tbody>
 	<c:set var="even" scope="page" value="${true}" />
 	<c:forEach items="${users}" var="u">
+<c:if test="${projUser.user != u.user}">
 		<c:set var="even" scope="page" value="${!even}" />
 		<tr class="evenRow<c:out value='${even}' />">
 			<td>
-<c:if test="${projUser.user != u.user}">
 				<input type="checkbox" name="users" id="users" value="<c:out value='${u.keyString}' />" />
-</c:if>
 			</td>
 			<td><c:out value="${u.user}" /></td>
-			<td><c:out value="${roles[u.role]}" /></td>
+			<td>
+<c:if test="${u.role <= projUser.role}">
+				<select id="role:<c:out value='${u.user}'/>" name="role:<c:out value='${u.user}'/>">
+					<c:forEach items="${roles}" var="r">
+					<option value="<c:out value='${r.key}'/>"
+					 	<c:if test="${r.key == u.role}">selected="selected"</c:if>
+						><c:out value="${r.value}"/></option>
+					</c:forEach>
+				</select>				
+</c:if>			
+<c:if test="${projUser.role < u.role}">
+				<c:out value="${roles[u.role]}" />
+</c:if>			
+			</td>
 		</tr>
+</c:if>
 	</c:forEach>
 	</tbody>
 </table>
-<input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected users" /><br />
-</form>
+<input type="submit" id="deleteSelected" name="deleteSelected" value="Delete selected users" />
+<input type="submit" id="updateRoles" name="updateRoles" value="Save user roles" />
+</form><br />
 <a href="user.html">Add user...</a>
 </c:if>
 

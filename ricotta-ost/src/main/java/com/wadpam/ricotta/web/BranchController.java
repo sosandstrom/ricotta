@@ -2,6 +2,7 @@ package com.wadpam.ricotta.web;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -45,7 +46,20 @@ public class BranchController extends AbstractDaoController {
                 request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHNAME));
     }
 
-    @RequestMapping(value = "branch/{branchName}/index.html")
+    private void addAvailableRoles(HttpServletRequest request, Model model) {
+        final ProjUser user = (ProjUser) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJUSER);
+        Map<Long, String> roles = new TreeMap<Long, String>();
+
+        // add only same or less granted roles
+        for(Role r : roleDao.findAll()) {
+            if (user.getRole() == (user.getRole() | r.getGrants())) {
+                roles.put(r.getGrants(), r.getName());
+            }
+        }
+        model.addAttribute("roles", roles);
+    }
+
+    @RequestMapping(value = "branch/{branchName}/index.html", method = RequestMethod.GET)
     public String getBranch(Model model, HttpServletRequest request) {
         final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
         final ProjUser user = (ProjUser) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJUSER);
@@ -93,6 +107,35 @@ public class BranchController extends AbstractDaoController {
         }
 
         return "branch";
+    }
+
+    @RequestMapping(value = "branch/{branchName}/index.html", method = RequestMethod.POST)
+    public String postBranch(Model model, HttpServletRequest request) {
+        final Key projKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJKEY);
+        final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
+        final ProjUser user = (ProjUser) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJUSER);
+
+        if ("Save user roles".equals(request.getParameter("updateRoles"))) {
+            String name, value;
+            for(Enumeration<String> names = request.getParameterNames(); names.hasMoreElements();) {
+                name = names.nextElement();
+                LOG.debug("   updateRoles {}", name);
+                if (name.startsWith("role:")) {
+                    String username = name.substring(5);
+                    value = request.getParameter(name);
+                    ProjUser pu = projUserDao.findByPrimaryKey(projKey, username);
+                    if (null != pu && null != value && !value.equals(pu.getRole().toString())) {
+                        pu.setRole(Long.parseLong(value));
+                        projUserDao.update(pu);
+                    }
+                }
+            }
+        }
+        else if ("Delete selected users".equals(request.getParameter("deleteSelected"))) {
+
+        }
+
+        return "redirect:index.html";
     }
 
     // --------- projlang part ----------------
@@ -157,6 +200,7 @@ public class BranchController extends AbstractDaoController {
 
     @RequestMapping(value = "branch/{branchName}/user.html", method = RequestMethod.GET)
     public String getUser(HttpServletRequest request, Model model) {
+        addAvailableRoles(request, model);
         return "createUser";
     }
 

@@ -15,6 +15,14 @@
 		<td><input id="user" name="user" type="text" value="" /></td>
 	</tr>
 	<tr>
+		<td>User role:</td>
+		<td><select id="role" name="role">
+			<c:forEach items="${roles}" var="r">
+			<option value="<c:out value='${r.key}'/>"><c:out value="${r.value}"/></option>
+			</c:forEach>
+		</select></td>
+	</tr>
+	<tr>
 		<td></td>
 		<td><input id="create" name="create" type="submit" value="Add user" /></td>
 	</tr>
