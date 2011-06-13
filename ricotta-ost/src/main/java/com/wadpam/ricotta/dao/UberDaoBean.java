@@ -367,7 +367,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         // Projects
         final Proj proj = projDao.persist("ricotta", "s.o.sandstrom@gmail.com");
         final Key projKey = (Key) proj.getPrimaryKey();
-        projUserDao.persist(projKey, "test@example.com", Role.ROLE_VIEWER);
+        projUserDao.persist(projKey, "test@example.com", Role.ROLE_DEVELOPER);
 
         // trunk per project
         final Branch trunk = branchDao.persist(projKey, "trunk", "2011-01-28 10:10 GMT+7", "Latest version");
