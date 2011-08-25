@@ -111,7 +111,7 @@ public class Downloader {
             folder.mkdirs();
         }
         FileOutputStream fos = new FileOutputStream(destination);
-        PrintStream ps = new PrintStream(fos);
+        PrintStream ps = new PrintStream(fos, false, "utf-8");
         download(baseUrl, projectName, version, languageCode, templateName, artifactName, ps);
         ps.close();
     }

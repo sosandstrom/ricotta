@@ -452,6 +452,53 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<wtpversion>2.0</wtpversion>
+				</configuration>
+			</plugin>
+			<!-- download language files with ricotta -->
+			    <plugin>
+				<groupId>com.wadpam.ricotta</groupId>
+				<artifactId>ricotta-maven-plugin</artifactId>
+				<version>15-SNAPSHOT</version>
+				<configuration>
+					<projectName>ricotta-ost</projectName>
+					<destination>${project.basedir}/src/main/webapp/WEB-INF</destination>
+					<resourceItems>
+					    <resourceItem>
+                            <languageCode>en</languageCode>
+                            <templateName>spring_messages_xml</templateName>
+                            <filePath>messages.xml</filePath>
+                            <artifactName>webapp</artifactName>
+                        </resourceItem>
+                        <resourceItem>
+							<languageCode>kh</languageCode>
+							<templateName>spring_messages_xml</templateName>
+							<filePath>messages_km.xml</filePath>
+							<artifactName>webapp</artifactName>
+						</resourceItem>
+						<resourceItem>
+							<languageCode>en</languageCode>
+							<templateName>spring_messages_xml</templateName>
+							<filePath>messages_en.xml</filePath>
+							<artifactName>webapp</artifactName>
+						</resourceItem>
+						<resourceItem>
+                            <languageCode>en</languageCode>
+                            <templateName>spring_messages_xml</templateName>
+                            <filePath>messages_en_US.xml</filePath>
+                            <artifactName>webapp</artifactName>
+                        </resourceItem>
+						<!-- <resourceItem> <languageCode>${opco.language}</languageCode> <templateName>strings_android_inherit</templateName> 
+							<filePath>values-${opco.language}/strings.xml</filePath> <artifactName>${vertical.ricottaname}</artifactName> 
+							</resourceItem> -->
+					</resourceItems>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
