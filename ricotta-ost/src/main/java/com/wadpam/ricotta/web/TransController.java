@@ -29,7 +29,7 @@ import com.wadpam.ricotta.model.TransModel;
 public class TransController extends AbstractDaoController {
     static final Logger LOG = LoggerFactory.getLogger(TransController.class);
 
-    @RequestMapping(value = "index.html", method = RequestMethod.GET)
+    @RequestMapping(value = "/index.html", method = RequestMethod.GET)
     public String getTrans(Model model, HttpServletRequest request) {
         return getTrans(model, request, true);
     }
@@ -48,12 +48,12 @@ public class TransController extends AbstractDaoController {
         return "trans";
     }
 
-    @RequestMapping(value = "ctxt/index.html", method = RequestMethod.GET)
+    @RequestMapping(value = "/ctxt/index.html", method = RequestMethod.GET)
     public String getAllTrans(Model model, HttpServletRequest request) {
         return getTrans(model, request, false);
     }
 
-    @RequestMapping(value = "ctxt/{contextName}/index.html", method = RequestMethod.GET)
+    @RequestMapping(value = "/ctxt/{contextName}/index.html", method = RequestMethod.GET)
     public String getTransByContext(Model model, HttpServletRequest request) {
         final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
 
@@ -69,17 +69,17 @@ public class TransController extends AbstractDaoController {
         return "trans";
     }
 
-    @RequestMapping(value = "index.html", method = RequestMethod.POST)
+    @RequestMapping(value = "/index.html", method = RequestMethod.POST)
     public String saveTrans(Model model, HttpServletRequest request) {
         return saveTransInner(model, request);
     }
 
-    @RequestMapping(value = "ctxt/index.html", method = RequestMethod.POST)
+    @RequestMapping(value = "/ctxt/index.html", method = RequestMethod.POST)
     public String saveAllTrans(Model model, HttpServletRequest request) {
         return saveTransInner(model, request);
     }
 
-    @RequestMapping(value = "ctxt/{contextName}/index.html", method = RequestMethod.POST)
+    @RequestMapping(value = "/ctxt/{contextName}/index.html", method = RequestMethod.POST)
     public String saveTransByContext(Model model, HttpServletRequest request) {
         return saveTransInner(model, request);
     }
@@ -119,6 +119,9 @@ public class TransController extends AbstractDaoController {
             catch (javax.persistence.PersistenceException pe) {
                 LOG.warn(name, pe);
             }
+            catch (IllegalArgumentException ignore) {
+                // simply ignore non-keys
+            }
 
         }
 
@@ -126,17 +129,17 @@ public class TransController extends AbstractDaoController {
         final Proj proj = projDao.findByPrimaryKey(projKey.getName());
         uberDao.notifyOwner(proj, branchKey.getName(), projLangKey.getName(), changes, request.getUserPrincipal().getName());
 
-        return "redirect:index.html";
+        return "redirect:index.html?";
     }
 
     // ------------------ import ---------------------
 
-    @RequestMapping(value = "import.html", method = RequestMethod.GET)
+    @RequestMapping(value = "/import.html", method = RequestMethod.GET)
     public String getImport() {
         return "import";
     }
 
-    @RequestMapping(value = "import.html", method = RequestMethod.POST)
+    @RequestMapping(value = "/import.html", method = RequestMethod.POST)
     public String postImport(HttpServletRequest request, @RequestParam String regexp, @RequestParam String custom,
             @RequestParam String body) {
         final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
