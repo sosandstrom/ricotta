@@ -1,7 +1,5 @@
 package com.wadpam.ricotta.domain;
 
-import java.io.Serializable;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -9,11 +7,13 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import net.sf.mardao.api.domain.AEDCreatedUpdatedEntity;
+
 import com.google.appengine.api.datastore.Key;
 
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"userId"})})
-public class AppUser implements Serializable {
+public class AppUser extends AEDCreatedUpdatedEntity<Key> {
     /**
      * 
      */
@@ -26,6 +26,16 @@ public class AppUser implements Serializable {
     String                    userId;
 
     String                    email;
+
+    @Override
+    public Key getSimpleKey() {
+        return key;
+    }
+
+    @Override
+    public Class<Key> getIdClass() {
+        return Key.class;
+    }
 
     @Override
     public String toString() {

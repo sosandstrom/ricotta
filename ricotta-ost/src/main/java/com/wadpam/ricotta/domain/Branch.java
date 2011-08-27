@@ -4,12 +4,12 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import net.sf.mardao.api.Parent;
-import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
+import net.sf.mardao.api.domain.AEDStringEntity;
 
 import com.google.appengine.api.datastore.Key;
 
 @Entity
-public class Branch extends AEDPrimaryKeyEntity {
+public class Branch extends AEDStringEntity {
     private static final long serialVersionUID = -5395287576673002330L;
 
     @Parent(kind = "Proj")
@@ -20,21 +20,19 @@ public class Branch extends AEDPrimaryKeyEntity {
 
     String                    description;
 
-    String                    datum;
-
     @Override
     public Key getParentKey() {
         return project;
     }
 
     @Override
-    public Object getSimpleKey() {
+    public String getSimpleKey() {
         return name;
     }
 
     @Override
     public String toString() {
-        return "Branch{" + project + ',' + name + ',' + datum + '}';
+        return "Branch{" + project + ',' + name + '}';
     }
 
     public String getName() {
@@ -61,11 +59,4 @@ public class Branch extends AEDPrimaryKeyEntity {
         this.project = project;
     }
 
-    public String getDatum() {
-        return datum;
-    }
-
-    public void setDatum(String datum) {
-        this.datum = datum;
-    }
 }

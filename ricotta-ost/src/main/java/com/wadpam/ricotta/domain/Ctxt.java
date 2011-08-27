@@ -5,13 +5,13 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import net.sf.mardao.api.Parent;
-import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
+import net.sf.mardao.api.domain.AEDStringEntity;
 
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.Key;
 
 @Entity
-public class Ctxt extends AEDPrimaryKeyEntity {
+public class Ctxt extends AEDStringEntity {
     private static final long serialVersionUID = 7269107590420055343L;
     @Parent(kind = "Branch")
     private Key               branch;
@@ -24,7 +24,7 @@ public class Ctxt extends AEDPrimaryKeyEntity {
     private BlobKey           blobKey;
 
     @Override
-    public Object getSimpleKey() {
+    public String getSimpleKey() {
         return name;
     }
 

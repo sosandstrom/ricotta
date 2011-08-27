@@ -3,10 +3,10 @@ package com.wadpam.ricotta.domain;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
+import net.sf.mardao.api.domain.AEDStringEntity;
 
 @Entity
-public class Proj extends AEDPrimaryKeyEntity {
+public class Proj extends AEDStringEntity {
     private static final long serialVersionUID = 8370138695054738061L;
 
     @Id
@@ -36,7 +36,7 @@ public class Proj extends AEDPrimaryKeyEntity {
     }
 
     @Override
-    public Object getSimpleKey() {
+    public String getSimpleKey() {
         return name;
     }
 }

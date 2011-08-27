@@ -5,12 +5,12 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import net.sf.mardao.api.Parent;
-import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
+import net.sf.mardao.api.domain.AEDStringEntity;
 
 import com.google.appengine.api.datastore.Key;
 
 @Entity
-public class ProjLang extends AEDPrimaryKeyEntity {
+public class ProjLang extends AEDStringEntity {
     private static final long serialVersionUID = -5999417886086767472L;
 
     @Parent(kind = "Branch")
@@ -34,7 +34,7 @@ public class ProjLang extends AEDPrimaryKeyEntity {
     }
 
     @Override
-    public Object getSimpleKey() {
+    public String getSimpleKey() {
         return langCode;
     }
 

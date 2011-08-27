@@ -7,12 +7,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import net.sf.mardao.api.Parent;
-import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
+import net.sf.mardao.api.domain.AEDCreatedUpdatedEntity;
 
 import com.google.appengine.api.datastore.Key;
 
 @Entity
-public class Tokn extends AEDPrimaryKeyEntity {
+public class Tokn extends AEDCreatedUpdatedEntity<Long> {
     private static final long serialVersionUID = 1L;
     @Parent(kind = "Branch")
     Key                       branch;
@@ -34,13 +34,18 @@ public class Tokn extends AEDPrimaryKeyEntity {
     }
 
     @Override
-    public Object getSimpleKey() {
+    public Long getSimpleKey() {
         return id;
     }
 
     @Override
     public Object getParentKey() {
         return branch;
+    }
+
+    @Override
+    public Class<Long> getIdClass() {
+        return Long.class;
     }
 
     public String getName() {

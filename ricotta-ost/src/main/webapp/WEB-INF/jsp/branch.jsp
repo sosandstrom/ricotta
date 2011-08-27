@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <jsp:include page="header.jsp" />
@@ -95,7 +95,7 @@
 			<th>Delete</th>
 			<th>Name</th>
 			<th>Description</th>
-			<th>Date</th>
+			<th>Created</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -118,7 +118,7 @@
 </c:if>
 			</td>
 			<td><c:out value="${v.description}" /></td>
-			<td><c:out value="${v.datum}" /></td>
+			<td><c:out value="${v.createdDate}" /></td>
 		</tr>
 	</c:forEach>
 	</tbody>
@@ -143,6 +143,7 @@
 			<th>Delete</th>
 			<th>Email</th>
 			<th>Role</th>
+			<th>Added</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -169,6 +170,7 @@
 				<c:out value="${roles[u.role]}" />
 </c:if>			
 			</td>
+			<td>${u.createdDate}</td>
 		</tr>
 </c:if>
 	</c:forEach>

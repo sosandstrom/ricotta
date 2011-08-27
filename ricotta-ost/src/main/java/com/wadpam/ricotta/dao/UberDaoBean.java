@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -51,13 +52,26 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
 
     public void init() {
         populate();
-        // patchRoles();
+        patchRoles();
+        patchBranches();
+    }
+
+    private void patchBranches() {
+        Date date = new Date(2011, 1, 28);
+        for(Proj p : projDao.findAll()) {
+            for(Branch b : branchDao.findByProject(p.getPrimaryKey())) {
+                b._setCreatedDate(date);
+                branchDao.update(b);
+            }
+            p._setCreatedDate(date);
+            projDao.update(p);
+        }
     }
 
     private void patchRoles() {
         for(Proj proj : projDao.findAll()) {
             final Key projKey = (Key) proj.getPrimaryKey();
-            // add owner just in case
+            // add owner
             createUser(projKey, proj.getOwner(), Role.ROLE_OWNER);
 
             // add Role.DEVELOPER to all users without role
@@ -370,7 +384,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         projUserDao.persist(projKey, "test@example.com", Role.ROLE_OWNER);
 
         // trunk per project
-        final Branch trunk = branchDao.persist(projKey, "trunk", "2011-01-28 10:10 GMT+7", "Latest version");
+        final Branch trunk = branchDao.persist(projKey, "trunk", "Latest version");
         final Key branchKey = (Key) trunk.getPrimaryKey();
 
         // ProjLang
@@ -462,7 +476,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
 
     @Override
     public Object createBranch(Object proj, String name, String description) {
-        final Branch b = branchDao.persist(proj, name, null, description);
+        final Branch b = branchDao.persist(proj, name, description);
         return b.getPrimaryKey();
     }
 
@@ -585,14 +599,13 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         subsetDao.delete(branchKey, subsets);
 
         // and itself
-        branchDao.delete(branchKey);
+        branchDao.deleteByCore(branchKey);
     }
 
     public void deleteProj(Key projKey) {
         // users
-        for(String u : projUserDao.findKeysByProj(projKey)) {
-            projUserDao.delete(projKey, u);
-        }
+        List<String> userKeys = projUserDao.findKeysByProj(projKey);
+        projUserDao.delete(projKey, userKeys);
 
         // branches
         for(String branchName : branchDao.findKeysByProject(projKey)) {
@@ -600,6 +613,6 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         }
 
         // the proj
-        projDao.delete(projKey);
+        projDao.deleteByCore(projKey);
     }
 }

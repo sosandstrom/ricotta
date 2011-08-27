@@ -4,10 +4,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
-import net.sf.mardao.api.domain.PrimaryKeyEntity;
 
 @Entity
-public class Role extends AEDPrimaryKeyEntity implements PrimaryKeyEntity {
+public class Role extends AEDPrimaryKeyEntity<Long> {
     private static final long serialVersionUID = -7733471256247686317L;
 
     public static final long  GRANT_ALL        = 0x1000;
@@ -34,8 +33,13 @@ public class Role extends AEDPrimaryKeyEntity implements PrimaryKeyEntity {
     String                    name;
 
     @Override
-    public Object getSimpleKey() {
+    public Long getSimpleKey() {
         return grants;
+    }
+
+    @Override
+    public Class<Long> getIdClass() {
+        return Long.class;
     }
 
     public String getName() {

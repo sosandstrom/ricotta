@@ -4,13 +4,12 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import net.sf.mardao.api.Parent;
-import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
-import net.sf.mardao.api.domain.PrimaryKeyEntity;
+import net.sf.mardao.api.domain.AEDStringEntity;
 
 import com.google.appengine.api.datastore.Key;
 
 @Entity
-public class Subset extends AEDPrimaryKeyEntity implements PrimaryKeyEntity {
+public class Subset extends AEDStringEntity {
     private static final long serialVersionUID = -3099992336486992018L;
 
     @Id
@@ -28,7 +27,7 @@ public class Subset extends AEDPrimaryKeyEntity implements PrimaryKeyEntity {
     }
 
     @Override
-    public Object getSimpleKey() {
+    public String getSimpleKey() {
         return name;
     }
 

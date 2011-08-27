@@ -8,7 +8,7 @@ import com.google.appengine.api.datastore.Key;
 import com.wadpam.ricotta.domain.Tokn;
 import com.wadpam.ricotta.domain.Trans;
 
-public class TransModel extends AEDPrimaryKeyEntity implements Serializable, Comparable<TransModel> {
+public class TransModel extends AEDPrimaryKeyEntity<Key> implements Serializable, Comparable<TransModel> {
     private static final long serialVersionUID = 1059177606423578865L;
 
     private Key               key;
@@ -17,8 +17,13 @@ public class TransModel extends AEDPrimaryKeyEntity implements Serializable, Com
     private Trans             parent;
 
     @Override
-    public Object getSimpleKey() {
+    public Key getSimpleKey() {
         return key;
+    }
+
+    @Override
+    public Class<Key> getIdClass() {
+        return Key.class;
     }
 
     public Tokn getToken() {

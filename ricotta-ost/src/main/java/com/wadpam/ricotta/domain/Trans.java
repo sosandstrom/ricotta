@@ -4,12 +4,12 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import net.sf.mardao.api.Parent;
-import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
+import net.sf.mardao.api.domain.AEDCreatedUpdatedEntity;
 
 import com.google.appengine.api.datastore.Key;
 
 @Entity
-public class Trans extends AEDPrimaryKeyEntity {
+public class Trans extends AEDCreatedUpdatedEntity<Long> {
     private static final long serialVersionUID = -5659004527175071885L;
     @Parent(kind = "ProjLang")
     Key                       projLang;
@@ -25,13 +25,18 @@ public class Trans extends AEDPrimaryKeyEntity {
     }
 
     @Override
-    public Object getSimpleKey() {
+    public Long getSimpleKey() {
         return token;
     }
 
     @Override
     public Object getParentKey() {
         return projLang;
+    }
+
+    @Override
+    public Class<Long> getIdClass() {
+        return Long.class;
     }
 
     public String getLocal() {

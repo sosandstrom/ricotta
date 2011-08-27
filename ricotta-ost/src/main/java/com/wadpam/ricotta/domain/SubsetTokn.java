@@ -9,7 +9,7 @@ import net.sf.mardao.api.domain.AEDPrimaryKeyEntity;
 import com.google.appengine.api.datastore.Key;
 
 @Entity
-public class SubsetTokn extends AEDPrimaryKeyEntity {
+public class SubsetTokn extends AEDPrimaryKeyEntity<Long> {
     private static final long serialVersionUID = -2998638040524758351L;
     @Parent(kind = "Subset")
     Key                       subset;
@@ -18,8 +18,13 @@ public class SubsetTokn extends AEDPrimaryKeyEntity {
     Long                      tokn;
 
     @Override
-    public Object getSimpleKey() {
+    public Long getSimpleKey() {
         return tokn;
+    }
+
+    @Override
+    public Class<Long> getIdClass() {
+        return Long.class;
     }
 
     @Override
