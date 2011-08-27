@@ -57,7 +57,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
     }
 
     private void patchBranches() {
-        Date date = new Date(2011, 1, 28);
+        Date date = new Date();
         for(Proj p : projDao.findAll()) {
             for(Branch b : branchDao.findByProject(p.getPrimaryKey())) {
                 b._setCreatedDate(date);
