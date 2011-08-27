@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.wadpam.ricotta</groupId>
 	<artifactId>ricotta-maven-plugin</artifactId>
-	<version>15-SNAPSHOT</version>
+	<version>15</version>
 	<packaging>maven-plugin</packaging>
 	<name>${groupId}:${artifactId}</name>
 
