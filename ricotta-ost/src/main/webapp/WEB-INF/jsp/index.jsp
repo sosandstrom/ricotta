@@ -51,7 +51,7 @@
 <div>Contact: <a href="mailto:s.o.sandstrom@gmail.com">s.o.sandstrom@gmail.com</a</div>
 <h3>Downloads</h3>
 <div><a href="/static/ricotta-maven-plugin-7.zip">command line tool</a></div>
-<div><a href="/static/ricotta-maven-plugin-7.jar">ricotta-maven-plugin</a></div>
+<div><a href="/static/ricotta-maven-plugin-15.jar">ricotta-maven-plugin</a></div>
 <div><a href="/static/pom.xml">Example maven pom.xml</a></div>
 </body>
 </html>
