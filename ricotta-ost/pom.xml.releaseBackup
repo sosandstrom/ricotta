@@ -3,18 +3,18 @@
 	<parent>
 		<groupId>com.wadpam.ricotta</groupId>
 		<artifactId>ricotta</artifactId>
-		<version>15-SNAPSHOT</version>
+		<version>16-SNAPSHOT</version>
 	</parent>
 	<groupId>com.wadpam.ricotta</groupId>
 	<artifactId>ricotta-ost</artifactId>
-	<version>15-SNAPSHOT</version>
+	<version>16-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>${project.groupId}:${project.artifactId}</name>
 
 	<!-- Specify hard-coded project properties here -->
 	<properties>
-		<gae.version>1.3.7</gae.version>
-		<mardao.version>1.9</mardao.version>
+		<gae.version>1.5.2</gae.version>
+		<mardao.version>1.11</mardao.version>
 		<spring.version>3.0.2.RELEASE</spring.version>
 		<!-- This is just for "eclipse:eclipse" goal to always attempt downloading 
 			sources -->
@@ -68,6 +68,13 @@
 			<version>2.5</version>
 			<scope>provided</scope>
 		</dependency>
+        <dependency>
+            <artifactId>standard</artifactId>
+            <groupId>taglibs</groupId>
+            <version>1.1.2</version>
+            <type>jar</type>
+            <scope>runtime</scope>
+        </dependency>
 
 		<dependency>
 			<groupId>net.sf.mardao</groupId>
@@ -142,14 +149,6 @@
 			<artifactId>slf4j-jdk14</artifactId>
 			<version>1.6.1</version>
 			<scope>runtime</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>jstl</artifactId>
-			<version>1.2</version>
-			<!-- JSTL is included in jetty -->
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -344,21 +343,46 @@
 			<!-- The actual maven-gae-plugin. Type "mvn gae:run" to run project, "mvn 
 				gae:deploy" to upload to GAE. -->
 			<plugin>
-				<groupId>net.kindleit</groupId>
-				<artifactId>maven-gae-plugin</artifactId>
-				<version>0.7.2</version>
-				<configuration>
-					<serverId>ricotta</serverId>
-					<disableUpdateCheck>true</disableUpdateCheck>
-				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>net.kindleit</groupId>
-						<artifactId>gae-runtime</artifactId>
-						<version>${gae.version}</version>
-						<type>pom</type>
-					</dependency>
-				</dependencies>
+               <groupId>net.kindleit</groupId>
+                <artifactId>maven-gae-plugin</artifactId>
+                <version>0.8.4</version>
+                <configuration>
+                    <port>8282</port>
+                    <monitorPort>8287</monitorPort>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>net.kindleit</groupId>
+                        <artifactId>gae-runtime</artifactId>
+                        <version>${gae.version}</version>
+                        <type>pom</type>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-jdk14</artifactId>
+                        <version>1.6.1</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>start-gae</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                        <configuration>
+                            <scanIntervalSeconds>0</scanIntervalSeconds>
+                            <daemon>true</daemon>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>stop-gae</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
 			</plugin>
 
 			<plugin>
@@ -402,48 +426,6 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.mortbay.jetty</groupId>
-				<artifactId>maven-jetty-plugin</artifactId>
-				<version>6.1.10</version>
-				<configuration>
-
-					<!--<webDefaultXml>src/main/resources/webdefault.xml</webDefaultXml> -->
-					<overrideWebXml>src/main/resources/override-web.xml</overrideWebXml>
-
-					<connectors>
-						<connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
-							<port>9092</port>
-							<maxIdleTime>60000</maxIdleTime>
-						</connector>
-					</connectors>
-					<stopPort>9093</stopPort>
-					<stopKey>STOP</stopKey>
-					<!--<daemon>true</daemon> -->
-					<scanIntervalSeconds>3</scanIntervalSeconds>
-					<contextPath>/itest</contextPath>
-				</configuration>
-				<executions>
-					<execution>
-						<id>start-jetty</id>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<scanIntervalSeconds>0</scanIntervalSeconds>
-							<daemon>true</daemon>
-						</configuration>
-					</execution>
-					<execution>
-						<id>stop-jetty</id>
-						<phase>post-integration-test</phase>
-						<goals>
-							<goal>stop</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
 				<version>2.6</version>
@@ -451,11 +433,12 @@
 					<wtpversion>2.0</wtpversion>
 				</configuration>
 			</plugin>
+
 			<!-- download language files with ricotta -->
-			    <plugin>
+		    <plugin>
 				<groupId>com.wadpam.ricotta</groupId>
 				<artifactId>ricotta-maven-plugin</artifactId>
-				<version>15-SNAPSHOT</version>
+				<version>15</version>
 				<configuration>
 					<projectName>ricotta-ost</projectName>
 					<destination>${project.basedir}/src/main/webapp/WEB-INF</destination>
@@ -472,21 +455,6 @@
 							<filePath>messages_km.xml</filePath>
 							<artifactName>webapp</artifactName>
 						</resourceItem>
-						<resourceItem>
-							<languageCode>en</languageCode>
-							<templateName>spring_messages_xml</templateName>
-							<filePath>messages_en.xml</filePath>
-							<artifactName>webapp</artifactName>
-						</resourceItem>
-						<resourceItem>
-                            <languageCode>en</languageCode>
-                            <templateName>spring_messages_xml</templateName>
-                            <filePath>messages_en_US.xml</filePath>
-                            <artifactName>webapp</artifactName>
-                        </resourceItem>
-						<!-- <resourceItem> <languageCode>${opco.language}</languageCode> <templateName>strings_android_inherit</templateName> 
-							<filePath>values-${opco.language}/strings.xml</filePath> <artifactName>${vertical.ricottaname}</artifactName> 
-							</resourceItem> -->
 					</resourceItems>
 				</configuration>
 			</plugin>
