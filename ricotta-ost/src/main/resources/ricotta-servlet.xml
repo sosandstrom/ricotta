@@ -67,7 +67,7 @@
 		<property name="uberDao" ref="uberDao" />
 	</bean>
 
-	<bean id="generateController" class="com.wadpam.ricotta.web.GenerateController">
+	<bean id="generateController" class="com.wadpam.ricotta.web.GenerateController" init-method="init">
 		<property name="ctxtDao" ref="ctxtDao" />
 		<property name="projDao" ref="projDao" />
 		<property name="projLangDao" ref="projLangDao" />

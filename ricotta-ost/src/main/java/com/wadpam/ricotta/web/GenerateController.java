@@ -2,10 +2,12 @@ package com.wadpam.ricotta.web;
 
 import java.io.PrintWriter;
 import java.util.Collection;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections.ExtendedProperties;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -25,6 +27,20 @@ import com.wadpam.ricotta.velocity.Encoder;
 @Controller
 public class GenerateController extends AbstractDaoController {
     static final Logger LOG = LoggerFactory.getLogger(GenerateController.class);
+    
+    public void init() throws Exception {
+
+        ExtendedProperties configuration = new ExtendedProperties();
+        LOG.info("Initializing Velocity");
+
+        final Properties p = new Properties();
+        p.setProperty("resource.loader", "dao");
+
+        p.setProperty("dao.resource.loader.description", "Ricotta DAO Resource Loader");
+        p.setProperty("dao.resource.loader.class", "com.wadpam.ricotta.velocity.DaoResourceLoader");
+
+        Velocity.init(p);
+    }    
 
     @RequestMapping(value = "/proj/{projName}/branch/{branchName}/lang/{langCode}/templ/{templName}/index.html", method = RequestMethod.GET)
     public String getTempl(HttpServletRequest request, HttpServletResponse response) throws ResourceNotFoundException,
