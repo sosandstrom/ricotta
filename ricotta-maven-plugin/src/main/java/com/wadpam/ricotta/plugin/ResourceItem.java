@@ -59,6 +59,9 @@ public class ResourceItem {
      * @return the encoding
      */
     public String getEncoding() {
+        if (null == encoding) {
+            encoding = "UTF-8";
+        }
         return encoding;
     }
 
