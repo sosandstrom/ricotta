@@ -14,7 +14,7 @@
 	<!-- Specify hard-coded project properties here -->
 	<properties>
 		<gae.version>1.5.2</gae.version>
-		<mardao.version>1.11</mardao.version>
+		<mardao.version>1.14</mardao.version>
 		<spring.version>3.0.2.RELEASE</spring.version>
 		<!-- This is just for "eclipse:eclipse" goal to always attempt downloading 
 			sources -->

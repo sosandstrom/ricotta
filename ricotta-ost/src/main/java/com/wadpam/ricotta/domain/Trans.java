@@ -30,7 +30,7 @@ public class Trans extends AEDCreatedUpdatedEntity<Long> {
     }
 
     @Override
-    public Object getParentKey() {
+    public Key getParentKey() {
         return projLang;
     }
 

@@ -28,7 +28,7 @@ public class SubsetTokn extends AEDPrimaryKeyEntity<Long> {
     }
 
     @Override
-    public Object getParentKey() {
+    public Key getParentKey() {
         return subset;
     }
 

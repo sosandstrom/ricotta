@@ -39,7 +39,7 @@ public class ProjLang extends AEDStringEntity {
     }
 
     @Override
-    public Object getParentKey() {
+    public Key getParentKey() {
         return branch;
     }
 

@@ -39,7 +39,7 @@ public class Tokn extends AEDCreatedUpdatedEntity<Long> {
     }
 
     @Override
-    public Object getParentKey() {
+    public Key getParentKey() {
         return branch;
     }
 
