@@ -46,7 +46,7 @@ public class DownloadMojo extends AbstractMojo {
      * @parameter expression="${download.baseUrl}" default-value="http://ricotta-ost.appspot.com/"
      */
     private String       baseUrl;
-
+    
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         getLog().info("Starting download of ricotta language files...");
@@ -56,7 +56,7 @@ public class DownloadMojo extends AbstractMojo {
             File output = new File(destination, item.getFilePath());
             try {
                 Downloader.download(baseUrl, projectName, version, item.getLanguageCode(), item.getTemplateName(),
-                        item.getArtifactName(), output);
+                        item.getArtifactName(), output, item.getEncoding());
             }
             catch (ClientProtocolException e) {
                 throw new MojoExecutionException("Error downloading language file: " + item.getLanguageCode(), e);

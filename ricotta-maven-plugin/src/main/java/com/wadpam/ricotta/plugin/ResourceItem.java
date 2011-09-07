@@ -17,6 +17,11 @@ public class ResourceItem {
      * @parameter expression="${download.filePath}" required
      */
     private String filePath;
+    
+    /**
+     * @parameter expression="${download.encoding}" default-value="UTF-8"
+     */
+    private String encoding;
 
     public String getLanguageCode() {
         return languageCode;
@@ -50,4 +55,17 @@ public class ResourceItem {
         return artifactName;
     }
 
+    /**
+     * @return the encoding
+     */
+    public String getEncoding() {
+        return encoding;
+    }
+
+    /**
+     * @param encoding the encoding to set
+     */
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
+    }
 }

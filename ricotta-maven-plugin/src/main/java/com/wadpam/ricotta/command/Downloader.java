@@ -105,13 +105,13 @@ public class Downloader {
     }
 
     public static void download(String baseUrl, String projectName, String version, String languageCode, String templateName,
-            String artifactName, File destination) throws ClientProtocolException, IOException {
+            String artifactName, File destination, String encode) throws ClientProtocolException, IOException {
         File folder = destination.getParentFile();
         if (false == folder.exists()) {
             folder.mkdirs();
         }
         FileOutputStream fos = new FileOutputStream(destination);
-        PrintStream ps = new PrintStream(fos, false, "utf-8");
+        PrintStream ps = new PrintStream(fos, false, encode);
         download(baseUrl, projectName, version, languageCode, templateName, artifactName, ps);
         ps.close();
     }
