@@ -3,18 +3,18 @@
 	<parent>
 		<groupId>com.wadpam.ricotta</groupId>
 		<artifactId>ricotta</artifactId>
-		<version>17-SNAPSHOT</version>
+		<version>18-SNAPSHOT</version>
 	</parent>
 	<groupId>com.wadpam.ricotta</groupId>
 	<artifactId>ricotta-ost</artifactId>
-	<version>17-SNAPSHOT</version>
+	<version>18-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>${project.groupId}:${project.artifactId}</name>
 
 	<!-- Specify hard-coded project properties here -->
 	<properties>
 		<gae.version>1.5.2</gae.version>
-		<mardao.version>1.11</mardao.version>
+		<mardao.version>1.14</mardao.version>
 		<spring.version>3.0.2.RELEASE</spring.version>
 		<!-- This is just for "eclipse:eclipse" goal to always attempt downloading 
 			sources -->

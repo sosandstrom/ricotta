@@ -22,6 +22,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.wadpam.ricotta.domain.Branch;
 import com.wadpam.ricotta.domain.Proj;
+import com.wadpam.ricotta.domain.Role;
 import com.wadpam.ricotta.velocity.Encoder;
 
 @Controller
@@ -68,6 +69,9 @@ public class ProjController extends AbstractDaoController {
         // fetch the principal
         project.setOwner(request.getUserPrincipal().getName());
         projDao.persist(project);
+
+        // also create a project user with role owner:
+        uberDao.createUser(project.getPrimaryKey(), request.getUserPrincipal().getName(), Role.ROLE_OWNER);
 
         // create the trunk
         Branch trunk = new Branch();
