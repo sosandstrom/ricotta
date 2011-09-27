@@ -3,7 +3,7 @@
 <properties version="1.0">
 	<comment>Ricotta Web GUI localisation</comment>
 		<entry key="ric_lnk_home">Home</entry>
-		<entry key="ric_lnk_languages">Language</entry>
+		<entry key="ric_lnk_languages">Languages</entry>
 		<entry key="ric_lnk_login">Login</entry>
 		<entry key="ric_lnk_logout">Logout</entry>
 		<entry key="ric_lnk_overviews">Ricotta Overview</entry>

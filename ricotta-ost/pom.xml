@@ -455,6 +455,12 @@
 							<filePath>messages_km.xml</filePath>
 							<artifactName>webapp</artifactName>
 						</resourceItem>
+                        <resourceItem>
+							<languageCode>sv</languageCode>
+							<templateName>spring_messages_xml</templateName>
+							<filePath>messages_sv.xml</filePath>
+							<artifactName>webapp</artifactName>
+						</resourceItem>
 					</resourceItems>
 				</configuration>
 			</plugin>

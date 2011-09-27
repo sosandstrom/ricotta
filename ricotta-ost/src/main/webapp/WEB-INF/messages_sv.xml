@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties version="1.0">
+	<comment>Ricotta Web GUI localisation</comment>
+		<entry key="ric_lnk_home">Startsida</entry>
+		<entry key="ric_lnk_languages">Språk</entry>
+		<entry key="ric_lnk_login">Logga in</entry>
+		<entry key="ric_lnk_logout">Logga ut</entry>
+		<entry key="ric_lnk_overviews">Ricotta översikt</entry>
+		<entry key="ric_lnk_overviews_txt">Ricotta är ett översättningsverktyg, med tillhörande byggverktyg, som effektivt hanterar lokaliserade resurser i ditt mjukvaruprojekt.</entry>
+		<entry key="ric_lnk_projects">Projekt</entry>
+		<entry key="ric_lnk_templates">${t.local.local}</entry>
+	</properties>

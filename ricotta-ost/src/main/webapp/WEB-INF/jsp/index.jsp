@@ -46,6 +46,16 @@
 <h3><spring:message code="ric_lnk_overviews"/></h3>
 <spring:message code="ric_lnk_overviews_txt"/>
 <div><iframe src="http://www.facebook.com/plugins/like.php?app_id=202783656429603&amp;href=http%3A%2F%2Fricotta-ost.appspot.com%2F&amp;send=true&amp;layout=standard&amp;width=450&amp;show_faces=true&amp;action=like&amp;colorscheme=light&amp;font&amp;height=80" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:450px; height:80px;" allowTransparency="true"></iframe></div>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+<div class="fb-comments" data-href="http://ricotta-ost.appspot.com/" data-num-posts="2" data-width="500">
+</div>
 <div><img src="/static/RicottaOverview.2.png" alt="Ricotta Overview" /></div>
 <div>Source repository: <a href="https://bitbucket.org/f94os/ricotta-ost">https://bitbucket.org/f94os/ricotta-ost</a></div>
 <div>Contact: <a href="mailto:s.o.sandstrom@gmail.com">s.o.sandstrom@gmail.com</a</div>
