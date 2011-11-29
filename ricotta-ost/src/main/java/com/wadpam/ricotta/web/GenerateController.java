@@ -70,7 +70,8 @@ public class GenerateController extends AbstractDaoController {
             throws ResourceNotFoundException, ParseErrorException, Exception {
         final VelocityContext model = new VelocityContext();
         model.put("encoder", new Encoder());
-        model.put(ProjectHandlerInterceptor.KEY_PROJKEY, request.getAttribute(ProjectHandlerInterceptor.KEY_PROJKEY));
+        final Key projKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJKEY);
+        model.put(ProjectHandlerInterceptor.KEY_PROJKEY, projKey);
         final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
         model.put(ProjectHandlerInterceptor.KEY_BRANCHKEY, branchKey);
         final Key templKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_TEMPLKEY);
@@ -83,6 +84,13 @@ public class GenerateController extends AbstractDaoController {
         final ProjLang projLang = projLangDao.findByPrimaryKey(branchKey, langCode);
         final Collection<TransModel> trans = uberDao.loadTrans(branchKey, subsetKey, projLang, null);
         model.put("translations", trans);
+        
+        // meta data:
+        model.put("language", projLang);
+        model.put("project", projKey);
+        model.put("template", templKey);
+        // legacy
+        model.put("mall", templKey);
 
         renderTemplate(templKey.getName(), model, response);
         return null;
