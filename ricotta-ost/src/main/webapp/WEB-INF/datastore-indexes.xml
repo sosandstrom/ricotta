@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <datastore-indexes autoGenerate="true">
-	<datastore-index kind="Token" ancestor="false" source="manual">
-		<property name="project" direction="asc" />
-		<property name="name" direction="asc" />
-	</datastore-index>
-	<datastore-index kind="Tokn" ancestor="true" source="manual">
-		<property name="name" direction="asc" />
-		<property name="description" direction="asc" />
-	</datastore-index>
+    <datastore-index kind="Token" ancestor="false" source="manual">
+        <property name="project" direction="asc" />
+        <property name="name" direction="asc" />
+    </datastore-index>
+    <datastore-index kind="Tokn" ancestor="true" source="manual">
+        <property name="name" direction="asc" />
+        <property name="description" direction="asc" />
+    </datastore-index>
+    <datastore-index kind="Tokn" ancestor="true" source="manual">
+        <property name="name" direction="asc"/>
+    </datastore-index>
 </datastore-indexes>
