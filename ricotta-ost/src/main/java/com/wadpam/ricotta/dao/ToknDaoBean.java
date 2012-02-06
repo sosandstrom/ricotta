@@ -21,4 +21,10 @@ public class ToknDaoBean extends GeneratedToknDaoImpl implements ToknDao {
         return asIterable(query, -1, 0);
     }
 
+    @Override
+    public List<Tokn> findSortedByBranch(Key branchKey) {
+        final PreparedQuery query = prepare(false, branchKey, null, COLUMN_NAME_NAME, true);
+        return asIterable(query, -1, 0);
+        
+    }
 }

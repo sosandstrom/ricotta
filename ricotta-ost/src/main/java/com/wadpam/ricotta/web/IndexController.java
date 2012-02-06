@@ -1,6 +1,6 @@
 package com.wadpam.ricotta.web;
 
-import static com.google.appengine.api.labs.taskqueue.TaskOptions.Builder.url;
+import static com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,8 +31,8 @@ import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreInputStream;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
-import com.google.appengine.api.labs.taskqueue.Queue;
-import com.google.appengine.api.labs.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.wadpam.ricotta.importexport.RicottaImportHandler;
 import com.wadpam.ricotta.importexport.TokensImportHandler;
@@ -122,7 +122,7 @@ public class IndexController extends AbstractDaoController {
 
     protected String uploadedImport(BlobKey blobKey) {
         Queue queue = QueueFactory.getDefaultQueue();
-        queue.add(url("/blobWorker.html").param("blobKey", blobKey.getKeyString()));
+        queue.add(withUrl("/blobWorker.html").param("blobKey", blobKey.getKeyString()));
         return "redirect:/index.html";
     }
 

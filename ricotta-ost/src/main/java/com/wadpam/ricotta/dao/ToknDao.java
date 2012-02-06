@@ -12,4 +12,5 @@ public interface ToknDao extends GeneratedToknDao<Key, Key> {
 
     List<Tokn> findByBranchName(Key branchKey, String tokenName);
 
+    List<Tokn> findSortedByBranch(Key branchKey);
 }

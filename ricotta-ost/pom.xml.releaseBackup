@@ -3,11 +3,11 @@
 	<parent>
 		<groupId>com.wadpam.ricotta</groupId>
 		<artifactId>ricotta</artifactId>
-		<version>19-SNAPSHOT</version>
+		<version>21-SNAPSHOT</version>
 	</parent>
 	<groupId>com.wadpam.ricotta</groupId>
 	<artifactId>ricotta-ost</artifactId>
-	<version>19-SNAPSHOT</version>
+	<version>21-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>${project.groupId}:${project.artifactId}</name>
 
@@ -453,6 +453,12 @@
 							<languageCode>kh</languageCode>
 							<templateName>spring_messages_xml</templateName>
 							<filePath>messages_km.xml</filePath>
+							<artifactName>webapp</artifactName>
+						</resourceItem>
+                        <resourceItem>
+							<languageCode>sv</languageCode>
+							<templateName>spring_messages_xml</templateName>
+							<filePath>messages_sv.xml</filePath>
 							<artifactName>webapp</artifactName>
 						</resourceItem>
 					</resourceItems>

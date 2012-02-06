@@ -24,6 +24,7 @@ import com.wadpam.ricotta.domain.Subset;
 import com.wadpam.ricotta.domain.SubsetTokn;
 import com.wadpam.ricotta.domain.Tokn;
 import com.wadpam.ricotta.model.SubsetToknModel;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Created by Ola on Nov 12, 2010
@@ -42,16 +43,37 @@ public class ToknController extends AbstractDaoController {
         final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
 
         model.addAttribute("viewContexts", getContextMap(branchKey));
+        
+        // also add subset checkboxes
+        List<Subset> subsets = subsetDao.findByBranch(branchKey);
+        model.addAttribute("subsets", subsets);
 
+        // and TokenArtifact mappings
+        final Map<String, SubsetTokn> mappings = getSubsetToknMap(subsets);
+        model.addAttribute("mappings", mappings);
+        
         return "createToken";
     }
 
     @RequestMapping(value = "create.html", method = RequestMethod.POST)
-    public String createToken(HttpServletRequest request, @ModelAttribute(value = "token") Tokn tokn) throws IOException {
+    public String createToken(HttpServletRequest request, 
+            @ModelAttribute(value = "token") Tokn tokn, 
+            @RequestParam String ctxt,
+            @RequestParam String[] mappings) throws IOException {
         LOGGER.debug("create token");
         final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
         tokn.setBranch(branchKey);
+        if (!NO_CONTEXT_NAME.equals(ctxt)) {
+            final Key ctxtKey = KeyFactory.createKey(branchKey, Ctxt.class.getSimpleName(), ctxt);
+            tokn.setViewContext(ctxtKey);
+        }
         toknDao.persist(tokn);
+        
+        // create subsetTokens
+        for (String subsetKeyString : mappings) {
+            Key subsetKey = KeyFactory.stringToKey(subsetKeyString);
+            subsetToknDao.persist(subsetKey, tokn.getId());
+        }
 
         return "redirect:index.html";
     }
@@ -213,7 +235,7 @@ public class ToknController extends AbstractDaoController {
         final List<Subset> subsets = subsetDao.findByBranch(branchKey);
 
         // fetch and add tokens for this branch
-        final List<Tokn> tokens = toknDao.findByBranch(branchKey);
+        final List<Tokn> tokens = toknDao.findSortedByBranch(branchKey);
         final List<SubsetToknModel> stms = new ArrayList<SubsetToknModel>();
         for(Tokn t : tokens) {
             stms.add(new SubsetToknModel(t, subsets));

@@ -19,6 +19,22 @@
 		<td><input id="description" name="description" type="text" value="" /></td>
 	</tr>
 	<tr>
+		<td>Context:</td>
+                <td><select name="ctxt" id="ctxt">
+                        <c:forEach items="${viewContexts}" var="c">
+                                <option value="<c:out value='${c.key}'/>" <c:if test="${token.viewContext == c.value.primaryKey}"> selected="selected" </c:if> >
+                                        <c:out value="${c.value.name}" /></option>
+                        </c:forEach>
+                </select></td>
+	</tr>
+	<tr>
+		<td>Subsets:</td>
+                <c:forEach items="${subsets}" var="subset">
+                        <td><input type="checkbox" id="mappings" name="mappings" value="<c:out value='${subset.keyString}' />" title=":<c:out value='${subset.name}' />"  />
+                        </td>
+                </c:forEach>
+	</tr>
+	<tr>
 		<td></td>
 		<td><input id="create" name="create" type="submit" value="Create token" /></td>
 	</tr>
