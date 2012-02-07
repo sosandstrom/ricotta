@@ -55,7 +55,7 @@
 </c:if>
 <c:if test="${projUser.tokn}">
 <h3>Import</h3>
-<a href="/proj/<c:out value="${projName}"/>/branch/<c:out value='${branchName}' />/lang/<c:out value="${langCode}" />/import.html">Import tokens and <c:out value="${langCode}" /> translations...</a>
+<a href="import.html">Import tokens and <c:out value="${langCode}" /> translations...</a>
 </c:if>
 </body>
 </html>

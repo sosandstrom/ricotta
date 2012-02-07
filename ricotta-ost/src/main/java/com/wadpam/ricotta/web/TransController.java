@@ -23,6 +23,7 @@ import com.wadpam.ricotta.domain.ProjLang;
 import com.wadpam.ricotta.domain.Tokn;
 import com.wadpam.ricotta.domain.Trans;
 import com.wadpam.ricotta.model.TransModel;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 @RequestMapping(value = "/proj/{projName}/branch/{branchName}/lang/{langCode}")
@@ -134,21 +135,31 @@ public class TransController extends AbstractDaoController {
 
     // ------------------ import ---------------------
 
-    @RequestMapping(value = "/import.html", method = RequestMethod.GET)
+    @RequestMapping(value = {"import.html", "ctxt/import.html", "ctxt/{contextName}/import.html"}, method = RequestMethod.GET)
     public String getImport() {
         return "import";
     }
 
-    @RequestMapping(value = "/import.html", method = RequestMethod.POST)
+    @RequestMapping(value = {"import.html", "ctxt/import.html"}, method = RequestMethod.POST)
     public String postImport(HttpServletRequest request, @RequestParam String regexp, @RequestParam String custom,
             @RequestParam String body) {
+        return postImport(request, regexp, custom, body, null);
+    }
+    
+    @RequestMapping(value = "ctxt/{contextName}/import.html", method = RequestMethod.POST)
+    public String postImport(HttpServletRequest request, @RequestParam String regexp, @RequestParam String custom,
+            @RequestParam String body, @PathVariable String contextName) {
         final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
         final String langCode = (String) request.getAttribute(ProjectHandlerInterceptor.KEY_LANGCODE);
+        Key ctxtKey = null;
+        if (null != contextName) {
+            ctxtKey = ctxtDao.createKey(branchKey, contextName);
+        }
         if ("custom".equals(regexp)) {
             regexp = custom;
         }
-        uberDao.importBody(request, branchKey, langCode, regexp, body);
-        return "redirect:ctxt/index.html";
+        uberDao.importBody(request, branchKey, langCode, ctxtKey, regexp, body);
+        return "redirect:index.html";
     }
 
 }

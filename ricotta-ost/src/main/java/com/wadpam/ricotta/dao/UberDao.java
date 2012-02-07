@@ -6,10 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.appengine.api.datastore.Key;
-import com.wadpam.ricotta.domain.Proj;
-import com.wadpam.ricotta.domain.ProjLang;
-import com.wadpam.ricotta.domain.Tokn;
-import com.wadpam.ricotta.domain.Trans;
+import com.wadpam.ricotta.domain.*;
 import com.wadpam.ricotta.model.TransModel;
 
 public interface UberDao {
@@ -22,7 +19,7 @@ public interface UberDao {
 
     void notifyOwner(Proj proj, String branchName, String langCode, List<String> changes, String from);
 
-    void importBody(HttpServletRequest request, Key branchKey, String langCode, String regexp, String body);
+    void importBody(HttpServletRequest request, Key branchKey, String langCode, Key ctxtKey, String regexp, String body);
 
     // ---------------- import methods -----------------------
 

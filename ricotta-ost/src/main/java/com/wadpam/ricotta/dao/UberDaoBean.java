@@ -95,7 +95,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
     }
 
     @Override
-    public void importBody(HttpServletRequest request, Key branchKey, String langCode, String regexp, String body) {
+    public void importBody(HttpServletRequest request, Key branchKey, String langCode, Key ctxtKey, String regexp, String body) {
         LOG.info("matching {} on {}", body, regexp);
         List<String> changes = new ArrayList<String>();
         final Key projLangKey = projLangDao.createKey(branchKey, langCode);
@@ -119,6 +119,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
                     token = new Tokn();
                     token.setName(tokenName);
                     token.setBranch(branchKey);
+                    token.setViewContext(ctxtKey);
                     toknDao.persist(token);
                 }
                 else if (1 == tokens.size()) {
