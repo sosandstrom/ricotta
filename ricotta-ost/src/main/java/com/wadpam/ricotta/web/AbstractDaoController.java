@@ -1,24 +1,12 @@
 package com.wadpam.ricotta.web;
 
+import com.wadpam.ricotta.dao.*;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-import com.wadpam.ricotta.dao.BranchDao;
-import com.wadpam.ricotta.dao.CtxtDao;
-import com.wadpam.ricotta.dao.LangDao;
-import com.wadpam.ricotta.dao.ProjDao;
-import com.wadpam.ricotta.dao.ProjLangDao;
-import com.wadpam.ricotta.dao.ProjUserDao;
-import com.wadpam.ricotta.dao.RoleDao;
-import com.wadpam.ricotta.dao.SubsetDao;
-import com.wadpam.ricotta.dao.SubsetToknDao;
-import com.wadpam.ricotta.dao.TemplateDao;
-import com.wadpam.ricotta.dao.ToknDao;
-import com.wadpam.ricotta.dao.TransDao;
-import com.wadpam.ricotta.dao.UberDao;
 
 public abstract class AbstractDaoController {
     protected LangDao       langDao;
@@ -33,7 +21,7 @@ public abstract class AbstractDaoController {
     protected SubsetDao     subsetDao;
     protected SubsetToknDao subsetToknDao;
     protected RoleDao       roleDao;
-    protected UberDao       uberDao;
+    protected UberDaoBean       uberDao;
 
     // ----------------- Populate Model ----------------------
 
@@ -106,7 +94,7 @@ public abstract class AbstractDaoController {
         this.projUserDao = projUserDao;
     }
 
-    public final void setUberDao(UberDao uberDao) {
+    public final void setUberDao(UberDaoBean uberDao) {
         this.uberDao = uberDao;
     }
 

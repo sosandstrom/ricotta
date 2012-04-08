@@ -19,6 +19,14 @@ th {
 	text-align: left;
 }
 
+td {
+    vertical-align: top;
+}
+
+tfoot {
+	background-color: #F7F7F7;
+}
+
 .pageHeading {
 	font-size: larger;
 	background-color: lightgray;

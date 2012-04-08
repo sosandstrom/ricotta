@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Ricotta</title>
+        <link type="text/css" href="css/blitzer/jquery-ui-1.8.17.custom.css" rel="stylesheet" />	
+        <link type="text/css" href="ricotta.custom.css" rel="stylesheet" />	
+    </head>
+    <body>
+        <div id="header" class="ui-widget">
+            <table id="headerTable" class="ui-widget ui-widget-content">
+                <tbody>
+                    <tr>
+                        <td id="headerHome" class="ui-state-default">Home</td>
+                        <td id="headerProject"></td>
+                        <td id="headerContext"></td>
+                        <td id="headerLanguage"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div id="contents" class="ui-widget">
+            <img src="RicottaOverview.2.png" alt="Ricotta Overview" />
+        </div>
+        
+        <div id="footer" class="ui-widget">Footer stuff</div>
+        <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+        <script type="text/javascript" src="js/jquery-ui-1.8.17.custom.min.js"></script>
+	<script type="text/javascript" src="ricotta_common.js"></script>
+        <script type="text/javascript">
+$.ajaxSetup( {
+    cache: false
+}
+);
+
+$(document).ready(function() {
+    $("#contents").html("Loading...").load("projects.html");
+});
+
+$("#headerHome").click(function() {
+    $("#contents").html("Loading...").load("projects.html");
+});
+        </script>
+        
+    </body>
+</html>

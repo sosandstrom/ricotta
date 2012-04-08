@@ -1,0 +1,54 @@
+<h4>Projects</h4>
+<table id="projects" class="ui-widget ui-widget-content">
+    <thead class="ui-widget-header">
+        <tr>
+            <th>Name</th><th>Owner</th>
+        </tr>
+    </thead>
+    <tbody id="projectsBody"></tbody>
+    <!--
+    <tfoot>
+        <tr>
+            <td>Total:</td><td id="projectsTotal">0</td>
+        </tr>
+    </tfoot>
+    -->
+</table>
+<script type="text/javascript">
+function loadProject(projectName) {
+    // copy json from table to header
+    var p = $("#projectTR" + projectName).data("json");
+    $("#headerProject").data("project", p);
+    
+    // set header project name
+    $("#headerProject").text(p.name);
+    
+    // load project contents
+    $("#contents").load("project.html");
+}
+
+$("#projects").ready(function() {
+    // clear project name
+    $("#headerProject").text("");
+    
+    $.ajax({
+        async: false,
+        type: "GET",
+        url: "/api/project/v10",
+        dataType: "json",
+        success: function(data){
+            $.map(data, function(p, i) {
+                $("#projectsBody")
+                .append("<tr id=\"projectTR" + p.name + "\">")
+                .append("<td class=\"ui-state-default\" onClick=\"loadProject('" + p.name + "');\">" + p.name + "</td>")
+                .append("<td>" + p.owner + "</td>")
+                .append("</tr>");
+                $("#projectTR" + p.name).data("json", p);
+//                $("#projectsTotal").text(i+1);
+            });
+        },
+        error: function(req, textStatus, errorThrown) {}
+    });        
+});
+</script>
+

@@ -21,10 +21,6 @@ function all_checkboxes(id, checked, artifactKey) {
 <a href="/index.html">Home</a> | <a href="/proj/index.html">Projects</a> | <a href="../index.html"><c:out value="${projName}" /></a>
 <div class="pageHeading">Project Tokens</div>
 <form id="tokens" name="tokens" action="" method="post" >
-<c:if test="${projUser.destroy}">
-<input type="submit" name="Action" value="Delete selected tokens" />
-</c:if>
-<input type="submit" value="Save" />
 <a href="create.html">Create token...</a>
 <table>
 		<thead>

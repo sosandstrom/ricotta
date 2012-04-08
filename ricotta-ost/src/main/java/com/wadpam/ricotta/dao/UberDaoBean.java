@@ -45,7 +45,11 @@ import com.wadpam.ricotta.domain.Template;
 import com.wadpam.ricotta.domain.Tokn;
 import com.wadpam.ricotta.domain.Trans;
 import com.wadpam.ricotta.model.TransModel;
+import com.wadpam.ricotta.model.v10.Proj10;
+import com.wadpam.ricotta.model.v10.Tokn10;
 import com.wadpam.ricotta.web.AbstractDaoController;
+import com.wadpam.ricotta.web.ProjectHandlerInterceptor;
+import java.util.*;
 
 public class UberDaoBean extends AbstractDaoController implements UberDao {
     static final Logger LOG = LoggerFactory.getLogger(UberDaoBean.class);
@@ -54,6 +58,50 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         populate();
         patchRoles();
         patchBranches();
+    }
+    
+    protected static Proj10 convert(Proj from) {
+        if (null == from) {
+            return null;
+        }
+        
+        final Proj10 to = new Proj10(from.getName(), from.getOwner());
+        
+        return to;
+    }
+    
+    protected static List<Proj10> convertProjects(Collection<Proj> from) {
+        final List<Proj10> to = new ArrayList<Proj10>();
+        
+        for (Proj entity : from) {
+            to.add(convert(entity));
+        }
+        
+        return to;
+    }
+
+    protected static Tokn10 convert(Tokn from) {
+        if (null == from) {
+            return null;
+        }
+        
+        final Tokn10 to = new Tokn10(from.getId(), from.getName(), from.getDescription());
+        
+        to.setContext(null != from.getViewContext() ? from.getViewContext().getName() : "");
+        
+        return to;
+    }
+
+    protected static List<Tokn10> convertTokens(List<Tokn> from) {
+        final List<Tokn10> to = new ArrayList<Tokn10>();
+        
+        for (Tokn entity : from) {
+            to.add(convert(entity));
+        }
+        
+        Collections.sort(to, TOKEN_COMPARATOR);
+        
+        return to;
     }
 
     private void patchBranches() {
@@ -92,6 +140,84 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
             }
         }
         return u;
+    }
+    
+    public Collection<Proj> getProjectsByUsername(String username) {
+        // owned projects first
+        List<Proj> projects = new ArrayList<Proj>(projDao.findByOwner(username));
+
+        // then add projects where user
+        for(String projName : projDao.findAllKeys()) {
+            Key projKey = KeyFactory.createKey(Proj.class.getSimpleName(), projName);
+            if (null != projUserDao.findByPrimaryKey(projKey, username)) {
+                projects.add(projDao.findByPrimaryKey(projName));
+            }
+        }
+        
+        // unique and sort
+        final TreeSet<Proj> returnValue = new TreeSet<Proj>(PROJ_COMPARATOR);
+        returnValue.addAll(projects);
+        return returnValue;
+    }
+    
+    public List<Proj10> getProjects(String username) {
+        final Collection<Proj> projects = getProjectsByUsername(username);
+        final List<Proj10> returnValue = convertProjects(projects);
+        
+        // populate JSON properties
+        Key projKey, branchKey;
+        for (Proj10 p10 : returnValue) {
+            projKey = projDao.createKey(p10.getName());
+            branchKey = branchDao.createKey(projKey, ProjectHandlerInterceptor.NAME_TRUNK);
+            
+            // populate languages
+            List<ProjLang> langs = new ArrayList<ProjLang>();
+            p10.setProjLangs(langs);
+            for (ProjLang pl : projLangDao.findByBranch(branchKey)) {
+                
+                // exclude default language
+                if (null == pl.getDefaultLang()) {
+                    p10.setDefProjLang(pl);
+                }
+                else {
+                    langs.add(pl);
+                }
+            }
+            
+            // populate contexts
+            p10.setContexts(ctxtDao.findByBranch(branchKey));
+        }
+        
+        return returnValue;
+    }
+    
+    public List<Tokn10> getTokens(String username, String projectName, String branchName) {
+        final Key projKey = projDao.createKey(projectName);
+        final Key branchKey = branchDao.createKey(projKey, branchName);
+        final List<Tokn> entities = toknDao.findByBranch(branchKey);
+        final List<Tokn10> tokens = convertTokens(entities);
+        
+        // map the tokens by id
+        final HashMap<Long, Tokn10> tokenMap = new HashMap<Long, Tokn10>();
+        for (Tokn10 t : tokens) {
+            tokenMap.put(t.getId(), t);
+        }
+        
+        // get languages for this project branch
+        Key projLangKey;
+        Tokn10 t10;
+        for (String projLang : projLangDao.findKeysByBranch(branchKey)) {
+
+            // fetch translations for this language
+            projLangKey = projLangDao.createKey(branchKey, projLang);
+            List<Trans> trans = transDao.findByProjLang(projLangKey);
+            for (Trans t : trans) {
+                t10 = tokenMap.get(t.getToken());
+                t10.getTrans().put(projLang, t.getLocal());
+            }
+        }
+        
+        return tokens;
     }
 
     @Override
@@ -616,4 +742,25 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         // the proj
         projDao.deleteByCore(projKey);
     }
+
+    protected static final Comparator<Proj> PROJ_COMPARATOR = new Comparator<Proj>() {
+
+        @Override
+        public int compare(Proj o1, Proj o2) {
+            return o1.getName().compareToIgnoreCase(o2.getName());
+        }
+        
+    };
+    
+    protected static final Comparator<Tokn10> TOKEN_COMPARATOR = new Comparator<Tokn10>() {
+
+        @Override
+        public int compare(Tokn10 o1, Tokn10 o2) {
+            int returnValue = o1.getName().compareToIgnoreCase(o2.getName());
+            if (0 == returnValue) {
+                returnValue = o2.getContext().compareToIgnoreCase(o2.getContext());
+            }
+            return returnValue;
+        }
+    };
 }

@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:mvc="http://www.springframework.org/schema/mvc" 
 	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+                http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+       ">
 
 	<bean id="uberDao" class="com.wadpam.ricotta.dao.UberDaoBean"
 		init-method="init" depends-on="dataResourceLoader">
@@ -22,10 +26,7 @@
 		<property name="roleDao" ref="roleDao" />
 	</bean>
 
-	<bean id="projectHandlerInterceptor" class="com.wadpam.ricotta.web.ProjectHandlerInterceptor">
-		<property name="projDao" ref="projDao" />
-		<property name="projUserDao" ref="projUserDao" />
-	</bean>
+	<mvc:annotation-driven />
 	
 	<!-- As auto-wiring does not work well in GAE, define controllers manually: -->
 	
@@ -82,17 +83,35 @@
 	<bean id="indexController" class="com.wadpam.ricotta.web.IndexController">
 		<property name="uberDao" ref="uberDao" />
 	</bean>
+        
+	<bean id="restController" class="com.wadpam.ricotta.web.RestController">
+		<property name="uberDao" ref="uberDao" />
+	</bean>
+        
+	<bean id="docController" class="com.wadpam.ricotta.web.DocumentController" />
 
 	<bean id="dataResourceLoader" class="com.wadpam.ricotta.velocity.DaoResourceLoader">
 		<property name="templateDao" ref="templateDao" />
 	</bean>
 
+<!--
 	<bean
 		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
 		<property name="interceptors">
+                    
 			<ref bean="projectHandlerInterceptor" />
 		</property>
 	</bean>
+-->
+        <mvc:interceptors>
+            <mvc:interceptor>
+                <mvc:mapping path="/proj/**"/>
+                <bean id="projectHandlerInterceptor" class="com.wadpam.ricotta.web.ProjectHandlerInterceptor">
+                        <property name="projDao" ref="projDao" />
+                        <property name="projUserDao" ref="projUserDao" />
+                </bean>
+            </mvc:interceptor>
+        </mvc:interceptors>
 
 	<bean
 		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
@@ -101,6 +120,7 @@
 		</property>
 	</bean>
 
+<!--
 	<bean id="jsonView"
 		class="org.springframework.web.servlet.view.json.MappingJacksonJsonView">
 		<property name="renderedAttributes">
@@ -109,7 +129,7 @@
 			</set>
 		</property>
 	</bean>
-
+-->
 	<bean id="viewResolver"
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="viewClass"

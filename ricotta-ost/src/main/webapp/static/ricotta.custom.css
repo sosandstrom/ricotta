@@ -1,0 +1,20 @@
+/* added by f94os */
+.ui-widget-content td, .ui-widget-header th { border: 1px solid #eeeeee; padding: .6em 10px; text-align: left; }
+
+.ui-widget-content tfoot td, .default-trans { border: 1px solid #eeeeee; padding: .6em 10px; text-align: left; background: #f0f0f0; }
+
+#projectTiles { width: 100%; }
+#tileContexts { width: 15%; }
+#tileTokens { width: 70%; }
+#tileLanguages { width: 15%; }
+
+#contexts { width: 100%; }
+#thContexts { width: 100%; }
+
+#tokens { width: 100%; }
+#thToken { width: 30%; }
+#thDescr { width: 30%; }
+#thTrans { width: 40%; }
+
+#languages { width: 100%; }
+#thLanguages { width: 100%; }
