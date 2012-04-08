@@ -6,6 +6,7 @@ package com.wadpam.ricotta.model.v10;
 
 import com.wadpam.ricotta.domain.Ctxt;
 import com.wadpam.ricotta.domain.ProjLang;
+import com.wadpam.ricotta.domain.Subset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,10 @@ public class Proj10 {
     private List<ProjLang> projLangs = new ArrayList<ProjLang>();
     
     private List<Ctxt> contexts = new ArrayList<Ctxt>();
+    
+    private List<Tokn10> tokens;
+    
+    private List<String> subsets;
 
     public Proj10(String name, String owner) {
         this.name = name;
@@ -65,6 +70,22 @@ public class Proj10 {
 
     public void setProjLangs(List<ProjLang> projLangs) {
         this.projLangs = projLangs;
+    }
+
+    public List<String> getSubsets() {
+        return subsets;
+    }
+
+    public void setSubsets(List<String> subsets) {
+        this.subsets = subsets;
+    }
+
+    public List<Tokn10> getTokens() {
+        return tokens;
+    }
+
+    public void setTokens(List<Tokn10> tokens) {
+        this.tokens = tokens;
     }
 
     

@@ -6,6 +6,8 @@ package com.wadpam.ricotta.model.v10;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  *
@@ -17,6 +19,7 @@ public class Tokn10 {
     private String description;
     private String context;
     private final Map<String, String> trans = new HashMap<String, String>();
+    private final Set<String> subsets = new TreeSet<String>();
 
     public Tokn10(Long id, String name, String description) {
         this.id = id;
@@ -58,6 +61,10 @@ public class Tokn10 {
 
     public Map<String, String> getTrans() {
         return trans;
+    }
+
+    public Set<String> getSubsets() {
+        return subsets;
     }
     
     

@@ -35,13 +35,13 @@ public class RestController {
     }
 
     @RequestMapping(value="project/v10/{name}/token", method= RequestMethod.GET)
-    public ResponseEntity<List<Tokn10>> getTokens(Principal principal,
+    public ResponseEntity<Proj10> getTokens(Principal principal,
             @PathVariable String name) {
         String username = "Googlebot";
         if (null != principal) {
             username = principal.getName();
         }
-        return new ResponseEntity<List<Tokn10>>(uberDao.getTokens(username, name, ProjectHandlerInterceptor.NAME_TRUNK), HttpStatus.OK);
+        return new ResponseEntity(uberDao.getTokens(username, name, ProjectHandlerInterceptor.NAME_TRUNK), HttpStatus.OK);
     }
 
     public void setUberDao(UberDaoBean uberDao) {

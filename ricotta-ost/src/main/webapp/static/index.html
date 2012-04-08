@@ -12,9 +12,10 @@
                 <tbody>
                     <tr>
                         <td id="headerHome" class="ui-state-default">Home</td>
-                        <td id="headerProject"></td>
-                        <td id="headerContext"></td>
-                        <td id="headerLanguage"></td>
+                        <td id="headerProject" class="ui-state-default">Project</td>
+                        <td id="headerView" class="ui-state-default">View</td>
+                        <td id="headerContext" class="ui-state-default">Context</td>
+                        <td id="headerLanguage">Lang</td>
                     </tr>
                 </tbody>
             </table>
@@ -24,22 +25,29 @@
             <img src="RicottaOverview.2.png" alt="Ricotta Overview" />
         </div>
         
-        <div id="footer" class="ui-widget">Footer stuff</div>
+        <div id="footer" class="ui-widget">Ricotta translations management tool</div>
         <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
         <script type="text/javascript" src="js/jquery-ui-1.8.17.custom.min.js"></script>
 	<script type="text/javascript" src="ricotta_common.js"></script>
         <script type="text/javascript">
 $.ajaxSetup( {
-    cache: false
-}
-);
+    cache: false,
+    data: null
+});
 
 $(document).ready(function() {
     $("#contents").html("Loading...").load("projects.html");
+    $("#headerProject").hide();
+    $("#headerView").hide();
+    $("#headerContext").hide();
+    $("#headerLanguage").hide();
 });
 
 $("#headerHome").click(function() {
     $("#contents").html("Loading...").load("projects.html");
+});
+$("#headerProject").click(function() {
+    $("#contents").html("Loading...").load("project.html");
 });
         </script>
         

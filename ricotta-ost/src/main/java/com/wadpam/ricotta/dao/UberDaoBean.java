@@ -191,17 +191,22 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         return returnValue;
     }
     
-    public List<Tokn10> getTokens(String username, String projectName, String branchName) {
+    public Proj10 getTokens(String username, String projectName, String branchName) {
+        final Proj10 proj = new Proj10(projectName, null);
         final Key projKey = projDao.createKey(projectName);
         final Key branchKey = branchDao.createKey(projKey, branchName);
         final List<Tokn> entities = toknDao.findByBranch(branchKey);
         final List<Tokn10> tokens = convertTokens(entities);
+        proj.setTokens(tokens);
         
         // map the tokens by id
         final HashMap<Long, Tokn10> tokenMap = new HashMap<Long, Tokn10>();
         for (Tokn10 t : tokens) {
             tokenMap.put(t.getId(), t);
         }
+        
+        // populate contexts
+        proj.setContexts(ctxtDao.findByBranch(branchKey));
         
         // get languages for this project branch
         Key projLangKey;
@@ -217,7 +222,21 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
             }
         }
         
-        return tokens;
+        // get subsets for this project branch
+        Key subsetKey;
+        proj.setSubsets(subsetDao.findKeysByBranch(branchKey));
+        for (String subset : proj.getSubsets()) {
+            subsetKey = subsetDao.createKey(branchKey, subset);
+            List<Long> subTokens = subsetToknDao.findKeysBySubset(subsetKey);
+            
+            LOG.debug("Subset {} has {}", subset, subTokens);
+            for (Long id : subTokens) {
+                t10 = tokenMap.get(id);
+                t10.getSubsets().add(subset);
+            }
+        }
+        
+        return proj;
     }
 
     @Override

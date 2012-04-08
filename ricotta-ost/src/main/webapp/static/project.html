@@ -1,147 +1,46 @@
-<h4>Tokens</h4>
-<table id="projectTiles">
-    <tbody>
+<h4 id="projectName">Project loading...</h4>
+<table id="commandsTable">
+    <thead class="ui-widget-header">
         <tr>
-            <td id="tileContexts" style="vertical-align: top;">
-                <table id="contexts" class="ui-widget ui-widget-content">
-                    <thead class="ui-widget-header">
-                        <tr>
-                            <th id="thContexts">Contexts</th>
-                        </tr>
-                    </thead>
-                    <tbody id="contextsBody">
-                        <tr>
-                            <td>
-                                <input type="radio" id="contextALL" name="context" checked="checked" value="" onChange="onContextChange(this.value);"/>
-                                <label for="contextALL">All tokens</label>
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                    </tfoot>
-                </table>
-            </td>
-            <td id="tileTokens" style="vertical-align: top;">    
-                <table id="tokens" class="ui-widget ui-widget-content">
-                    <thead class="ui-widget-header">
-                        <tr>
-                            <th id="thToken">Token</th>
-                            <th id="thDescr">Description</th>
-                            <th id="thTrans">Translation</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tokensBody"></tbody>
-                    <tfoot>
-                    </tfoot>
-                </table>
-            </td>
-            <td id="tileLanguages" style="vertical-align: top;">
-                <table id="languages" class="ui-widget ui-widget-content">
-                    <thead class="ui-widget-header">
-                        <tr>
-                            <th id="thLanguages">Languages</th>
-                        </tr>
-                    </thead>
-                    <tbody id="languagesBody">
-                        <tr id="languageTRdefault">
-                            <td>
-                                <input type="radio" id="langDefault" name="language" checked="checked" value="" onChange="onLanguageChange(this.value);" />
-                                <label id="langDefaultLabel" for="langDefault">Default</label>
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                    </tfoot>
-                </table>
-            </td>
+            <th id="thCommands">Views</th>
+        </tr>
+    </thead>
+    <tbody id="commandsBody" style="display: none;">
+        <tr>
+            <td><button id="buttonTranslations">Translations</button></td>
+        </tr>
+        <tr>
+            <td><button id="buttonTokens">Tokens</button></td>
         </tr>
     </tbody>
 </table>
 <script type="text/javascript">
-    function appendContext(obj, index) {
-        $("#contextsBody")
-        .append("<tr id=\"contextTR" + obj.name + "\">")
-        .append("<td><input type=\"radio\" id=\"contextCH" + obj.name + "\" name=\"context\" value=\"" + obj.name + "\" onChange=\"onContextChange(this.value);\" /><label for=\"contextCH" + obj.name + "\">"+ obj.name + "</label></td>")
-        .append("</tr>");
-        $("#contextTR" + obj.name).data("json", obj);
-    }
-    
-    function onContextChange(contextName) {
-        $("#contexts").data("sel", contextName);
-        updateTokens();
-    }
-    
-    function appendToken(obj, index) {
-        var context = $("#contexts").data("sel");
-        var projLang = $("#languages").data("sel");
-        var langCode = projLang.langCode;
-        var defLang = projLang.defaultLang ? projLang.defaultLang.name : "";
-        if (context == "" || context == obj.context) {
-            $("#tokensBody")
-            .append("<tr id=\"tokenTR" + obj.id + "\">")
-            .append("<td>" + obj.name + "</td>")
-            .append("<td>" + obj.description + "</td>")
-            .append("<td class=\"" + (obj.trans[langCode] ? "" : "default-trans") + "\">" + (obj.trans[langCode] ? obj.trans[langCode] : (obj.trans[defLang] ? obj.trans[defLang] : "")) + "<span class=\"ui-icon ui-icon-pencil\" /></td>")
-            .append("</tr>");
-            $("#tokenTR" + obj.id).data("json", obj);
-        }
-    }
-    
-    function updateTokens() {
-        var context = $("#contexts").data("sel");
-        $("#headerContext").text(context);
-        var projLang = $("#languages").data("sel");
-        $("#headerLanguage").text(projLang.langCode);
-        var tokens = $("#tokensBody").data("json");
-        $("#tokensBody").empty();
-        $.map(tokens, appendToken);
-    }
-    
-    function appendLanguage(obj, index) {
-        $("#languagesBody")
-        .append("<tr id=\"languageTR" + obj.langCode + "\">")
-        .append("<td><input type=\"radio\" id=\"lang_" + obj.langCode + "\" name=\"language\" value=\"" + obj.langCode + "\" onChange=\"onLanguageChange(this.value);\" /><label for=\"lang_" + obj.langCode + "\">"+ obj.langCode + " [" + obj.defaultLang.name + "]</label></td>")
-        .append("</tr>");
-        $("#languageTR" + obj.langCode).data("json", obj);
-    }
-    
-    function onLanguageChange(langCode) {
-        var pl = $("#languageTR" + langCode).data("json");
-        $("#languages").data("sel", pl);
-        updateTokens();
-    }
-    
-    $("#projectTiles").ready(function() {
-        var projectName = $("#headerProject").text();
-        var p = $("#headerProject").data("project");
-        
-        // populate contexts
-        $.map(p.contexts, appendContext);
-        $("#contexts").data("sel", "");
-        
-        // update default language
-        $("#langDefault").val(p.defProjLang.langCode);
-        $("#langDefault").attr("id", "lang_" + p.defProjLang.langCode);
-        $("#langDefaultLabel").text(p.defProjLang.langCode);
-        $("#langDefaultLabel").attr("for", "lang_" + p.defProjLang.langCode);
-        $("#languageTRdefault").attr("id", "languageTR" + p.defProjLang.langCode);
-        $("#languageTR" + p.defProjLang.langCode).data("json", p.defProjLang);
-        
-        // populate languages
-        $.map(p.projLangs, appendLanguage);
-        $("#languages").data("sel", p.defProjLang);
-    
-        $.ajax({
-            async: false,
-            type: "GET",
-            url: "/api/project/v10/" + p.name + "/token",
-            dataType: "json",
-            success: function(data){
-                $("#tokensBody").data("json", data);
-                updateTokens();
-            },
-            error: function(req, textStatus, errorThrown) {}
-        });        
-    });
+
+$("#buttonTranslations").button().click(function() {
+    $("#contents").html("Loading translations...").load("translations.html");
+});
+$("#buttonTokens").button().click(function() {
+    $("#contents").html("Loading tokens...").load("tokens.html");
+});
+
+$(function() {
+    var p = $("#headerProject").data("project");
+    $("#headerProject").text(p.name).show();
+    $("#headerView").hide();
+
+    $.ajax({
+        async: false,
+        type: "GET",
+        url: "/api/project/v10/" + p.name + "/token",
+        dataType: "json",
+        success: function(data){
+            $("#headerProject").data("json", data);
+            $("#projectName").text("Project " + p.name);
+            $("#commandsBody").show();
+        },
+        error: function(req, textStatus, errorThrown) {}
+    });        
+
+});
 
 </script>

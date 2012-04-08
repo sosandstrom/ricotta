@@ -20,9 +20,6 @@ function loadProject(projectName) {
     var p = $("#projectTR" + projectName).data("json");
     $("#headerProject").data("project", p);
     
-    // set header project name
-    $("#headerProject").text(p.name);
-    
     // load project contents
     $("#contents").load("project.html");
 }
