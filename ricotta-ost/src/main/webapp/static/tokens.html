@@ -1,40 +1,106 @@
     <table>
         <thead class="ui-widget-header">
 		<tr id="tokensHeadTR">
-			<th>Delete</th>
+			<th><span class="ui-icon ui-icon-trash" /></th>
+                        <th><span class="ui-icon ui-icon-disk" /></th>
 			<th>Name</th>
 			<th>Description</th>
 			<th>Context</th>
 		</tr>
 	</thead>
-        <tbody id="tokensBody"></tbody>
+        <tbody id="tokensTBody"></tbody>
         <tfoot>
-            <tr>
-                <td colspan="2"><button id="buttonCreateToken">Create new token...</button></td>
-            </tr>
         </tfoot>
         
     </table>
+<button id="buttonCreateToken">Create new token...</button>
 <script type="text/javascript">
+
+function deleteToken(id) {
+    alert("Delete " + id);
+}
+
+function saveToken(id) {
+    var p = $("#headerProject").data("json");
+    
+    var subsets = $(':checked[name="subsets_' + id + '"]').map(function() {
+        return this.value;
+    }).get();
+    
+    var body = {
+            name: $("#name_" + id).val(),
+            description: $("#description_" + id).val(),
+            context: $("#context_" + id).val(),
+            subsets: subsets.join(','),
+            separator: ','
+        };
+    
+    $.ajax({
+        type: "POST",
+        url: "/api/project/v10/" + p.name + "/token/" + id,
+        data: body,
+        dataType: "json",
+        success: function(data, textStatus, jqXHR){
+            updateModel(id, body.name, body.description, body.context, subsets, body.separator);
+            clearChanged(id);
+        },
+        error: function(req, textStatus, errorThrown) {}
+    });        
+    
+}
+
+function updateModel(id, name, description, context, subsets, separator) {
+    // find this token in data
+    var p = $("#headerProject").data("json");
+    $.map(p.tokens, function(t, i) {
+        if (t.id == id) {
+            t.name = name;
+            t.description = description;
+            t.context = context;
+            t.subsets = subsets;
+            return;
+        }
+    });
+}
+
+function setChanged(id) {
+    $("#delete_" + id).hide();
+    $("#save_" + id).show();
+}
+
+function clearChanged(id) {
+    $("#delete_" + id).show();
+    $("#save_" + id).hide();
+}
 
 function buildTokensTable(p) {
     $.map(p.subsets, function(s, index) {
         $("#tokensHeadTR").append('<th title="' + s + '"><input type="checkbox" onClick="" /></th>');
     });
     $.map(p.tokens, function(t, index) {
-        $("#tokensBody").append('<tr id="tr_' + t.id + '"></tr>');
-        $("#tr_" + t.id).append('<td id="id_' + t.id + '">' + t.id + '</td>',
-            '<td><input id="name_' + t.id + '" value="' + t.name + '" /></td>',
-            '<td><input id="description_' + t.id + '" value="' + t.description + '" /></td>',
-            '<td><select id="context_' + t.id + '" ><option value="_NO_CONTEXT_">_NO_CONTEXT_</option></select></td>');
+        $("#tokensTBody").append('<tr id="token_' + t.id + '"></tr>');
+        
+        // icons
+        $("#token_" + t.id).append('<td>' +
+            '<span id="delete_' + t.id + '" class="ui-icon ui-icon-trash" onClick="deleteToken(' + t.id + ');" />' +
+            '</td>');
+        $("#token_" + t.id).append('<td>' +
+            '<span id="save_' + t.id + '" class="ui-icon ui-icon-disk" onClick="saveToken(' + t.id + ');" style="display: none" />' +
+            '</td>');
+        
+        $("#token_" + t.id).append('<td><input id="name_' + t.id + '" value="' + t.name + '" onChange="setChanged(' + t.id + ');" /></td>');
+        $("#token_" + t.id).append('<td><input id="description_' + t.id + '" value="' + t.description + '" onChange="setChanged(' + t.id + ');" /></td>');
+        $("#token_" + t.id).append('<td><select id="context_' + t.id + '" onChange="setChanged(' + t.id + ');" ><option value="_NO_CONTEXT_">_NO_CONTEXT_</option></select></td>');
         $.map(p.contexts, function(c, ci) {
             $("#context_" + t.id).append('<option value="' + c.name + '" ' + 
                 (c.name == t.context ? 'selected="selected" ' : '') +
                 '>' + c.name + '</option>');
         });
         $.map(p.subsets, function(s, si) {
-            $("#tr_" + t.id).append('<td><input type="checkbox" id="subset_' + t.id + '_' + s + '"' +
-                ' title="' + t.name + ':' + s + '" /></td>');
+            $("#token_" + t.id).append('<td><input type="checkbox" id="subset_' + t.id + '_' + s + '"' +
+                ' name="subsets_' + t.id + '"' +
+                ' value="' + s + '"' + 
+                ' title="' + t.name + ':' + s + '" onChange="setChanged(' + t.id + ');" /></td>');
         });
         $.map(t.subsets, function(s, si) {
             $("#subset_" + t.id + "_" + s).attr("checked", "checked");
@@ -42,13 +108,12 @@ function buildTokensTable(p) {
     });
 }
 
-$("#headerView").click(function() {
-    $("#contents").html("Loading...").load("tokens.html");
+$("#buttonCreateToken").button().click(function() {
+
 });
 
 $(function() {
     var p = $("#headerProject").data("json");
-    $("#headerView").text("Tokens").show();
 
     buildTokensTable(p);
 });

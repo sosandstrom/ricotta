@@ -42,13 +42,8 @@ function buildTokensTable(p) {
     });
 }
 
-$("#headerView").click(function() {
-    $("#contents").html("Loading...").load("tokens.html");
-});
-
 $(function() {
     var p = $("#headerProject").data("json");
-    $("#headerView").text("Tokens").show();
 
     buildTokensTable(p);
 });

@@ -52,6 +52,8 @@ import com.wadpam.ricotta.web.ProjectHandlerInterceptor;
 import java.util.*;
 
 public class UberDaoBean extends AbstractDaoController implements UberDao {
+    public static final String NO_CONTEXT_NAME     = "_NO_CONTEXT_";
+    
     static final Logger LOG = LoggerFactory.getLogger(UberDaoBean.class);
 
     public void init() {
@@ -209,16 +211,18 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         proj.setContexts(ctxtDao.findByBranch(branchKey));
         
         // get languages for this project branch
-        Key projLangKey;
         Tokn10 t10;
-        for (String projLang : projLangDao.findKeysByBranch(branchKey)) {
+        proj.setProjLangs(projLangDao.findByBranch(branchKey));
+        for (ProjLang projLang : proj.getProjLangs()) {
+            if (null == projLang.getDefaultLang()) {
+                proj.setDefProjLang(projLang);
+            }
 
             // fetch translations for this language
-            projLangKey = projLangDao.createKey(branchKey, projLang);
-            List<Trans> trans = transDao.findByProjLang(projLangKey);
+            List<Trans> trans = transDao.findByProjLang(projLang.getPrimaryKey());
             for (Trans t : trans) {
                 t10 = tokenMap.get(t.getToken());
-                t10.getTrans().put(projLang, t.getLocal());
+                t10.getTrans().put(projLang.getLangCode(), t.getLocal());
             }
         }
         
@@ -782,4 +786,53 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
             return returnValue;
         }
     };
+
+    public Tokn10 updateToken(String projectName, String branchName, Long tokenId, 
+            String name, String description, String context, String[] subs) {
+        Tokn10 t10 = null;
+        final Key projKey = projDao.createKey(projectName);
+        final Key branchKey = branchDao.createKey(projKey, branchName);
+        final Tokn tokn = toknDao.findByPrimaryKey(branchKey, tokenId);
+
+        LOG.debug("update {} for {}", tokenId, tokn);
+        
+        if (null != tokn) {
+            Set<String> subSet = new HashSet<String>();
+            Collections.addAll(subSet, subs);
+            tokn.setName(name);
+            tokn.setDescription(description);
+            
+            // context reference
+            final Key viewContext = NO_CONTEXT_NAME.equals(context) ? null : ctxtDao.createKey(branchKey, context);
+            tokn.setViewContext(viewContext);
+            
+            toknDao.update(tokn);
+            
+            // subsets (mutable)
+            final List<Key> existing = subsetToknDao.findKeysByBranchKeyTokenId(branchKey, tokenId);
+            final ArrayList<Key> remove = new ArrayList<Key>(existing);
+            for (Key stKey : existing) {
+                if (subSet.remove(stKey.getParent().getName())) {
+                    remove.remove(stKey);
+                }
+            }
+            
+            // remove remaining existing, insert remaining from subSet
+            LOG.debug("deleting {}, inserting {}", remove, subSet);
+            subsetToknDao.deleteByCore(remove);
+            final List<SubsetTokn> insert = new ArrayList<SubsetTokn>();
+            SubsetTokn st;
+            for (String s : subSet) {
+                st = new SubsetTokn();
+                st.setSubset(subsetDao.createKey(branchKey, s));
+                st.setTokn(tokenId);
+                insert.add(st);
+            }
+            subsetToknDao.persist(insert);
+            
+            t10 = convert(tokn);
+        }
+        
+        return t10;
+    }
 }

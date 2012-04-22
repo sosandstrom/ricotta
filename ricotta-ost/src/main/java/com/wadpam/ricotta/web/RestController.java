@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  *
@@ -41,7 +42,25 @@ public class RestController {
         if (null != principal) {
             username = principal.getName();
         }
-        return new ResponseEntity(uberDao.getTokens(username, name, ProjectHandlerInterceptor.NAME_TRUNK), HttpStatus.OK);
+        final Proj10 body = uberDao.getTokens(username, name, ProjectHandlerInterceptor.NAME_TRUNK);
+        return new ResponseEntity(body, HttpStatus.OK);
+    }
+    
+    @RequestMapping(value="project/v10/{projectName}/token/{tokenId}", method= RequestMethod.POST)
+    public ResponseEntity<Tokn10> updateToken(
+            @PathVariable String projectName, 
+            @PathVariable Long tokenId,
+            @RequestParam String name,
+            @RequestParam String description,
+            @RequestParam String context,
+            @RequestParam String subsets,
+            @RequestParam(value="separator", defaultValue=",") String separator) {
+        final String[] subs = subsets.split(separator);
+        final Tokn10 body = uberDao.updateToken(projectName, ProjectHandlerInterceptor.NAME_TRUNK, tokenId, name, description, context, subs);
+        if (null == body) {
+            return new ResponseEntity(null, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity(body, HttpStatus.OK);
     }
 
     public void setUberDao(UberDaoBean uberDao) {

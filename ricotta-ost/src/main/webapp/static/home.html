@@ -1,0 +1,23 @@
+        <div id="homeTabs" class="ui-widget">
+            <ul>
+                <li><a href="projects.html"><span>Projects</span></a></li>
+                <li><a href="templates.html"><span>Templates</span></a></li>
+                <li><a href="languages.html"><span>Languages</span></a></li>
+            </ul>
+        </div>
+        <script type="text/javascript">
+$.ajaxSetup( {
+    cache: false,
+    data: null
+});
+
+$(function() {
+    $("#headerProject").hide();
+    $("#headerView").hide();
+    $("#headerContext").hide();
+    $("#headerLanguage").hide();
+    
+    $("#homeTabs").tabs();
+});
+
+        </script>

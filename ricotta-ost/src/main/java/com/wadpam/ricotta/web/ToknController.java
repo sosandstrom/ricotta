@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.wadpam.ricotta.dao.UberDaoBean;
 import com.wadpam.ricotta.domain.Ctxt;
 import com.wadpam.ricotta.domain.Subset;
 import com.wadpam.ricotta.domain.SubsetTokn;
@@ -34,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ToknController extends AbstractDaoController {
     static final String VIEW_CONTEXT_PREFIX = "viewContext.";
 
-    static final String NO_CONTEXT_NAME     = "_NO_CONTEXT_";
+    static final String NO_CONTEXT_NAME     = UberDaoBean.NO_CONTEXT_NAME;
 
     static final Logger LOGGER              = LoggerFactory.getLogger(ToknController.class);
 

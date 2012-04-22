@@ -1,46 +1,35 @@
 <h4 id="projectName">Project loading...</h4>
-<table id="commandsTable">
-    <thead class="ui-widget-header">
-        <tr>
-            <th id="thCommands">Views</th>
-        </tr>
-    </thead>
-    <tbody id="commandsBody" style="display: none;">
-        <tr>
-            <td><button id="buttonTranslations">Translations</button></td>
-        </tr>
-        <tr>
-            <td><button id="buttonTokens">Tokens</button></td>
-        </tr>
-    </tbody>
-</table>
+<div id="projectTabs" style="display: none;">
+    <ul>
+        <li><a href="translations.html"><span>Translations</span></a></li>
+        <li><a href="tokens.html"><span>Tokens</span></a></li>
+    </ul>
+</div>
 <script type="text/javascript">
 
-$("#buttonTranslations").button().click(function() {
-    $("#contents").html("Loading translations...").load("translations.html");
-});
-$("#buttonTokens").button().click(function() {
-    $("#contents").html("Loading tokens...").load("tokens.html");
-});
+function loadProject(name) {
+    $.ajax({
+        async: false,
+        type: "GET",
+        url: "/api/project/v10/" + name + "/token",
+        dataType: "json",
+        success: function(data){
+            $("#headerProject").data("json", data);
+            $("#projectName").text("Project " + name);
+            $("#projectTabs").show();
+        },
+        error: function(req, textStatus, errorThrown) {}
+    });        
+}
 
 $(function() {
+    $("#projectTabs").tabs();
+    
     var p = $("#headerProject").data("project");
     $("#headerProject").text(p.name).show();
     $("#headerView").hide();
 
-    $.ajax({
-        async: false,
-        type: "GET",
-        url: "/api/project/v10/" + p.name + "/token",
-        dataType: "json",
-        success: function(data){
-            $("#headerProject").data("json", data);
-            $("#projectName").text("Project " + p.name);
-            $("#commandsBody").show();
-        },
-        error: function(req, textStatus, errorThrown) {}
-    });        
-
+    loadProject(p.name);
 });
 
 </script>

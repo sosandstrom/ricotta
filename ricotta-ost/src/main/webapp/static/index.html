@@ -22,7 +22,6 @@
         </div>
         
         <div id="contents" class="ui-widget">
-            <img src="RicottaOverview.2.png" alt="Ricotta Overview" />
         </div>
         
         <div id="footer" class="ui-widget">Ricotta translations management tool</div>
@@ -36,15 +35,11 @@ $.ajaxSetup( {
 });
 
 $(document).ready(function() {
-    $("#contents").html("Loading...").load("projects.html");
-    $("#headerProject").hide();
-    $("#headerView").hide();
-    $("#headerContext").hide();
-    $("#headerLanguage").hide();
+    $("#contents").html("Loading...").load("home.html");
 });
 
 $("#headerHome").click(function() {
-    $("#contents").html("Loading...").load("projects.html");
+    $("#contents").html("Loading...").load("home.html");
 });
 $("#headerProject").click(function() {
     $("#contents").html("Loading...").load("project.html");

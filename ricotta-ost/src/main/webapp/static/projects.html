@@ -1,4 +1,3 @@
-<h4>Projects</h4>
 <table id="projects" class="ui-widget ui-widget-content">
     <thead class="ui-widget-header">
         <tr>
@@ -6,15 +5,15 @@
         </tr>
     </thead>
     <tbody id="projectsBody"></tbody>
-    <!--
     <tfoot>
-        <tr>
-            <td>Total:</td><td id="projectsTotal">0</td>
-        </tr>
+<!--        <tr>
+            <td colspan="2"><button id="createProjectButton" >Create new project...</button></td>
+        </tr>-->
     </tfoot>
-    -->
 </table>
+<button id="createProjectButton" >Create new project...</button>
 <script type="text/javascript">
+
 function loadProject(projectName) {
     // copy json from table to header
     var p = $("#projectTR" + projectName).data("json");
@@ -24,9 +23,13 @@ function loadProject(projectName) {
     $("#contents").load("project.html");
 }
 
-$("#projects").ready(function() {
+$(function() {
     // clear project name
     $("#headerProject").text("");
+    
+    $("#createProjectButton").button().click(function() {
+        
+    });
     
     $.ajax({
         async: false,

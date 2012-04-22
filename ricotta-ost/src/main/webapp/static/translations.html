@@ -1,4 +1,3 @@
-<h4>Tokens</h4>
 <table id="projectTiles">
     <tbody>
         <tr>
@@ -24,7 +23,7 @@
             <td id="tileTokens" style="vertical-align: top;">    
                 <table id="tokens" class="ui-widget ui-widget-content">
                     <thead class="ui-widget-header">
-                        <tr>
+                        <tr id="tileTokensHeader">
                             <th id="thToken">Token</th>
                             <th id="thDescr">Description</th>
                             <th id="thTrans">Translation</th>
@@ -71,77 +70,129 @@
         updateTokens();
     }
     
-    function appendToken(obj, index) {
-        var context = $("#contexts").data("sel");
-        var projLang = $("#languages").data("sel");
-        var langCode = projLang.langCode;
-        var defLang = projLang.defaultLang ? projLang.defaultLang.name : "";
-        if (context == "" || context == obj.context) {
-            $("#tokensBody")
-            .append("<tr id=\"tokenTR" + obj.id + "\">")
+    function appendToken(obj, index, defProjLang, projLangs) {
+        var langCode = defProjLang.langCode;
+        var defLang = langCode;
+        $("#tokensBody")
+            .append("<tr id=\"tokenTR" + obj.id + "\"></tr>");
+        $("#tokenTR" + obj.id).addClass("context_" + obj.context).addClass("token");
+        $("#tokenTR" + obj.id)
             .append("<td>" + obj.name + "</td>")
             .append("<td>" + obj.description + "</td>")
-            .append("<td class=\"" + (obj.trans[langCode] ? "" : "default-trans") + "\">" + (obj.trans[langCode] ? obj.trans[langCode] : (obj.trans[defLang] ? obj.trans[defLang] : "")) + "<span class=\"ui-icon ui-icon-pencil\" /></td>")
-            .append("</tr>");
-            $("#tokenTR" + obj.id).data("json", obj);
-        }
+            .append("<td id=\"t_" + obj.id + "_" + defLang + "\">" + (obj.trans[langCode] ? obj.trans[langCode] : "") + "<span class=\"ui-icon ui-icon-pencil\" /></td>");
+        // set the class attributes on this translation:
+        $("#t_" + obj.id + "_" + langCode).addClass("lang_" + langCode).addClass("translation");
+        $.map(projLangs, function(projLang, pi){
+            if (projLang.defaultLang) {
+                langCode = projLang.langCode;
+                $("#tokenTR" + obj.id)
+                    .append("<td id=\"t_" + obj.id + "_" + langCode + "\" class=\"" + (obj.trans[langCode] ? "" : "default-trans") + "\">" + 
+                        (obj.trans[langCode] ? obj.trans[langCode] : (obj.trans[defLang] ? obj.trans[defLang] : "")) + 
+                        "<span class=\"ui-icon ui-icon-pencil\" /></td>");
+            }
+            // set the class attributes on this translation:
+            $("#t_" + obj.id + "_" + langCode).addClass("lang_" + langCode).addClass("translation");
+        });
+        $("#tokenTR" + obj.id).data("json", obj);
     }
     
     function updateTokens() {
         var context = $("#contexts").data("sel");
-        $("#headerContext").text(context);
-        var projLang = $("#languages").data("sel");
-        $("#headerLanguage").text(projLang.langCode);
-        var tokens = $("#tokensBody").data("json");
-        $("#tokensBody").empty();
-        $.map(tokens, appendToken);
+        if ("" == context) {
+            $(".token").show();
+        }
+        else {
+            // show selected context only
+            $(".token").hide();
+            $(".context_" + context).show();
+        }
+        
+        // show selected language only
+        var langCode = $("#languages").data("sel");
+        $(".translation").hide();
+        $(".lang_" + langCode).show();
     }
     
     function appendLanguage(obj, index) {
-        $("#languagesBody")
-        .append("<tr id=\"languageTR" + obj.langCode + "\">")
-        .append("<td><input type=\"radio\" id=\"lang_" + obj.langCode + "\" name=\"language\" value=\"" + obj.langCode + "\" onChange=\"onLanguageChange(this.value);\" /><label for=\"lang_" + obj.langCode + "\">"+ obj.langCode + " [" + obj.defaultLang.name + "]</label></td>")
-        .append("</tr>");
-        $("#languageTR" + obj.langCode).data("json", obj);
+        if (obj.defaultLang) {
+            $("#languagesBody")
+                .append("<tr id=\"languageTR" + obj.langCode + "\"></tr>");
+            $("#languageTR" + obj.langCode)
+                .append("<td>" +
+                "<input type=\"radio\" id=\"lang_" + obj.langCode + "\" name=\"language\" value=\"" + obj.langCode + "\" onChange=\"onLanguageChange(this.value);\" />" +
+                "<label for=\"lang_" + obj.langCode + "\">"+ obj.langCode + " [" + obj.defaultLang.name + "]" + "</label>" +
+                "</td>");
+//            $("#languageTR" + obj.langCode).data("json", obj);
+            
+            $("#tileTokensHeader")
+                .append('<th id="thTrans_' + obj.langCode + '">Translation (' + obj.langCode + ')</th>');
+            $("#thTrans_" + obj.langCode).addClass("lang_" + obj.langCode).addClass("translation");
+        }
+        else {
+            $("#langDefaultLabel").text(obj.langCode);
+            $("#langDefault").val(obj.langCode);
+            
+            $("#thTrans").text("Translation (" + obj.langCode + ")");
+            $("#thTrans").addClass("lang_" + obj.langCode).addClass("translation");
+        }
     }
     
     function onLanguageChange(langCode) {
-        var pl = $("#languageTR" + langCode).data("json");
-        $("#languages").data("sel", pl);
+        $("#languages").data("sel", langCode);
         updateTokens();
     }
-    
-    $("#projectTiles").ready(function() {
-        var projectName = $("#headerProject").text();
-        var p = $("#headerProject").data("project");
-        
-        // populate contexts
-        $.map(p.contexts, appendContext);
-        $("#contexts").data("sel", "");
-        
-        // update default language
-        $("#langDefault").val(p.defProjLang.langCode);
-        $("#langDefault").attr("id", "lang_" + p.defProjLang.langCode);
-        $("#langDefaultLabel").text(p.defProjLang.langCode);
-        $("#langDefaultLabel").attr("for", "lang_" + p.defProjLang.langCode);
-        $("#languageTRdefault").attr("id", "languageTR" + p.defProjLang.langCode);
-        $("#languageTR" + p.defProjLang.langCode).data("json", p.defProjLang);
-        
-        // populate languages
-        $.map(p.projLangs, appendLanguage);
-        $("#languages").data("sel", p.defProjLang);
-    
-        $.ajax({
-            async: false,
-            type: "GET",
-            url: "/api/project/v10/" + p.name + "/token",
-            dataType: "json",
-            success: function(data){
-                $("#tokensBody").data("json", data);
-                updateTokens();
-            },
-            error: function(req, textStatus, errorThrown) {}
-        });        
+
+function buildProjectTiles(p) {
+    $.map(p.contexts, function(c, index) {
+        appendContext(c, index);
     });
+    $.map(p.tokens, function(t, index) {
+        appendToken(t, index, p.defProjLang, p.projLangs);
+    });
+    $.map(p.projLangs, function(l, index) {
+        appendLanguage(l, index);
+    });
+}
+
+$(function() {
+    var p = $("#headerProject").data("json");
+
+    $("#contexts").data("sel", "");
+    $("#languages").data("sel", p.defProjLang.langCode);
+
+    buildProjectTiles(p);
+    updateTokens();
+});
+
+//    $(function() {
+//        var projectName = $("#headerProject").text();
+//        var p = $("#headerProject").data("project");
+//        
+//        // populate contexts
+//        $.map(p.contexts, appendContext);
+//        
+//        // update default language
+//        $("#langDefault").val(p.defProjLang.langCode);
+//        $("#langDefault").attr("id", "lang_" + p.defProjLang.langCode);
+//        $("#langDefaultLabel").text(p.defProjLang.langCode);
+//        $("#langDefaultLabel").attr("for", "lang_" + p.defProjLang.langCode);
+//        $("#languageTRdefault").attr("id", "languageTR" + p.defProjLang.langCode);
+//        $("#languageTR" + p.defProjLang.langCode).data("json", p.defProjLang);
+//        
+//        // populate languages
+//        $.map(p.projLangs, appendLanguage);
+//    
+//        $.ajax({
+//            async: false,
+//            type: "GET",
+//            url: "/api/project/v10/" + p.name + "/token",
+//            dataType: "json",
+//            success: function(data){
+//                $("#tokensBody").data("json", data);
+//                updateTokens();
+//            },
+//            error: function(req, textStatus, errorThrown) {}
+//        });        
+//    });
 
 </script>

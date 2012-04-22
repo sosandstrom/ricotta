@@ -1,6 +1,7 @@
 package com.wadpam.ricotta.dao;
 
 import com.google.appengine.api.datastore.Key;
+import java.util.List;
 
 /**
  * Business Methods interface for entity SubsetTokn.
@@ -13,5 +14,6 @@ import com.google.appengine.api.datastore.Key;
 public interface SubsetToknDao extends GeneratedSubsetToknDao<Key, Key> {
 
 	// TODO: declare your Business Methods here
-	
+
+    List<Key> findKeysByBranchKeyTokenId(Key branchKey, Long tokenId);
 }
