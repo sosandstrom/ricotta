@@ -4,11 +4,16 @@
  */
 package com.wadpam.ricotta.web;
 
+import com.google.appengine.api.users.UserServiceFactory;
 import com.wadpam.ricotta.dao.UberDaoBean;
+import com.wadpam.ricotta.model.v10.Me10;
 import com.wadpam.ricotta.model.v10.Proj10;
 import com.wadpam.ricotta.model.v10.Tokn10;
 import java.security.Principal;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 @Controller
 public class RestController {
+    
+    static final Logger LOG = LoggerFactory.getLogger(RestController.class);
     
     private UberDaoBean uberDao;
     
@@ -46,6 +53,21 @@ public class RestController {
         return new ResponseEntity(body, HttpStatus.OK);
     }
     
+    @RequestMapping(value="me/v10", method= RequestMethod.GET)
+    public ResponseEntity<Me10> me(Principal principal,
+            @RequestParam(value="path", defaultValue="/index.html") String path) {
+        final Me10 me = new Me10();
+        LOG.debug("path={}, principal is {}", path, principal);
+        if (null == principal) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Login-Logout-URL", UserServiceFactory.getUserService().createLoginURL(path));
+            return new ResponseEntity(headers, HttpStatus.UNAUTHORIZED);
+        }
+        me.setUrl(UserServiceFactory.getUserService().createLogoutURL(path));
+        me.setEmail(principal.getName());
+        return new ResponseEntity<Me10>(me, HttpStatus.OK);
+    }
+    
     @RequestMapping(value="project/v10/{projectName}/token/{tokenId}", method= RequestMethod.POST)
     public ResponseEntity<Tokn10> updateToken(
             @PathVariable String projectName, 
@@ -58,7 +80,7 @@ public class RestController {
         final String[] subs = subsets.split(separator);
         final Tokn10 body = uberDao.updateToken(projectName, ProjectHandlerInterceptor.NAME_TRUNK, tokenId, name, description, context, subs);
         if (null == body) {
-            return new ResponseEntity(null, HttpStatus.NOT_FOUND);
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity(body, HttpStatus.OK);
     }

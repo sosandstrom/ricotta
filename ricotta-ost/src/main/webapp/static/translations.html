@@ -29,7 +29,7 @@
                             <th id="thTrans">Translation</th>
                         </tr>
                     </thead>
-                    <tbody id="tokensBody"></tbody>
+                    <tbody id="tokensBody" class="ricotta-text-small"></tbody>
                     <tfoot>
                     </tfoot>
                 </table>
@@ -75,11 +75,11 @@
         var defLang = langCode;
         $("#tokensBody")
             .append("<tr id=\"tokenTR" + obj.id + "\"></tr>");
-        $("#tokenTR" + obj.id).addClass("context_" + obj.context).addClass("token");
+        $("#tokenTR" + obj.id).addClass("context_" + getSafe(obj.context)).addClass("token");
         $("#tokenTR" + obj.id)
-            .append("<td>" + obj.name + "</td>")
-            .append("<td>" + obj.description + "</td>")
-            .append("<td id=\"t_" + obj.id + "_" + defLang + "\">" + (obj.trans[langCode] ? obj.trans[langCode] : "") + "<span class=\"ui-icon ui-icon-pencil\" /></td>");
+            .append('<td title="' + obj.name + '">' + getShort(obj.name, 20) + "</td>")
+            .append('<td title="' + obj.description + '">' + getShort(obj.description,20) + "</td>")
+            .append('<td id="t_' + obj.id + '_' + defLang + '" title="' + (obj.trans[langCode] ? obj.trans[langCode] : '') + '"><pre>' + getShort(obj.trans[langCode] ? obj.trans[langCode] : '', 30) + '</pre><span class="ui-icon ui-icon-pencil" /></td>');
         // set the class attributes on this translation:
         $("#t_" + obj.id + "_" + langCode).addClass("lang_" + langCode).addClass("translation");
         $.map(projLangs, function(projLang, pi){
@@ -104,7 +104,7 @@
         else {
             // show selected context only
             $(".token").hide();
-            $(".context_" + context).show();
+            $(".context_" + getSafe(context)).show();
         }
         
         // show selected language only

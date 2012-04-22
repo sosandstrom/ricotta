@@ -1,4 +1,3 @@
-<h4 id="projectName">Project loading...</h4>
 <div id="projectTabs" style="display: none;">
     <ul>
         <li><a href="translations.html"><span>Translations</span></a></li>
@@ -8,17 +7,20 @@
 <script type="text/javascript">
 
 function loadProject(name) {
+    showToast("Loading project...");
     $.ajax({
         async: false,
         type: "GET",
         url: "/api/project/v10/" + name + "/token",
         dataType: "json",
         success: function(data){
+            hideToast();
             $("#headerProject").data("json", data);
-            $("#projectName").text("Project " + name);
             $("#projectTabs").show();
         },
-        error: function(req, textStatus, errorThrown) {}
+        error: function(req, textStatus, errorThrown) {
+            showToast(textStatus);
+        }
     });        
 }
 

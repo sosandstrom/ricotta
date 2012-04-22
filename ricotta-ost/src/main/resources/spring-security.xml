@@ -16,6 +16,7 @@
 		<security:intercept-url pattern="/_ah/**" filters="none" />
 		<security:intercept-url pattern="/static/**" filters="none" />
 		<security:intercept-url pattern="/api/doc/**" filters="none" />
+		<security:intercept-url pattern="/api/me/v10" filters="none" />
 		<!-- For generating calls -->
 		<security:intercept-url pattern="/proj/**/branch/**/lang/**/templ/**" filters="none" />
 		<security:intercept-url pattern="/projects/**/languages/**/templates/**" filters="none" />

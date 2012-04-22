@@ -543,26 +543,32 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         final ProjLang plSV = projLangDao.persist(branchKey, sv.getCode(), enKey, (Key) sv.getPrimaryKey());
 
         // Variant
-        final Subset ricottaOst = subsetDao.persist(branchKey, "ricotta-ost", "The web app");
-        final Subset ricottaPlugin = subsetDao.persist(branchKey, "ricotta-maven-plugin", "The maven plugin");
+        final Subset ricottaOst = subsetDao.persist(branchKey, "webapp", "The web app");
+        final Subset ricottaPlugin = subsetDao.persist(branchKey, "plugin", "The maven plugin");
+        final Subset android = subsetDao.persist(branchKey, "Android", "Android app");
 
         // Contexts
-        final Ctxt projects = ctxtDao.persist(branchKey, "projects", null, "The projects view");
+        final Ctxt projects = ctxtDao.persist(branchKey, "projects view", null, "The projects view");
+        final Ctxt home = ctxtDao.persist(branchKey, "Home view", null, "The Home view");
 
         // Tokens
         final Tokn appTitle = toknDao.persist(branchKey, 1L, "The Application title as displayed to the user", "appTitle",
-                (Key) projects.getPrimaryKey());
-        final Tokn tokenProject = toknDao.persist(branchKey, 2L, "The Project Entity", "Project", null);
+                projects.getPrimaryKey());
+        final Tokn tokenProject = toknDao.persist(branchKey, 2L, "The Project Entity", "project_Project_Android_Specific", null);
+        final Tokn tokenLong = toknDao.persist(branchKey, 3L, "A Really Long Token with Translations", "A Really Long Token with Translations", 
+                home.getPrimaryKey());
 
         // subset tokens
-        final SubsetTokn appTitleOst = subsetToknDao.persist(ricottaOst.getPrimaryKey(), 1L);
+        subsetToknDao.persist(ricottaOst.getPrimaryKey(), 1L);
         subsetToknDao.persist(ricottaOst.getPrimaryKey(), 2L);
         subsetToknDao.persist(ricottaPlugin.getPrimaryKey(), 1L);
+        subsetToknDao.persist(android.getPrimaryKey(), 1L);
 
         // Trans
         transDao.persist(plEN.getPrimaryKey(), appTitle.getId(), "Ricotta");
         transDao.persist(plGB.getPrimaryKey(), tokenProject.getId(), "Project");
         transDao.persist(plSV.getPrimaryKey(), tokenProject.getId(), "Projekt");
+        transDao.persist(plEN.getPrimaryKey(), tokenLong.getId(), "Ricotta is a Translations management</br>tool with complimentary build tools.");
 
     }
 

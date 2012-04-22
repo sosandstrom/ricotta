@@ -12,9 +12,11 @@
 #thContexts { width: 100%; }
 
 #tokens { width: 100%; }
-#thToken { width: 30%; }
-#thDescr { width: 30%; }
-#thTrans { width: 40%; }
+#thToken { width: 27%; }
+#thDescr { width: 28%; }
+#thTrans { width: 55%; }
 
 #languages { width: 100%; }
 #thLanguages { width: 100%; }
+
+.ricotta-text-small { font-size: smaller; }
