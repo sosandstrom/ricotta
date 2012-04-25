@@ -1,12 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.wadpam.ricotta.model.v10;
 
 import com.wadpam.ricotta.domain.Ctxt;
 import com.wadpam.ricotta.domain.ProjLang;
-import com.wadpam.ricotta.domain.Subset;
+import com.wadpam.ricotta.domain.ProjUser;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +22,8 @@ public class Proj10 {
     private List<Tokn10> tokens;
     
     private List<String> subsets;
+    
+    private List<ProjUser> users;
 
     public Proj10(String name, String owner) {
         this.name = name;
@@ -86,6 +84,14 @@ public class Proj10 {
 
     public void setTokens(List<Tokn10> tokens) {
         this.tokens = tokens;
+    }
+
+    public List<ProjUser> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<ProjUser> users) {
+        this.users = users;
     }
 
     

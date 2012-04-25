@@ -1,0 +1,111 @@
+    <table>
+        <thead class="ui-widget-header">
+		<tr>
+			<th><span class="ui-icon ui-icon-trash" /></th>
+                        <th><span class="ui-icon ui-icon-disk" /></th>
+			<th>Email</th>
+			<th>Role</th>
+		</tr>
+	</thead>
+        <tbody id="usersBody" class="ricotta-text-small"></tbody>
+        <tfoot>
+        </tfoot>
+        
+    </table>
+<button id="buttonAddUser">Add new user...</button>
+<script type="text/javascript">
+
+function updateUser(id, role) {
+    // find this user in data
+    var p = $("#headerProject").data("json");
+    $.map(p.users, function(t, i) {
+        if (t.keyString == id) {
+            t.role = role;
+            return;
+        }
+    });
+}
+
+
+function saveUser(id) {
+    showToast('Saving user role...');
+    var p = $("#headerProject").data("json");
+    
+    var body = {
+            role: $("#role_" + id).val()
+        };
+    
+    $.ajax({
+        type: "POST",
+        url: "/api/project/v10/" + p.name + "/user/" + id,
+        data: body,
+        dataType: "json",
+        success: function(data, textStatus, jqXHR){
+            updateUser(id, body.role);
+            clearChanged(id);
+            hideToast();
+        },
+        error: function(req, textStatus, errorThrown) {
+            showToast(textStatus);
+        }
+    });        
+    
+}
+
+function setChanged(id) {
+    $("#delete_" + id).hide();
+    $("#save_" + id).show();
+}
+
+function clearChanged(id) {
+    $("#delete_" + id).show();
+    $("#save_" + id).hide();
+}
+
+function buildUsersTable(p,roles) {
+    $.map(p.users, function(t, index) {
+        var id = t.keyString; //user.replace(/[@.]/gi, '_');
+        $("#usersBody").append('<tr id="user_' + id + '"></tr>');
+        
+        // icons
+        $("#user_" + id).append('<td>' +
+            '<span id="delete_' + id + '" class="ui-icon ui-icon-trash" onClick="deleteUser(\'' + id + '\');" />' +
+            '</td>');
+        $("#user_" + id).append('<td>' +
+            '<span id="save_' + id + '" class="ui-icon ui-icon-disk" onClick="saveUser(\'' + id + '\');" style="display: none" />' +
+            '</td>');
+
+        $("#user_" + id).append('<td>' + t.user + '</td>');
+        $("#user_" + id).append('<td><select id="role_' + id + '" onChange="setChanged(\'' + id + '\');" ></select></td>');
+        $.map(roles, function(r, ci) {
+            $("#role_" + id).append('<option value="' + r.grants + '" ' + 
+                (r.grants == t.role ? 'selected="selected" ' : '') +
+                '>' + r.name + '</option>');
+        });
+    });
+}
+
+$("#buttonAddUser").button().click(function() {
+
+});
+
+$(function() {
+    var roles = [];
+    $.ajax({
+        async: false,
+        type: "GET",
+        url: "/api/role/v10",
+        dataType: "json",
+        success: function(data){
+            roles = data;
+        },
+        error: function(req, textStatus, errorThrown) {
+            showToast(textStatus);
+        }
+    });        
+    
+    var p = $("#headerProject").data("json");
+    buildUsersTable(p, roles);
+});
+
+</script>

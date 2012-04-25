@@ -96,8 +96,8 @@ public class BranchController extends AbstractDaoController {
 
         // project users
         if (user.isDestroy()) {
-            List<Role> roleList = roleDao.findAll();
             Map<Long, String> roles = new TreeMap<Long, String>();
+            List<Role> roleList = roleDao.findAll();
             for(Role r : roleList) {
                 roles.put(r.getGrants(), r.getName());
             }

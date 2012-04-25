@@ -193,6 +193,14 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         return returnValue;
     }
     
+    private static List<Role> _roles = null;
+    public List<Role> getRoles() {
+        if (null == _roles) {
+            _roles = roleDao.findAll();
+        }
+        return _roles;
+    }
+    
     public Proj10 getTokens(String username, String projectName, String branchName) {
         final Proj10 proj = new Proj10(projectName, null);
         final Key projKey = projDao.createKey(projectName);
@@ -239,6 +247,9 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
                 t10.getSubsets().add(subset);
             }
         }
+        
+        // get project users
+        proj.setUsers(projUserDao.findByProj(projKey));
         
         return proj;
     }
@@ -532,6 +543,9 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         final Proj proj = projDao.persist("ricotta", "s.o.sandstrom@gmail.com");
         final Key projKey = (Key) proj.getPrimaryKey();
         projUserDao.persist(projKey, "test@example.com", Role.ROLE_OWNER);
+        projUserDao.persist(projKey, "developer@example.com", Role.ROLE_DEVELOPER);
+        projUserDao.persist(projKey, "translator@example.com", Role.ROLE_TRANSLATOR);
+        projUserDao.persist(projKey, "viewer@example.com", Role.ROLE_VIEWER);
 
         // trunk per project
         final Branch trunk = branchDao.persist(projKey, "trunk", "Latest version");
@@ -840,5 +854,19 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         }
         
         return t10;
+    }
+
+    public ProjUser updateUser(String keyString, Long role) {
+        ProjUser pu = null;
+        final Key projUserKey = KeyFactory.stringToKey(keyString);
+        final Key projKey = projUserKey.getParent();
+        
+        pu = projUserDao.findByPrimaryKey(projKey, projUserKey.getName());
+        if (null != pu) {
+            pu.setRole(role);
+            projUserDao.update(pu);
+        }
+        
+        return pu;
     }
 }

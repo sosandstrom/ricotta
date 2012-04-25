@@ -6,6 +6,8 @@ package com.wadpam.ricotta.web;
 
 import com.google.appengine.api.users.UserServiceFactory;
 import com.wadpam.ricotta.dao.UberDaoBean;
+import com.wadpam.ricotta.domain.ProjUser;
+import com.wadpam.ricotta.domain.Role;
 import com.wadpam.ricotta.model.v10.Me10;
 import com.wadpam.ricotta.model.v10.Proj10;
 import com.wadpam.ricotta.model.v10.Tokn10;
@@ -41,6 +43,11 @@ public class RestController {
         }
         return new ResponseEntity<List<Proj10>>(uberDao.getProjects(username), HttpStatus.OK);
     }
+    
+    @RequestMapping(value="role/v10", method= RequestMethod.GET)
+    public ResponseEntity<List<Role>> getRoles() {
+        return new ResponseEntity<List<Role>>(uberDao.getRoles(), HttpStatus.OK);
+    }
 
     @RequestMapping(value="project/v10/{name}/token", method= RequestMethod.GET)
     public ResponseEntity<Proj10> getTokens(Principal principal,
@@ -68,6 +75,17 @@ public class RestController {
         return new ResponseEntity<Me10>(me, HttpStatus.OK);
     }
     
+    @RequestMapping(value="project/v10/{projectName}/user/{keyString}", method= RequestMethod.POST)
+    public ResponseEntity<ProjUser> updateUser(
+            @PathVariable String keyString,
+            @RequestParam Long role) {
+        final ProjUser body = uberDao.updateUser(keyString, role);
+        if (null == body) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity(body, HttpStatus.OK);
+    }
+
     @RequestMapping(value="project/v10/{projectName}/token/{tokenId}", method= RequestMethod.POST)
     public ResponseEntity<Tokn10> updateToken(
             @PathVariable String projectName, 
