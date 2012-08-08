@@ -50,14 +50,14 @@ public class IndexController extends AbstractDaoController {
 
     @RequestMapping(value = "/index.html", method = RequestMethod.GET)
     public String getIndex(Model model) {
-        model.addAttribute("loginURL", UserServiceFactory.getUserService().createLoginURL("/index.html"));
+        model.addAttribute("loginURL", UserServiceFactory.getUserService().createLoginURL("/classic/index.html"));
         return "index";
     }
 
     @RequestMapping(value = "/logout.html", method = RequestMethod.GET)
     public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
         request.getSession().invalidate();
-        String logoutUrl = UserServiceFactory.getUserService().createLogoutURL("/loggedout.html");
+        String logoutUrl = UserServiceFactory.getUserService().createLogoutURL("/classic/loggedout.html");
         response.sendRedirect(logoutUrl);
     }
 

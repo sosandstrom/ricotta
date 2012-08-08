@@ -1,3 +1,4 @@
+<div id="homeDiv">
         <div id="homeTabs" class="ui-widget">
             <ul>
                 <li><a href="projects.html"><span>Projects</span></a></li>
@@ -6,18 +7,18 @@
             </ul>
         </div>
         <script type="text/javascript">
-$.ajaxSetup( {
-    cache: false,
-    data: null
-});
-
-$(function() {
+function homeReady() {
     $("#headerProject").hide();
     $("#headerView").hide();
     $("#headerContext").hide();
     $("#headerLanguage").hide();
     
     $("#homeTabs").tabs();
+}
+
+$(function() {
+    homeReady();
 });
 
         </script>
+</div>

@@ -158,41 +158,10 @@ $(function() {
     var p = $("#headerProject").data("json");
 
     $("#contexts").data("sel", "");
-    $("#languages").data("sel", p.defProjLang.langCode);
+//    $("#languages").data("sel", p.defProjLang.langCode);
 
     buildProjectTiles(p);
     updateTokens();
 });
-
-//    $(function() {
-//        var projectName = $("#headerProject").text();
-//        var p = $("#headerProject").data("project");
-//        
-//        // populate contexts
-//        $.map(p.contexts, appendContext);
-//        
-//        // update default language
-//        $("#langDefault").val(p.defProjLang.langCode);
-//        $("#langDefault").attr("id", "lang_" + p.defProjLang.langCode);
-//        $("#langDefaultLabel").text(p.defProjLang.langCode);
-//        $("#langDefaultLabel").attr("for", "lang_" + p.defProjLang.langCode);
-//        $("#languageTRdefault").attr("id", "languageTR" + p.defProjLang.langCode);
-//        $("#languageTR" + p.defProjLang.langCode).data("json", p.defProjLang);
-//        
-//        // populate languages
-//        $.map(p.projLangs, appendLanguage);
-//    
-//        $.ajax({
-//            async: false,
-//            type: "GET",
-//            url: "/api/project/v10/" + p.name + "/token",
-//            dataType: "json",
-//            success: function(data){
-//                $("#tokensBody").data("json", data);
-//                updateTokens();
-//            },
-//            error: function(req, textStatus, errorThrown) {}
-//        });        
-//    });
 
 </script>

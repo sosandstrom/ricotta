@@ -26,9 +26,13 @@
 		<property name="roleDao" ref="roleDao" />
 	</bean>
 
-	<mvc:annotation-driven />
+	<mvc:annotation-driven conversion-service="conversionService"/>
 	
 	<!-- As auto-wiring does not work well in GAE, define controllers manually: -->
+        
+        <bean id="adminTaskController" class="com.wadpam.ricotta.web.admin.AdminTaskController">
+            <property name="adminTaskBean" ref="uberDao" />
+        </bean>
 	
 	<bean id="branchController" class="com.wadpam.ricotta.web.BranchController">
 		<property name="ctxtDao" ref="ctxtDao" />
@@ -119,6 +123,15 @@
 			<bean class="com.wadpam.ricotta.web.RicottaBindingInitializer" />
 		</property>
 	</bean>
+
+        <bean id="conversionService"
+            class="org.springframework.context.support.ConversionServiceFactoryBean">
+            <property name="converters">
+                <list>
+                    <bean class="com.wadpam.ricotta.web.StringToKeyConverter"/>
+                </list>
+            </property>
+        </bean>
 
 <!--
 	<bean id="jsonView"

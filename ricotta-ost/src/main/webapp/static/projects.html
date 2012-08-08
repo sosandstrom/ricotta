@@ -9,7 +9,29 @@
     </tfoot>
 </table>
 <button id="createProjectButton" >Create new project...</button>
+<div id="createProjectDialog">
+    <p class="validateTips"></p>
+    <form>
+        <fieldset>
+            <label for="projName">Project name</label>
+            <input id="projName" name="projName"  class="text ui-widget-content ui-corner-all" />
+        </fieldset>
+    </form>
+</div>
+
 <script type="text/javascript">
+
+function populateProjects(data) {
+    $("#projectsBody").empty();
+    $.map(data, function(p, i) {
+        $("#projectsBody")
+        .append("<tr id=\"projectTR" + p.name + "\">")
+        .append("<td class=\"ui-state-default\" onClick=\"loadProject('" + p.name + "');\">" + p.name + "</td>")
+        .append("<td>" + p.owner + "</td>")
+        .append("</tr>");
+        $("#projectTR" + p.name).data("json", p);
+    });
+}
 
 function loadProject(projectName) {
     // copy json from table to header
@@ -24,9 +46,62 @@ function loadProject(projectName) {
 $(function() {
     // clear project name
     $("#headerProject").text("");
+
+    var projName = $("#projName"),
+        allFields = $([]).add(projName),
+        tips = $( ".validateTips" );
+
+    $("#createProjectDialog").dialog({
+        autoOpen: false,
+        height: 500,
+        width: 500,
+        modal: true,
+        title: "Enter the new project's name",
+        buttons: {
+            Cancel: function() {
+                $( this ).dialog("close");
+            },
+            "Create project": function() {
+                var bValid = true;
+                allFields.removeClass("ui-state-error");
+                bValid = bValid && checkLength(projName, "project name", 4, 16);
+
+                if (bValid) {
+                    $.ajax({
+                            async: false,
+                            type: "POST",
+                            url: "/api/project/v10",
+                            dataType: "json",
+                            data: {
+                                name: projName.val()
+                            }
+                        })
+                        .done(function(data){
+                                $("#createProjectDialog").dialog("close");
+//                                populateProjects(data);
+                                loadProject(projName.val());
+                            })
+                        .fail(function() {
+                                if (this.status == 409) {
+                                    updateTips('name already taken');
+                                } else {
+                                    updateTips(this.statusText);
+                                }
+                            });
+                }
+                
+            }
+        },
+        close: function() {
+            allFields.val( "" ).removeClass( "ui-state-error" );
+        },
+        open: function() {
+            updateTips("All form fields are required.");
+        }
+    });
     
     $("#createProjectButton").button().click(function() {
-        
+        $("#createProjectDialog").dialog("open");
     });
     
     $.ajax({
@@ -35,15 +110,7 @@ $(function() {
         url: "/api/project/v10",
         dataType: "json",
         success: function(data){
-            $.map(data, function(p, i) {
-                $("#projectsBody")
-                .append("<tr id=\"projectTR" + p.name + "\">")
-                .append("<td class=\"ui-state-default\" onClick=\"loadProject('" + p.name + "');\">" + p.name + "</td>")
-                .append("<td>" + p.owner + "</td>")
-                .append("</tr>");
-                $("#projectTR" + p.name).data("json", p);
-//                $("#projectsTotal").text(i+1);
-            });
+            populateProjects(data);
         },
         error: function(req, textStatus, errorThrown) {}
     });        

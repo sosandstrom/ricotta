@@ -8,7 +8,7 @@
 <body>
 <div class="pageHeading">Logged out</div>
 <ul>
-	<li><a href="/">Home</a></li>
+	<li><a href="/index.html">Home</a></li>
 </ul>
 </body>
 </html>

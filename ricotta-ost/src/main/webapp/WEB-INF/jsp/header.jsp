@@ -1,7 +1,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>Ricotta</title>
-	<link rel="stylesheet" href="/static/ricotta.css" />
+	<link rel="stylesheet" href="/ricotta.css" />
 	<script type="text/javascript">
 	
 	  var _gaq = _gaq || [];

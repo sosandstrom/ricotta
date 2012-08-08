@@ -49,9 +49,14 @@ import com.wadpam.ricotta.model.v10.Proj10;
 import com.wadpam.ricotta.model.v10.Tokn10;
 import com.wadpam.ricotta.web.AbstractDaoController;
 import com.wadpam.ricotta.web.ProjectHandlerInterceptor;
+import com.wadpam.ricotta.web.admin.AdminTask;
 import java.util.*;
+import java.util.logging.Level;
+import javax.xml.transform.TransformerConfigurationException;
+import net.sf.mardao.api.dao.AEDDaoImpl;
+import org.xml.sax.SAXException;
 
-public class UberDaoBean extends AbstractDaoController implements UberDao {
+public class UberDaoBean extends AbstractDaoController implements UberDao, AdminTask {
     public static final String NO_CONTEXT_NAME     = "_NO_CONTEXT_";
     
     static final Logger LOG = LoggerFactory.getLogger(UberDaoBean.class);
@@ -60,6 +65,14 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         populate();
         patchRoles();
         patchBranches();
+    }
+
+    @Override
+    public Object processTask(String taskName) {
+        if ("dump_xml_to_blob".equals(taskName)) {
+            return processDumpXmlToBlob();
+        }
+        return null;
     }
     
     protected static Proj10 convert(Proj from) {
@@ -663,7 +676,11 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
     }
 
     @Override
-    public Object createProj(String name, String owner) {
+    public Object createProj(String name, String owner) throws IllegalArgumentException {
+        final Proj existing = projDao.findByPrimaryKey(name);
+        if (null != existing) {
+            throw new IllegalArgumentException("Project with name already exists");
+        }
         final Proj p = projDao.persist(name, owner);
         createUser(p.getPrimaryKey(), owner, Role.ROLE_OWNER);
         return p.getPrimaryKey();
@@ -785,6 +802,10 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         // the proj
         projDao.deleteByCore(projKey);
     }
+    
+    public Proj getProj(String name) {
+        return projDao.findByPrimaryKey(name);
+    }
 
     protected static final Comparator<Proj> PROJ_COMPARATOR = new Comparator<Proj>() {
 
@@ -868,5 +889,25 @@ public class UberDaoBean extends AbstractDaoController implements UberDao {
         }
         
         return pu;
+    }
+
+    private Object processDumpXmlToBlob() {
+        try {
+            final BlobKey returnValue = AEDDaoImpl.xmlWriteToBlob(
+                    langDao, projDao, roleDao, templateDao, // AppUserDao,
+                    projUserDao, branchDao,
+                    ctxtDao, projLangDao, subsetDao,
+                    toknDao, transDao, subsetToknDao);
+            return returnValue;
+        } catch (IOException ex) {
+            LOG.error("IOException dumping XML", ex);
+            return ex.getMessage();
+        } catch (SAXException ex) {
+            LOG.error("SAXException dumping XML", ex);
+            return ex.getMessage();
+        } catch (TransformerConfigurationException ex) {
+            LOG.error("TransformerConfigurationException dumping XML", ex);
+            return ex.getMessage();
+        }
     }
 }

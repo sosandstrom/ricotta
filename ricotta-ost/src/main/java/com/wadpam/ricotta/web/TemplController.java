@@ -19,11 +19,11 @@ import com.wadpam.ricotta.domain.Template;
  * Created by Ola on Nov 12, 2010
  */
 @Controller
-@RequestMapping("/templ/")
+@RequestMapping("templ")
 public class TemplController extends AbstractDaoController {
     static final Logger LOGGER = LoggerFactory.getLogger(TemplController.class);
 
-    @RequestMapping(value = "index.html", method = RequestMethod.GET)
+    @RequestMapping(value = {"index.html", ""}, method = RequestMethod.GET)
     public String getTemplates(HttpServletRequest request, Model model) {
         LOGGER.debug("get templ list");
 
@@ -46,7 +46,7 @@ public class TemplController extends AbstractDaoController {
         return "redirect:index.html";
     }
 
-    @RequestMapping(value = "/{templName}/index.html", method = RequestMethod.GET)
+    @RequestMapping(value = {"/{templName}/index.html","{templName}/"}, method = RequestMethod.GET)
     public String editTemplate(Model model, @PathVariable String templName) {
         LOGGER.debug("display create templ form");
         Template existing = templateDao.findByPrimaryKey(templName);
@@ -54,7 +54,7 @@ public class TemplController extends AbstractDaoController {
         return "editMall";
     }
 
-    @RequestMapping(value = "/{templName}/index.html", method = RequestMethod.POST)
+    @RequestMapping(value = {"/{templName}/index.html","{templName}/"}, method = RequestMethod.POST)
     public String updateTemplate(HttpServletRequest request, @ModelAttribute("mall") Template templ,
             @PathVariable String templName) throws IOException {
         LOGGER.debug("save mall");

@@ -8,29 +8,29 @@
 <jsp:include page="header.jsp" />
 <body>
 <c:if test="${null != pageContext.request.userPrincipal}">
-		<a href="/logout.html">
+		<a href="logout.html">
 		  <spring:message code="ric_lnk_logout"/>
 		</a>
 		<c:out value="${pageContext.request.userPrincipal.name}" />
 	</c:if>
 <div class="pageHeading">
-    <spring:message code="ric_lnk_home"/>
+    <spring:message code="ric_lnk_home"/> - Try the <a href="/index.html">new look</a>
 </div>
 <ul>
 <c:choose>
 <c:when test="${null != pageContext.request.userPrincipal}">
 	<li>
-	   <a href="/proj/">
+	   <a href="proj/">
 	       <spring:message code="ric_lnk_projects"/>
 	   </a>
 	</li>
 	<li>
-	   <a href="/lang/">
+	   <a href="lang/">
 	       <spring:message code="ric_lnk_languages"/>
 	   </a>
 	</li>
 	<li>
-	   <a href="/templ/">
+	   <a href="templ/">
 	       <spring:message code="ric_lnk_templates"/>
 	   </a>
 	</li>
@@ -56,12 +56,12 @@
 }(document, 'script', 'facebook-jssdk'));</script>
 <div class="fb-comments" data-href="http://ricotta-ost.appspot.com/" data-num-posts="2" data-width="500">
 </div>
-<div><img src="/static/RicottaOverview.2.png" alt="Ricotta Overview" /></div>
+<div><img src="/RicottaOverview.2.png" alt="Ricotta Overview" /></div>
 <div>Source repository: <a href="https://bitbucket.org/f94os/ricotta-ost">https://bitbucket.org/f94os/ricotta-ost</a></div>
 <div>Contact: <a href="mailto:s.o.sandstrom@gmail.com">s.o.sandstrom@gmail.com</a</div>
 <h3>Downloads</h3>
-<div><a href="/static/ricotta-maven-plugin-7.zip">command line tool</a></div>
-<div><a href="/static/ricotta-maven-plugin-15.jar">ricotta-maven-plugin</a></div>
-<div><a href="/static/pom.xml">Example maven pom.xml</a></div>
+<div><a href="/ricotta-maven-plugin-7.zip">command line tool</a></div>
+<div><a href="/ricotta-maven-plugin-15.jar">ricotta-maven-plugin</a></div>
+<div><a href="/pom.xml">Example maven pom.xml</a></div>
 </body>
 </html>

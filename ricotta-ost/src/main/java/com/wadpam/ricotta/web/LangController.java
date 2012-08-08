@@ -18,11 +18,11 @@ import com.wadpam.ricotta.domain.Lang;
  * Created by Ola on Nov 12, 2010
  */
 @Controller
-@RequestMapping("/lang/")
+@RequestMapping("lang")
 public class LangController extends AbstractDaoController {
     static final Logger LOGGER = LoggerFactory.getLogger(LangController.class);
 
-    @RequestMapping(value = "index.html", method = RequestMethod.GET)
+    @RequestMapping(value = {"index.html", ""}, method = RequestMethod.GET)
     public String getLangss(HttpServletRequest request, Model model) {
         LOGGER.debug("get languages");
 
@@ -42,7 +42,7 @@ public class LangController extends AbstractDaoController {
 
         langDao.persist(lang);
 
-        return "redirect:/lang/";
+        return "redirect:index.html";
     }
 
 }

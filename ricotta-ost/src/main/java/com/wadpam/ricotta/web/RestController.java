@@ -35,6 +35,28 @@ public class RestController {
     
     private UberDaoBean uberDao;
     
+    @RequestMapping(value="project/v10", method= RequestMethod.POST)
+    public ResponseEntity<List<Proj10>> createProject(Principal principal,
+            @RequestParam String name) {
+        String username = "Googlebot";
+        if (null != principal) {
+            username = principal.getName();
+        }
+        
+        try {
+            Object projKey = uberDao.createProj(name, username);
+            
+            // create a trunk branch
+            Object branch = uberDao.createBranch(projKey, ProjectHandlerInterceptor.NAME_TRUNK, "The main branch");
+
+        }
+        catch (IllegalArgumentException alreadyExists) {
+            return new ResponseEntity(HttpStatus.CONFLICT);
+        }
+        
+        return new ResponseEntity<List<Proj10>>(uberDao.getProjects(username), HttpStatus.OK);
+    }
+    
     @RequestMapping(value="project/v10", method= RequestMethod.GET)
     public ResponseEntity<List<Proj10>> getProjects(Principal principal) {
         String username = "Googlebot";

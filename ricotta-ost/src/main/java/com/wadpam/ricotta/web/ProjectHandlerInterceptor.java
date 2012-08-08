@@ -57,7 +57,7 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
                                                               .compile("\\A/projects/([^/]+)/languages/([^/]+)/templates/([^/]+)/");
     static final Pattern          REGEXP_ARTIFACT     = Pattern.compile("/artifacts/([^/]+)/");
 
-    static final Pattern          REGEXP_PROJ         = Pattern.compile("\\A/proj/([^/]+)/");
+    static final Pattern          REGEXP_PROJ         = Pattern.compile("\\A/classic/proj/([^/]+)/");
     static final Pattern          REGEXP_BRANCH       = Pattern.compile("/branch/([^/]+)/");
     static final Pattern          REGEXP_LANG         = Pattern.compile("/lang/([^/]+)/");
     static final Pattern          REGEXP_CONTEXT      = Pattern.compile("/ctxt/([^/]+)/");
@@ -111,7 +111,9 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
 
         // try /proj/{projname} first
         matcher = REGEXP_PROJ.matcher(requestURI);
-        if (matcher.find()) {
+        boolean projMatch = matcher.find();
+        LOG.debug("projMatch for {} is {}", requestURI, projMatch);
+        if (projMatch) {
             final String projName = matcher.group(1);
 
             // create projKey first

@@ -29,7 +29,7 @@
         
         <div id="contents" class="ui-widget"></div>
         
-        <div id="footer" class="ui-widget">Ricotta translations management tool</div>
+        <div id="footer" class="ui-widget">Ricotta translations management tool <a href="/classic/index.html">Classic view</a></div>
         <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
         <script type="text/javascript" src="js/jquery-ui-1.8.17.custom.min.js"></script>
 	<script type="text/javascript" src="ricotta_common.js"></script>
@@ -54,7 +54,7 @@ $(document).ready(function() {
         type: "GET",
         url: "/api/me/v10",
         data: {
-            path: "/static/index.html"
+            path: "/index.html"
         },
         dataType: "json",
         success: function(data){
@@ -69,13 +69,13 @@ $(document).ready(function() {
             hideToast();
             $("#headerUsername").text("Anonymous");
             $("#headerUserAction").attr("href", jqXHR.getResponseHeader("Login-Logout-URL"));
-            $("#contents").html('<img src="/static/RicottaOverview.2.png" alt="Ricotta Overview" />');
+            $("#contents").html('<img src="/RicottaOverview.2.png" alt="Ricotta Overview" />');
         }
     });        
 });
 
 $("#headerHome").click(function() {
-    $("#contents").html("Loading...").load("home.html");
+    document.location = "index.html";
 });
 $("#headerProject").click(function() {
     $("#contents").html("Loading...").load("project.html");

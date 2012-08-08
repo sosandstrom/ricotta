@@ -12,43 +12,64 @@
 
 	<!-- ============== DaoBeans for entities in package com.wadpam.ricotta.domain ============ -->
 	<bean id="projLangDao" 
-		class="com.wadpam.ricotta.dao.ProjLangDaoBean">
+		class="com.wadpam.ricotta.dao.ProjLangDaoBean"
+                init-method="init">
+                <property name="mardaoParentDao" ref="branchDao" />
 	</bean>
 	<bean id="langDao" 
-		class="com.wadpam.ricotta.dao.LangDaoBean">
+		class="com.wadpam.ricotta.dao.LangDaoBean"
+                init-method="init">
 	</bean>
 	<bean id="branchDao" 
-		class="com.wadpam.ricotta.dao.BranchDaoBean">
+		class="com.wadpam.ricotta.dao.BranchDaoBean"
+                init-method="init">
+                <property name="mardaoParentDao" ref="projDao" />
 	</bean>
 	<bean id="templateDao" 
-		class="com.wadpam.ricotta.dao.TemplateDaoBean">
+		class="com.wadpam.ricotta.dao.TemplateDaoBean"
+                init-method="init">
 	</bean>
 	<bean id="projDao" 
-		class="com.wadpam.ricotta.dao.ProjDaoBean">
+		class="com.wadpam.ricotta.dao.ProjDaoBean"
+                init-method="init">
 	</bean>
 	<bean id="toknDao" 
-		class="com.wadpam.ricotta.dao.ToknDaoBean">
+		class="com.wadpam.ricotta.dao.ToknDaoBean"
+                init-method="init">
+                <property name="mardaoParentDao" ref="branchDao" />
 	</bean>
 	<bean id="projUserDao" 
-		class="com.wadpam.ricotta.dao.ProjUserDaoBean">
+		class="com.wadpam.ricotta.dao.ProjUserDaoBean"
+                init-method="init">
+                <property name="mardaoParentDao" ref="projDao" />
 	</bean>
 	<bean id="subsetToknDao" 
-		class="com.wadpam.ricotta.dao.SubsetToknDaoBean">
+		class="com.wadpam.ricotta.dao.SubsetToknDaoBean"
+                init-method="init">
+                <property name="mardaoParentDao" ref="subsetDao" />
 	</bean>
 	<bean id="ctxtDao" 
-		class="com.wadpam.ricotta.dao.CtxtDaoBean">
+		class="com.wadpam.ricotta.dao.CtxtDaoBean"
+                init-method="init">
+                <property name="mardaoParentDao" ref="branchDao" />
 	</bean>
 	<bean id="transDao" 
-		class="com.wadpam.ricotta.dao.TransDaoBean">
+		class="com.wadpam.ricotta.dao.TransDaoBean"
+                init-method="init">
+                <property name="mardaoParentDao" ref="projLangDao" />
 	</bean>
 	<bean id="roleDao" 
-		class="com.wadpam.ricotta.dao.RoleDaoBean">
+		class="com.wadpam.ricotta.dao.RoleDaoBean"
+                init-method="init">
 	</bean>
 	<bean id="subsetDao" 
-		class="com.wadpam.ricotta.dao.SubsetDaoBean">
+		class="com.wadpam.ricotta.dao.SubsetDaoBean"
+                init-method="init">
+                <property name="mardaoParentDao" ref="branchDao" />
 	</bean>
 	<bean id="appUserDao" 
-		class="com.wadpam.ricotta.dao.AppUserDaoBean">
+		class="com.wadpam.ricotta.dao.AppUserDaoBean"
+                init-method="init">
 	</bean>
 	
 

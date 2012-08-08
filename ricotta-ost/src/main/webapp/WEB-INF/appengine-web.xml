@@ -10,9 +10,12 @@ xsi:schemaLocation="http://appengine.google.com/ns/1.0 http://googleappengine.go
 
     <sessions-enabled>true</sessions-enabled>
     
+    <public-root>/static/</public-root>
     <static-files>
     	<include path="/favicon.ico"></include>
     	<include path="/static/**"></include>
     </static-files>
+    
+    <threadsafe>true</threadsafe>
 
 </appengine-web-app>

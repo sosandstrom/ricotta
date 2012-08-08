@@ -14,7 +14,7 @@
 	<!-- Specify hard-coded project properties here -->
 	<properties>
 		<gae.version>1.6.1</gae.version>
-		<mardao.version>1.18</mardao.version>
+		<mardao.version>1.33-SNAPSHOT</mardao.version>
 		<spring.version>3.1.0.RELEASE</spring.version>
 		<!-- This is just for "eclipse:eclipse" goal to always attempt downloading 
 			sources -->
@@ -276,7 +276,7 @@
 				daos (in process-sources) -->
 			<plugin>
 				<groupId>net.sf.mardao</groupId>
-				<artifactId>maven-mardao-plugin</artifactId>
+				<artifactId>mardao-maven-plugin</artifactId>
 				<version>${mardao.version}</version>
 				<executions>
 					<execution>

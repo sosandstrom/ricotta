@@ -34,13 +34,13 @@ import com.wadpam.ricotta.domain.Subset;
 import com.wadpam.ricotta.model.ProjLangModel;
 
 @Controller
-@RequestMapping(value = "/proj/{projName}")
+@RequestMapping(value = "proj/{projName}")
 public class BranchController extends AbstractDaoController {
     static final Logger            LOG              = LoggerFactory.getLogger(BranchController.class);
 
     private final BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
 
-    @RequestMapping(value = "index.html")
+    @RequestMapping(value = {"index.html",""})
     public String getTrunk(HttpServletRequest request, @PathVariable String projName) {
         return String.format("redirect:/proj/%s/branch/%s/", projName,
                 request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHNAME));
@@ -59,7 +59,7 @@ public class BranchController extends AbstractDaoController {
         model.addAttribute("roles", roles);
     }
 
-    @RequestMapping(value = "branch/{branchName}/index.html", method = RequestMethod.GET)
+    @RequestMapping(value = {"branch/{branchName}/index.html", "branch/{branchName}/"}, method = RequestMethod.GET)
     public String getBranch(Model model, HttpServletRequest request) {
         final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);
         final ProjUser user = (ProjUser) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJUSER);
@@ -109,7 +109,7 @@ public class BranchController extends AbstractDaoController {
         return "branch";
     }
 
-    @RequestMapping(value = "branch/{branchName}/index.html", method = RequestMethod.POST)
+    @RequestMapping(value = {"branch/{branchName}/index.html", "branch/{branchName}/"}, method = RequestMethod.POST)
     public String postBranch(Model model, HttpServletRequest request) {
         final Key projKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJKEY);
         final Key branchKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_BRANCHKEY);

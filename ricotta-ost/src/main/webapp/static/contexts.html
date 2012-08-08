@@ -1,0 +1,91 @@
+    <table>
+        <thead class="ui-widget-header">
+		<tr>
+			<th><span class="ui-icon ui-icon-trash" /></th>
+                        <th><span class="ui-icon ui-icon-disk" /></th>
+			<th>Name</th>
+			<th>Description</th>
+		</tr>
+	</thead>
+        <tbody id="contextsBody" class="ricotta-text-small"></tbody>
+        <tfoot>
+        </tfoot>
+        
+    </table>
+<button id="buttonAddContext">Add new context...</button>
+<script type="text/javascript">
+
+function updateUser(id, role) {
+    // find this user in data
+    var p = $("#headerProject").data("json");
+    $.map(p.users, function(t, i) {
+        if (t.keyString == id) {
+            t.role = role;
+            return;
+        }
+    });
+}
+
+function saveUser(id) {
+    showToast('Saving user role...');
+    var p = $("#headerProject").data("json");
+    
+    var body = {
+            role: $("#role_" + id).val()
+        };
+    
+    $.ajax({
+        type: "POST",
+        url: "/api/project/v10/" + p.name + "/user/" + id,
+        data: body,
+        dataType: "json",
+        success: function(data, textStatus, jqXHR){
+            updateUser(id, body.role);
+            clearChanged(id);
+            hideToast();
+        },
+        error: function(req, textStatus, errorThrown) {
+            showToast(textStatus);
+        }
+    });        
+    
+}
+
+function setChanged(id) {
+    $("#delete_" + id).hide();
+    $("#save_" + id).show();
+}
+
+function clearChanged(id) {
+    $("#delete_" + id).show();
+    $("#save_" + id).hide();
+}
+
+function buildContextsTable(p) {
+    $.map(p.contexts, function(t, index) {
+        var id = t.keyString;
+        $("#contextsBody").append('<tr id="context_' + id + '"></tr>');
+        
+        // icons
+        $("#context_" + id).append('<td>' +
+            '<span id="delete_' + id + '" class="ui-icon ui-icon-trash" onClick="deleteContext(\'' + id + '\');" />' +
+            '</td>');
+        $("#context_" + id).append('<td>' +
+            '<span id="save_' + id + '" class="ui-icon ui-icon-disk" onClick="saveContext(\'' + id + '\');" style="display: none" />' +
+            '</td>');
+//
+//        $("#context_" + id).append('<td>' + t.name + '</td>');
+//        $("#context_" + id).append('<td><input id="description_' + id + '" onChange="setChanged(\'' + id + '\');" value="' + t.description + '" /></td>');
+    });
+}
+
+$("#buttonAddContext").button().click(function() {
+
+});
+
+$(function() {
+    var p = $("#headerProject").data("json");
+    buildContextsTable(p);
+});
+
+</script>

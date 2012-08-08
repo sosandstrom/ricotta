@@ -23,11 +23,11 @@ import com.wadpam.ricotta.domain.Role;
 import com.wadpam.ricotta.velocity.Encoder;
 
 @Controller
-@RequestMapping(value = "/proj")
+@RequestMapping(value = "proj")
 public class ProjController extends AbstractDaoController {
     static final Logger LOG = LoggerFactory.getLogger(ProjController.class);
     
-    @RequestMapping(value = "index.html")
+    @RequestMapping(value = {"index.html", ""})
     public String getProjs(Model model, HttpServletRequest request) {
         // projects
         String username = "Googlebot";
