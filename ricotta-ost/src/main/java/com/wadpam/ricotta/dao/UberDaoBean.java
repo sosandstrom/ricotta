@@ -51,7 +51,7 @@ import com.wadpam.ricotta.web.AbstractDaoController;
 import com.wadpam.ricotta.web.ProjectHandlerInterceptor;
 import com.wadpam.ricotta.web.admin.AdminTask;
 import java.util.*;
-import java.util.logging.Level;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import net.sf.mardao.api.dao.AEDDaoImpl;
 import org.xml.sax.SAXException;
@@ -66,12 +66,29 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         patchRoles();
         patchBranches();
     }
+    
+    protected static String getParam(Map<String,String[]> params, String name) {
+        final String values[] = params.get(name);
+        if (null != values && 0 < values.length) {
+            return values[0];
+        }
+        return null;
+    }
 
     @Override
-    public Object processTask(String taskName) {
+    public Object processTask(String taskName, Map parameterMap) {
+        Map<String,String[]> params = parameterMap;
+        
+        // write XML dump to BlobStore
         if ("dump_xml_to_blob".equals(taskName)) {
             return processDumpXmlToBlob();
         }
+        
+        // parse XML and persist
+        if ("persist_xml_blob".equals(taskName)) {
+            return persistXmlBlob(params);
+        }
+        
         return null;
     }
     
@@ -893,7 +910,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
 
     private Object processDumpXmlToBlob() {
         try {
-            final BlobKey returnValue = AEDDaoImpl.xmlWriteToBlob(
+            final BlobKey returnValue = AEDDaoImpl.xmlWriteToBlobs(
                     langDao, projDao, roleDao, templateDao, // AppUserDao,
                     projUserDao, branchDao,
                     ctxtDao, projLangDao, subsetDao,
@@ -907,6 +924,31 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
             return ex.getMessage();
         } catch (TransformerConfigurationException ex) {
             LOG.error("TransformerConfigurationException dumping XML", ex);
+            return ex.getMessage();
+        }
+    }
+    
+    protected Object persistXmlBlob(Map<String,String[]> params) {
+        try {
+            String baseUrl = getParam(params, "baseUrl");
+            String blobKey = getParam(params, "blobKey");
+
+            if (null != baseUrl && null != blobKey) {
+                AEDDaoImpl.xmlParseFromBlobs(baseUrl, blobKey,
+                        langDao, projDao, roleDao, templateDao, // AppUserDao,
+                        projUserDao, branchDao,
+                        ctxtDao, projLangDao, subsetDao,
+                        toknDao, transDao, subsetToknDao);
+            }
+            return blobKey;
+        } catch (IOException ex) {
+            LOG.error("IOException dumping XML", ex);
+            return ex.getMessage();
+        } catch (SAXException ex) {
+            LOG.error("SAXException dumping XML", ex);
+            return ex.getMessage();
+        } catch (ParserConfigurationException ex) {
+            LOG.error("ParserConfigurationException dumping XML", ex);
             return ex.getMessage();
         }
     }

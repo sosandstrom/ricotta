@@ -4,10 +4,12 @@
  */
 package com.wadpam.ricotta.web.admin;
 
+import java.util.Map;
+
 /**
  *
  * @author os
  */
 public interface AdminTask {
-    Object processTask(String taskName);
+    Object processTask(String taskName, Map parameterMap);
 }

@@ -19,6 +19,8 @@
 		<security:intercept-url pattern="/api/me/v10" filters="none" />
                 <!-- for AdminTaskController, security is handled by J2EE in web.xml -->
 		<security:intercept-url pattern="/api/_admin/task/**" filters="none" />
+		<!-- For screenshot calls to be served by BlobStoreService: -->
+		<security:intercept-url pattern="/screenshot" filters="none" />
 		<!-- For generating calls -->
 		<security:intercept-url pattern="/proj/**/branch/**/lang/**/templ/**" filters="none" />
 		<security:intercept-url pattern="/projects/**/languages/**/templates/**" filters="none" />

@@ -4,6 +4,7 @@
  */
 package com.wadpam.ricotta.web.admin;
 
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +12,7 @@ import org.slf4j.LoggerFactory;
  * An adapter which does nothing in processTask
  * @author os
  */
-public class AdminTaskAdapter {
+public class AdminTaskAdapter implements AdminTask{
     protected static final Logger LOG = LoggerFactory.getLogger(AdminTaskAdapter.class);
     
     /**
@@ -19,7 +20,8 @@ public class AdminTaskAdapter {
      * @param taskName the name of the task to process
      * @return an object to serialize into JSON for response body
      */
-    public Object processTask(String taskName) {
+    @Override
+    public Object processTask(String taskName, Map parameterMap) {
         LOG.warn("Unknown task: {}", taskName);
         return null;
     }
