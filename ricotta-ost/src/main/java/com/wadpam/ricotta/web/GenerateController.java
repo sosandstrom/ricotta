@@ -25,6 +25,7 @@ import com.wadpam.ricotta.model.TransModel;
 import com.wadpam.ricotta.velocity.Encoder;
 
 @Controller
+@RequestMapping(value="{projName}/branch/{branchName}/lang/{langCode}/templ/{templName}")
 public class GenerateController extends AbstractDaoController {
     static final Logger LOG = LoggerFactory.getLogger(GenerateController.class);
     
@@ -42,26 +43,14 @@ public class GenerateController extends AbstractDaoController {
         Velocity.init(p);
     }    
 
-    @RequestMapping(value = "/proj/{projName}/branch/{branchName}/lang/{langCode}/templ/{templName}/index.html", method = RequestMethod.GET)
+    @RequestMapping(value = {"", "index.html"}, method = RequestMethod.GET)
     public String getTempl(HttpServletRequest request, HttpServletResponse response) throws ResourceNotFoundException,
             ParseErrorException, Exception {
         return renderTemplBySubset(request, response);
     }
 
-    @RequestMapping(value = "/proj/{projName}/branch/{branchName}/lang/{langCode}/templ/{templName}/subset/{subsetName}/index.html", method = RequestMethod.GET)
+    @RequestMapping(value = {"subset/{subsetName}","subset/{subsetName}/index.html"}, method = RequestMethod.GET)
     public String getTemplSubset(HttpServletRequest request, HttpServletResponse response) throws ResourceNotFoundException,
-            ParseErrorException, Exception {
-        return renderTemplBySubset(request, response);
-    }
-
-    @RequestMapping(value = "/projects/{projName}/languages/{langCode}/templates/{templName}/index.html", method = RequestMethod.GET)
-    public String getMall(HttpServletRequest request, HttpServletResponse response) throws ResourceNotFoundException,
-            ParseErrorException, Exception {
-        return renderTemplBySubset(request, response);
-    }
-
-    @RequestMapping(value = "/projects/{projName}/languages/{langCode}/templates/{templName}/artifacts/{subsetName}/index.html", method = RequestMethod.GET)
-    public String getMallArtifact(HttpServletRequest request, HttpServletResponse response) throws ResourceNotFoundException,
             ParseErrorException, Exception {
         return renderTemplBySubset(request, response);
     }

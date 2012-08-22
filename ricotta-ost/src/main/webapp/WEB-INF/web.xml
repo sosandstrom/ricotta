@@ -51,6 +51,10 @@
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>ricotta</servlet-name>
+		<url-pattern>/proj/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>ricotta</servlet-name>
 		<url-pattern>/api/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>

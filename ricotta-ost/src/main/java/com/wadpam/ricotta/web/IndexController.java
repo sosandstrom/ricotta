@@ -54,6 +54,11 @@ public class IndexController extends AbstractDaoController {
         return "index";
     }
 
+    @RequestMapping(value = "/commercial_license.html", method = RequestMethod.GET)
+    public String getLicense(Model model) {
+        return "commercial_license";
+    }
+
     @RequestMapping(value = "/logout.html", method = RequestMethod.GET)
     public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
         request.getSession().invalidate();

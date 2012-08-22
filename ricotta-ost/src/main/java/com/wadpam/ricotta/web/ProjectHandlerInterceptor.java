@@ -57,7 +57,7 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
                                                               .compile("\\A/projects/([^/]+)/languages/([^/]+)/templates/([^/]+)/");
     static final Pattern          REGEXP_ARTIFACT     = Pattern.compile("/artifacts/([^/]+)/");
 
-    static final Pattern          REGEXP_PROJ         = Pattern.compile("\\A/classic/proj/([^/]+)/");
+    static final Pattern          REGEXP_PROJ         = Pattern.compile("/proj/([^/]+)/");
     static final Pattern          REGEXP_BRANCH       = Pattern.compile("/branch/([^/]+)/");
     static final Pattern          REGEXP_LANG         = Pattern.compile("/lang/([^/]+)/");
     static final Pattern          REGEXP_CONTEXT      = Pattern.compile("/ctxt/([^/]+)/");

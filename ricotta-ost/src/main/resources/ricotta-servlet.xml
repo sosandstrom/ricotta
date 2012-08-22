@@ -109,6 +109,7 @@
 -->
         <mvc:interceptors>
             <mvc:interceptor>
+                <mvc:mapping path="/*/branch/**"/>
                 <mvc:mapping path="/proj/**"/>
                 <bean id="projectHandlerInterceptor" class="com.wadpam.ricotta.web.ProjectHandlerInterceptor">
                         <property name="projDao" ref="projDao" />
