@@ -3,19 +3,19 @@
 	<parent>
 		<groupId>com.wadpam.ricotta</groupId>
 		<artifactId>ricotta</artifactId>
-		<version>24-SNAPSHOT</version>
+		<version>25-SNAPSHOT</version>
 	</parent>
 	<groupId>com.wadpam.ricotta</groupId>
 	<artifactId>ricotta-ost</artifactId>
-	<version>24-SNAPSHOT</version>
+	<version>25-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>${project.groupId}:${project.artifactId}</name>
 
 	<!-- Specify hard-coded project properties here -->
 	<properties>
 		<gae.version>1.6.1</gae.version>
-		<mardao.version>1.18</mardao.version>
-		<spring.version>3.0.2.RELEASE</spring.version>
+		<mardao.version>1.36</mardao.version>
+		<spring.version>3.1.0.RELEASE</spring.version>
 		<!-- This is just for "eclipse:eclipse" goal to always attempt downloading 
 			sources -->
 		<downloadSources>true</downloadSources>
@@ -88,6 +88,17 @@
 			<version>${spring.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-config</artifactId>
 			<version>3.0.3.RELEASE</version>
@@ -151,12 +162,6 @@
 			<artifactId>slf4j-jdk14</artifactId>
 			<version>1.6.1</version>
 			<scope>runtime</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-webmvc</artifactId>
-			<version>${spring.version}</version>
 		</dependency>
 
                 <dependency>
@@ -271,7 +276,7 @@
 				daos (in process-sources) -->
 			<plugin>
 				<groupId>net.sf.mardao</groupId>
-				<artifactId>maven-mardao-plugin</artifactId>
+				<artifactId>mardao-maven-plugin</artifactId>
 				<version>${mardao.version}</version>
 				<executions>
 					<execution>
