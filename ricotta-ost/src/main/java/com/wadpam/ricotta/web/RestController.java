@@ -108,7 +108,7 @@ public class RestController {
         return new ResponseEntity(body, HttpStatus.OK);
     }
 
-    @RequestMapping(value="project/v10/{projectName}/token/{tokenId}", method= RequestMethod.POST)
+    @RequestMapping(value="project/v10/{projectName}/token/{tokenId}", method= RequestMethod.POST, params={"name", "description"})
     public ResponseEntity<Tokn10> updateToken(
             @PathVariable String projectName, 
             @PathVariable Long tokenId,
@@ -123,6 +123,20 @@ public class RestController {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity(body, HttpStatus.OK);
+    }
+
+    @RequestMapping(value="project/v10/{projectName}/token/{tokenId}", method= RequestMethod.POST, params={"langCode"})
+    public ResponseEntity<Tokn10> updateTranslation(
+            @PathVariable String projectName, 
+            @PathVariable Long tokenId,
+            @RequestParam String langCode,
+            @RequestParam(value="value", required=false) String value) {
+        
+        final List<String> body = uberDao.updateTrans(projectName, ProjectHandlerInterceptor.NAME_TRUNK, tokenId, langCode, value);
+        if (null == body) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     public void setUberDao(UberDaoBean uberDao) {

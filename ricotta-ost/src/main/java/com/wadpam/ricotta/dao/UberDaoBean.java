@@ -459,6 +459,21 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         }
         return returnValue;
     }
+    
+    public List<String> updateTrans(String projectName, String branchName, Long tokenId, String langCode, String value) {
+        final Key projKey = projDao.createKey(projectName);
+        final Key branchKey = branchDao.createKey(projKey, branchName);
+        final Key projLangKey = projLangDao.createKey(branchKey, langCode);
+        final Tokn tokn = toknDao.findByPrimaryKey(branchKey, tokenId);
+        if (null == tokn) {
+            return null;
+        }
+        final Trans t = transDao.findByPrimaryKey(projLangKey, tokenId);
+        
+        final List<String> log = updateTrans(projLangKey, tokn, t, null, value, null == value || "".equals(value));
+        
+        return log;
+    }
 
     @Override
     public void copyBranch(Key fromKey, String name, String description) {
