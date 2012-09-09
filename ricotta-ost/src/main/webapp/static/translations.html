@@ -137,8 +137,8 @@ $("#editTransDialog").dialog({
         $("#tokenTR" + obj.id)
             .append('<td id="t_' + obj.id + '_name" title="' + obj.name + '">' + getShort(obj.name, 20) + "</td>")
             .append('<td id="t_' + obj.id + '_description" title="' + obj.description + '">' + getShort(obj.description,20) + "</td>")
-            .append('<td id="t_' + obj.id + '_' + defLang + '">' +
-                (obj.trans[defLang] ? obj.trans[defLang] : '') + '</td>');
+            .append('<td id="t_' + obj.id + '_' + defLang + '"><textarea rows="1" cols="40">' +
+                (obj.trans[defLang] ? obj.trans[defLang] : '') + '</textarea></td>');
         // set the class attributes on this translation:
         $("#t_" + obj.id + "_" + defLang).addClass("lang_" + defLang).addClass("translation");
 
@@ -149,9 +149,9 @@ $("#editTransDialog").dialog({
                 $("#tokenTR" + obj.id)
                     .append("<td id=\"t_" + obj.id + "_" + langCode + 
                         "\" class=\"" + (obj.trans[langCode] ? "" : "default-trans") + 
-                        "\" title=\"" + (obj.trans[defLang] ? obj.trans[defLang] : "[no default translation]") + "\">" + 
+                        "\" title=\"" + (obj.trans[defLang] ? obj.trans[defLang] : "[no default translation]") + "\"><textarea rows=\"1\" cols=\"40\">" + 
                         (obj.trans[langCode] ? obj.trans[langCode] : "") + 
-                        "</td>");
+                        "</textarea></td>");
                 // set the class attributes on this translation:
                 $("#t_" + obj.id + "_" + langCode).addClass("lang_" + langCode).addClass("translation");
             }

@@ -361,6 +361,10 @@
                 <configuration>
                     <port>8282</port>
                     <monitorPort>8287</monitorPort>
+                    <jvmFlags>
+                        <jvmFlag>-Dappengine.user.timezone=UTC</jvmFlag>
+                        <jvmFlag>-D--enable_all_permissions=true</jvmFlag>
+                    </jvmFlags>
                 </configuration>
                 <dependencies>
                     <dependency>
