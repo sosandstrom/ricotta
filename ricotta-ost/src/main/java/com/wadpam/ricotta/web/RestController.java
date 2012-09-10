@@ -57,6 +57,19 @@ public class RestController {
         return new ResponseEntity<List<Proj10>>(uberDao.getProjects(username), HttpStatus.OK);
     }
     
+    @RequestMapping(value="project/v10/{projectName}/token", method= RequestMethod.POST, params={"name", "description"})
+    public ResponseEntity<Tokn10> createToken(
+            @PathVariable String projectName, 
+            @RequestParam String name,
+            @RequestParam String description,
+            @RequestParam String context) {
+        final Tokn10 body = uberDao.createToken(projectName, ProjectHandlerInterceptor.NAME_TRUNK, name, description, context);
+        if (null == body) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity(body, HttpStatus.OK);
+    }
+
     @RequestMapping(value="project/v10", method= RequestMethod.GET)
     public ResponseEntity<List<Proj10>> getProjects(Principal principal) {
         String username = "Googlebot";

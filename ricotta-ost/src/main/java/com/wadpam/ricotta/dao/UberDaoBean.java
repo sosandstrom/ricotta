@@ -532,6 +532,29 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         }
     }
 
+    public Tokn10 createToken(String projectName, String branchName, 
+            String name, String description, String context) {
+        Tokn10 t10 = null;
+        final Key projKey = projDao.createKey(projectName);
+        final Key branchKey = branchDao.createKey(projKey, branchName);
+        final Tokn tokn = new Tokn();
+
+        tokn.setBranch(branchKey);
+        tokn.setName(name);
+        tokn.setDescription(description);
+
+        // context reference
+        final Key viewContext = NO_CONTEXT_NAME.equals(context) ? null : ctxtDao.createKey(branchKey, context);
+        tokn.setViewContext(viewContext);
+        LOG.debug("create for {}", tokn);
+
+        toknDao.persist(tokn);
+
+        t10 = convert(tokn);
+        
+        return t10;
+    }
+
     public static List<Object> getKeys(List entities) {
         final List<Object> returnValue = new ArrayList<Object>();
         for(Object o : entities) {

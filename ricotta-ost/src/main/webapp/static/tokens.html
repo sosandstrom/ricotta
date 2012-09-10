@@ -14,6 +14,19 @@
         
     </table>
 <button id="buttonCreateToken">Create new token...</button>
+<div id="createTokenDialog">
+    <p class="validateTips"></p>
+    <form>
+        <fieldset>
+            <label for="toknName">Token name</label>
+            <input id="toknName" name="toknName"  class="text ui-widget-content ui-corner-all" /><br/>
+            <label for="toknDescription">Description</label>
+            <input id="toknDescription" name="toknDescription"  class="text ui-widget-content ui-corner-all" /><br/>
+            <label for="toknContext">Context</label>
+            <select id="toknContext" ><option value="_NO_CONTEXT_">_NO_CONTEXT_</option></select>
+        </fieldset>
+    </form>
+</div>
 <script type="text/javascript">
 
 function deleteToken(id) {
@@ -73,11 +86,18 @@ function clearChanged(id) {
     $("#save_" + id).hide();
 }
 
+function buildCreateTokenDialog(p) {
+    $.map(p.contexts, function(c, ci) {
+        $("#toknContext").append('<option value="' + c.name + '">' + c.name + '</option>');
+    });
+}
+
 function buildTokensTable(p) {
     $.map(p.subsets, function(s, index) {
         $("#tokensHeadTR").append('<th title="' + s + '"><input type="checkbox" onClick="" /></th>');
     });
     $.map(p.tokens, function(t, index) {
+        alert("Token " + t.name);
         $("#tokensTBody").append('<tr id="token_' + t.id + '"></tr>');
         
         // icons
@@ -109,13 +129,71 @@ function buildTokensTable(p) {
 }
 
 $("#buttonCreateToken").button().click(function() {
-
+    $("#createTokenDialog").dialog("open");
 });
+
+$("#createTokenDialog").dialog({
+    autoOpen: false,
+    height: 500,
+    width: 500,
+    modal: true,
+    title: "Enter the new token's details",
+    buttons: {
+        Cancel: function() {
+            $( this ).dialog("close");
+        },
+        "Create token": function() {
+            var p = $("#headerProject").data("json");
+            var toknName = $("#toknName"),
+                toknDescription = $("#toknDescription"),
+                toknContext = $("#toknContext"),
+                allFields = $([]).add(toknName, toknDescription, toknContext),
+                tips = $( ".validateTips" );
+
+            var bValid = true;
+            allFields.removeClass("ui-state-error");
+            bValid = bValid && checkLength(toknName, "token name", 1, 64);
+
+            if (bValid) {
+                $.ajax({
+                        async: false,
+                        type: "POST",
+                        url: "/api/project/v10/" + p.name + "/token",
+                        dataType: "json",
+                        data: {
+                            name: toknName.val(),
+                            description: toknDescription.val(),
+                            context: toknContext.val()
+                        }
+                    })
+                    .done(function(data){
+                            $("#createTokenDialog").dialog("close");
+                            loadProject(p.name);
+                        })
+                    .fail(function() {
+                            if (this.status == 409) {
+                                updateTips('name already taken');
+                            } else {
+                                updateTips(this.statusText);
+                            }
+                        });
+            }
+
+        }
+    },
+    close: function() {
+    },
+    open: function() {
+        updateTips("All form fields are required.");
+    }
+});
+    
 
 $(function() {
     var p = $("#headerProject").data("json");
 
     buildTokensTable(p);
+    buildCreateTokenDialog(p);
 });
 
 </script>
