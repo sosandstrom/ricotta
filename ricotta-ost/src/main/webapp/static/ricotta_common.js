@@ -21,6 +21,9 @@ function getSafe(s) {
 }
 
 function getShort(s, len) {
+    if (s == null || s == undefined) {
+        return '';
+    }
     if (s.length <= len) {
         return s;
     }

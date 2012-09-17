@@ -274,6 +274,10 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
             LOG.debug("Subset {} has {}", subset, subTokens);
             for (Long id : subTokens) {
                 t10 = tokenMap.get(id);
+                if (null == t10) {
+                    LOG.error("Incosistent token in subset {}: {}", subset, id);
+                    continue;
+                }
                 t10.getSubsets().add(subset);
             }
         }
