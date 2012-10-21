@@ -1,0 +1,112 @@
+<table id="languages" class="ui-widget ui-widget-content">
+    <thead class="ui-widget-header">
+        <tr>
+            <th>Code</th><th>Name</th>
+        </tr>
+    </thead>
+    <tbody id="languagesBody"></tbody>
+    <tfoot>
+    </tfoot>
+</table>
+<button id="createLanguageButton" >Create new language...</button>
+<div id="createLanguageDialog">
+    <p class="validateTips"></p>
+    <form>
+        <fieldset>
+            <label for="langCode">Language code</label>
+            <input id="langCode" name="langCode"  class="text ui-widget-content ui-corner-all" />
+            <label for="langName">Language name</label>
+            <input id="langName" name="langName"  class="text ui-widget-content ui-corner-all" />
+        </fieldset>
+    </form>
+</div>
+
+<script type="text/javascript">
+
+function populateLanguages(data) {
+    $("#languagesBody").empty();
+    $.map(data, function(p, i) {
+        $("#languagesBody")
+            .append("<tr><td>" + p.code + "</td>" +
+                "<td>" + p.name + "</td>" +
+                "</tr>");
+    });
+}
+
+function loadLanguages() {
+    $.ajax({
+        async: false,
+        type: "GET",
+        url: "/api/lang/v10",
+        dataType: "json",
+        success: function(data){
+            populateLanguages(data);
+        },
+        error: function(req, textStatus, errorThrown) {}
+    });        
+}
+
+$(function() {
+    var langCode = $("#langCode"),
+        langName = $("#langName"),
+        allFields = $([]).add(langCode).add(langName),
+        tips = $( ".validateTips" );
+
+    $("#createLanguageDialog").dialog({
+        autoOpen: false,
+        height: 500,
+        width: 700,
+        modal: true,
+        title: "Enter the new language's details",
+        buttons: {
+            Cancel: function() {
+                $( this ).dialog("close");
+            },
+            "Create language": function() {
+                var bValid = true;
+                allFields.removeClass("ui-state-error");
+                bValid = bValid && checkLength(langCode, "language code", 2, 7);
+                bValid = bValid && checkLength(langName, "language name", 4, 32);
+
+                if (bValid) {
+                    $.ajax({
+                            async: false,
+                            type: "POST",
+                            url: "/api/lang/v10",
+                            dataType: "json",
+                            data: {
+                                langCode: langCode.val(),
+                                name: langName.val()
+                            }
+                        })
+                        .done(function(data){
+                                $("#createLanguageDialog").dialog("close");
+                                loadLanguages();
+                            })
+                        .fail(function() {
+                                if (this.status == 409) {
+                                    updateTips('name already taken');
+                                } else {
+                                    updateTips(this.statusText);
+                                }
+                            });
+                }
+                
+            }
+        },
+        close: function() {
+            allFields.val( "" ).removeClass( "ui-state-error" );
+        },
+        open: function() {
+            updateTips("All form fields are required.");
+        }
+    });
+    
+    $("#createLanguageButton").button().click(function() {
+        $("#createLanguageDialog").dialog("open");
+    });
+
+    loadLanguages();
+});
+</script>
+

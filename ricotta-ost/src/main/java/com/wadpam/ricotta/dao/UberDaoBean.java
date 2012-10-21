@@ -174,6 +174,23 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         return u;
     }
     
+    /**
+     * 
+     * @param projectName
+     * @param branchName
+     * @param langCode
+     * @param defaultLang
+     * @return the primaryKey to the created ProjLang
+     */
+    public Object addProjLang(String projectName, String branchName, String langCode, String defaultLang) {
+        final Key projKey = projDao.createKey(projectName);
+        final Key branchKey = branchDao.createKey(projKey, branchName);
+        final Key langKey = langDao.createKey(langCode);
+        final Key defaultLangKey = null != defaultLang ? langDao.createKey(defaultLang) : null;
+        Object projLangKey = createProjLang(branchKey, langCode, defaultLangKey, langKey);
+        return projLangKey;
+    }
+    
     public Collection<Proj> getProjectsByUsername(String username) {
         // owned projects first
         List<Proj> projects = new ArrayList<Proj>(projDao.findByOwner(username));
@@ -595,6 +612,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         final Key enKey = (Key) en.getPrimaryKey();
         final Lang en_GB = langDao.persist("en_GB", "British English");
         final Lang sv = langDao.persist("sv", "Swedish");
+        final Lang fr = langDao.persist("fr", "French");
 
         // populate Templates
         final Template ricottaExportAll = persistTemplate("ricotta-export-all", "Export all ricotta projects to XML");

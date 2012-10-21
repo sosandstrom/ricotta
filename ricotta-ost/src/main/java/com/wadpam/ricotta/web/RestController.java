@@ -6,12 +6,15 @@ package com.wadpam.ricotta.web;
 
 import com.google.appengine.api.users.UserServiceFactory;
 import com.wadpam.ricotta.dao.UberDaoBean;
+import com.wadpam.ricotta.domain.Lang;
+import com.wadpam.ricotta.domain.ProjLang;
 import com.wadpam.ricotta.domain.ProjUser;
 import com.wadpam.ricotta.domain.Role;
 import com.wadpam.ricotta.model.v10.Me10;
 import com.wadpam.ricotta.model.v10.Proj10;
 import com.wadpam.ricotta.model.v10.Tokn10;
 import java.security.Principal;
+import java.util.Collection;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +37,23 @@ public class RestController {
     static final Logger LOG = LoggerFactory.getLogger(RestController.class);
     
     private UberDaoBean uberDao;
+    
+    @RequestMapping(value="lang/v10", method=RequestMethod.POST) 
+    public ResponseEntity<Object> addLanguage(
+            @RequestParam String langCode,
+            @RequestParam String name) {
+        Object langKey = uberDao.createLang(langCode, name);
+        return new ResponseEntity(langKey, HttpStatus.OK);
+    }
+    
+    @RequestMapping(value="project/v10/{projName}/projLang", method=RequestMethod.POST) 
+    public ResponseEntity<Object> addProjLang(
+            @PathVariable String projName, 
+            @RequestParam String langCode,
+            @RequestParam String defaultLang) {
+        Object projLangKey = uberDao.addProjLang(projName, ProjectHandlerInterceptor.NAME_TRUNK, langCode, defaultLang);
+        return new ResponseEntity(projLangKey, HttpStatus.OK);
+    }
     
     @RequestMapping(value="project/v10", method= RequestMethod.POST)
     public ResponseEntity<List<Proj10>> createProject(Principal principal,
@@ -68,6 +88,12 @@ public class RestController {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity(body, HttpStatus.OK);
+    }
+    
+    @RequestMapping(value="lang/v10", method= RequestMethod.GET)
+    public ResponseEntity<Collection<Lang>> getLanguages() {
+        final List<Lang> body = uberDao.getLang();
+        return new ResponseEntity<Collection<Lang>>(body, HttpStatus.OK);
     }
 
     @RequestMapping(value="project/v10", method= RequestMethod.GET)

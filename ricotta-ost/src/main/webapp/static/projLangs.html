@@ -1,0 +1,196 @@
+<table>
+    <thead class="ui-widget-header">
+            <tr id="projLangsHeadTR">
+                    <th><span class="ui-icon ui-icon-trash" /></th>
+                    <th>Language Code</th>
+                    <th>Default Language</th>
+            </tr>
+    </thead>
+    <tbody id="projLangsTBody"></tbody>
+    <tfoot>
+    </tfoot>
+
+</table>
+<button id="buttonCreateProjLang">Add Language...</button>
+<div id="createProjLangDialog">
+    <p class="validateTips"></p>
+    <form>
+        <fieldset>
+            <label for="projLangCode">Language Code</label>
+            <select id="projLangCode" name="projLangCode"  class="text ui-widget-content ui-corner-all"></select><br/>
+            <label for="projLangDefault">Default Language</label>
+            <select id="projLangDefault" name="projLangDefault"  class="text ui-widget-content ui-corner-all"></select><br/>
+        </fieldset>
+    </form>
+</div>
+<script type="text/javascript">
+
+function deleteProjLang(id) {
+    alert("Delete " + id);
+}
+
+function saveProjLang(id) {
+    var p = $("#headerProject").data("json");
+    
+    var subsets = $(':checked[name="subsets_' + id + '"]').map(function() {
+        return this.value;
+    }).get();
+    
+    var body = {
+            name: $("#name_" + id).val(),
+            description: $("#description_" + id).val(),
+            context: $("#context_" + id).val(),
+            subsets: subsets.join(','),
+            separator: ','
+        };
+    
+    $.ajax({
+        type: "POST",
+        url: "/api/project/v10/" + p.name + "/token/" + id,
+        data: body,
+        dataType: "json",
+        success: function(data, textStatus, jqXHR){
+            updateModel(id, body.name, body.description, body.context, subsets, body.separator);
+            clearChanged(id);
+        },
+        error: function(req, textStatus, errorThrown) {}
+    });        
+    
+}
+
+function updateModel(id, name, description, context, subsets, separator) {
+    // find this token in data
+    var p = $("#headerProject").data("json");
+    $.map(p.projLangs, function(t, i) {
+        if (t.langCode == id) {
+            t.name = name;
+            t.description = description;
+            t.context = context;
+            t.subsets = subsets;
+            return;
+        }
+    });
+}
+
+function setChanged(id) {
+    $("#delete_" + id).hide();
+    $("#save_" + id).show();
+}
+
+function clearChanged(id) {
+    $("#delete_" + id).show();
+    $("#save_" + id).hide();
+}
+
+function buildCreateProjLangDialog(p) {
+    $.map(p.contexts, function(c, ci) {
+        $("#projLangContext").append('<option value="' + c.name + '">' + c.name + '</option>');
+    });
+}
+
+function buildProjLangsTable(p) {
+
+    // build projLangs array
+    $("#projLangDefault").empty();
+    $("#projLangCode").empty();
+    $("#projLangsTBody").empty();
+    
+    var pls = new Array();
+    $.map(p.projLangs, function(t, index) {
+        pls.push(t.langCode);
+        // add to dialog select
+        $("#projLangDefault").append('<option value="' + t.langCode + '" >' + t.langCode + '</option>');
+        
+        // add to list table
+        $("#projLangsTBody").append('<tr id="pl_' + t.langCode + '"></tr>');
+        
+        // icons
+        $("#pl_" + t.langCode).append('<td>' +
+            '<span id="delete_' + t.langCode + '" class="ui-icon ui-icon-trash" onClick="deleteProjLang(' + t.langCode + ');" />' +
+            '</td>');
+//        $("#pl_" + t.langCode).append('<td>' +
+//            '<span id="save_' + t.langCode + '" class="ui-icon ui-icon-disk" onClick="saveProjLang(' + t.langCode + ');" style="display: none" />' +
+//            '</td>');
+        
+        $("#pl_" + t.langCode).append('<td>' + t.langCode + '</td>');
+        $("#pl_" + t.langCode).append('<td>' + (t.defaultLang ? t.defaultLang.name : '') + '</td>');
+    });
+
+    // load global langauges
+    $.getJSON("/api/lang/v10")
+    .done(function(data){
+        $.map(data, function(lang, index) {
+            // only list if not already project language
+            if (-1 == pls.indexOf(lang.simpleKey)) {
+                $("#projLangCode").append('<option value="' + lang.simpleKey + '">' + lang.simpleKey + '</option>');
+            }
+        });
+    })
+    .fail(function() {
+    });
+    
+}
+
+$("#buttonCreateProjLang").button().click(function() {
+    $("#createProjLangDialog").dialog("open");
+});
+
+$("#createProjLangDialog").dialog({
+    autoOpen: false,
+    height: 500,
+    width: 500,
+    modal: true,
+    title: "Select language to add to project",
+    buttons: {
+        Cancel: function() {
+            $( this ).dialog("close");
+        },
+        "Add Language": function() {
+            var p = $("#headerProject").data("json");
+            var projLangCode = $("#projLangCode"),
+                projLangDefault = $("#projLangDefault"),
+                allFields = $([]).add(projLangCode, projLangDefault),
+                tips = $( ".validateTips" );
+
+            var bValid = true;
+            allFields.removeClass("ui-state-error");
+
+            if (bValid) {
+                $.ajax({
+                        async: false,
+                        type: "POST",
+                        url: "/api/project/v10/" + p.name + "/projLang",
+                        dataType: "json",
+                        data: {
+                            langCode: projLangCode.val(),
+                            defaultLang: projLangDefault.val()
+                        }
+                    })
+                    .done(function(data){
+                            $("#createProjLangDialog").dialog("close");
+                            loadProject(p.name);
+                            p = $("#headerProject").data("json");
+                            buildProjLangsTable(p);
+                        })
+                    .fail(function() {
+                            updateTips(this.statusText);
+                        });
+            }
+
+        }
+    },
+    close: function() {
+    },
+    open: function() {
+        updateTips("All form fields are required.");
+    }
+});
+    
+
+$(function() {
+    var p = $("#headerProject").data("json");
+
+    buildProjLangsTable(p);
+});
+
+</script>
