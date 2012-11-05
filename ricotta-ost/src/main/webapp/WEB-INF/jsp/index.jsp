@@ -20,17 +20,17 @@
 <c:choose>
 <c:when test="${null != pageContext.request.userPrincipal}">
 	<li>
-	   <a href="proj/">
+	   <a href="proj/index.html">
 	       <spring:message code="ric_lnk_projects"/>
 	   </a>
 	</li>
 	<li>
-	   <a href="lang/">
+	   <a href="lang/index.html">
 	       <spring:message code="ric_lnk_languages"/>
 	   </a>
 	</li>
 	<li>
-	   <a href="templ/">
+	   <a href="templ/index.html">
 	       <spring:message code="ric_lnk_templates"/>
 	   </a>
 	</li>
