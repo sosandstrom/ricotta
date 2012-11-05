@@ -3,11 +3,11 @@
 	<parent>
 		<groupId>com.wadpam.ricotta</groupId>
 		<artifactId>ricotta</artifactId>
-		<version>26-SNAPSHOT</version>
+		<version>27-SNAPSHOT</version>
 	</parent>
 	<groupId>com.wadpam.ricotta</groupId>
 	<artifactId>ricotta-ost</artifactId>
-	<version>26-SNAPSHOT</version>
+	<version>27-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>${project.groupId}:${project.artifactId}</name>
 
@@ -361,6 +361,10 @@
                 <configuration>
                     <port>8282</port>
                     <monitorPort>8287</monitorPort>
+                    <jvmFlags>
+                        <jvmFlag>-Dappengine.user.timezone=UTC</jvmFlag>
+                        <jvmFlag>-D--enable_all_permissions=true</jvmFlag>
+                    </jvmFlags>
                 </configuration>
                 <dependencies>
                     <dependency>

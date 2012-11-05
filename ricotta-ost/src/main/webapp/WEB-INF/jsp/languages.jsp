@@ -6,7 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <jsp:include page="header.jsp" />
 <body>
-<a href="/">Home</a>
+<a href="/classic/index.html">Classic Home</a>
 <div class="pageHeading">Languages</div>
 <table>
 		<thead>

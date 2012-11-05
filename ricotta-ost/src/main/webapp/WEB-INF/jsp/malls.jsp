@@ -6,7 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <jsp:include page="header.jsp" />
 <body>
-<a href="/index.html">Home</a>
+<a href="/classic/index.html">Classic Home</a>
 <div class="pageHeading">Templates</div>
 <table>
 		<thead>
@@ -18,7 +18,7 @@
 	<tbody>
 	<c:forEach items="${malls}" var="m">
 		<tr>
-			<td><a href="<c:out value='${m.name}' />/"><c:out value="${m.name}" /></a></td>
+			<td><a href="<c:out value='${m.name}' />/index.html"><c:out value="${m.name}" /></a></td>
 			<td><c:out value="${m.description}" /></td>
 		</tr>
 	</c:forEach>

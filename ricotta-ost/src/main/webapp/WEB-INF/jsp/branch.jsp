@@ -6,7 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <jsp:include page="header.jsp" />
 <body>
-<a href="/">Home</a> | <a href="/proj/">Projects</a>
+<a href="/index.html">The new look</a> | <a href="/classic/index.html">Classic Home</a> | <a href="/classic/proj/index.html">Projects</a>
 <div class="pageHeading">Project: <c:out value="${projName}" /> (<c:out value="${branchName}" />)</div>
 <p />
 <h3>Languages</h3>
@@ -36,7 +36,7 @@
 
 <c:if test="${projUser.tokn}">
 <h3>Tokens</h3>
-<a href="tokn/">Edit tokens...</a>
+<a href="tokn/index.html">Edit tokens...</a>
 </c:if>
 
 <c:if test="${null != ctxts}">
