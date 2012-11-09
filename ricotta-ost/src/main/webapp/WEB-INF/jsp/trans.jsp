@@ -6,11 +6,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <jsp:include page="header.jsp" />
 <body>
-<a href="/">Home</a> | 
-<a href="/proj/">Projects</a> | 
-<a href="/proj/<c:out value='${projName}' />/branch/<c:out value='${branchName}' />/"><c:out value="${projName}" /></a>
+<a href="/classic/index.html">Home</a> | 
+<a href="/classic/proj/index.html">Projects</a> | 
+<a href="/classic/proj/<c:out value='${projName}' />/branch/<c:out value='${branchName}' />/index.html"><c:out value="${projName}" /></a>
 <c:if test="${null != viewContext}" >
- | <a href="/proj/<c:out value='${projName}' />/branch/<c:out value='${branchName}' />/lang/<c:out value='${langCode}' />/"><c:out value="${langCode}" /></a>  
+ | <a href="/classic/proj/<c:out value='${projName}' />/branch/<c:out value='${branchName}' />/lang/<c:out value='${langCode}' />/index.html"><c:out value="${langCode}" /></a>  
 </c:if>
 <div class="pageHeading"><c:out value="${langCode}" /> translations for context <c:out value="${viewContext.name}" /></div>
 <c:if test="${null != viewContext}" >
