@@ -38,6 +38,7 @@
 			sources -->
 		<downloadSources>true</downloadSources>
 
+                <gae.application.id>ricotta-gekko</gae.application.id>
 		<!-- Upload to http://test.latest.<applicationName>.appspot.com by default -->
 		<gae.application.version>lab</gae.application.version>
 
