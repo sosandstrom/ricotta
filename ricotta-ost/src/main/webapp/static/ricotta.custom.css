@@ -20,3 +20,41 @@
 #thLanguages { width: 100%; }
 
 .ricotta-text-small { font-size: smaller; }
+
+.footer {
+	clear:both;
+	margin-top:0;
+}
+.modal-body textarea{
+	width:98%;
+}
+.link {
+	cursor: pointer;
+}
+.modal-body .input_error {
+	border: 1px solid #B94A48;
+}
+#preview{
+	position:absolute;
+	border:1px solid #ccc;
+	background:#eee;
+	padding:5px;
+	display:none;
+	color:#000;
+}
+.modal-body span#ajaxloader {
+	width: 25px;
+	height: 25px;
+	background: url('img/ajax_loader.gif');
+	background-repeat: no-repeat;
+	vertical-align: middle;
+	display:none;
+}
+#ricotta_contents {
+	min-height: 100px;
+	margin-top: 41px;
+}
+#toast{
+	width: 100%;
+	text-align:center;
+}

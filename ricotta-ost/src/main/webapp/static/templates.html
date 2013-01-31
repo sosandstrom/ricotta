@@ -1,0 +1,99 @@
+<div class="templates">
+	<table  class="table table-striped table-bordered">
+		<thead>
+	        <tr>
+	            <th>Name</th><th>Description</th>
+	        </tr>
+	    </thead>
+	    <tbody id="templatesTBody"></tbody>
+	</table>
+	<a id="createTemplate" data-toggle="modal" href="#createTemplateDialog" class="btn btn-primary">Create Template...</a>
+	<div id="createTemplateDialog"  class="modal hide fade in" style="display: none;">
+		<div class="modal-header">
+			<a class="close" data-dismiss="modal">×</a>
+			<h3 id="modalHeader">Create template</h3>
+		</div>
+		<div class="modal-body">
+			<fieldset>
+				<label for="templateName">Template Name</label>
+				<input type="text" id="templateName" value="">
+			</fieldset>
+			<fieldset>
+				<label for="templateDescription">Template Description</label>
+				<input type="text" id="templateDescription" value="">
+			</fieldset>
+			<fieldset>
+				<label for="templateMIME">Template MIME</label>
+				<input type="text" id="templateMIME" value="">
+			</fieldset>
+			<fieldset>
+				<label for="templateBody">Template Body</label>
+				<textarea id="templateBody"  rows="30" cols="80"></textarea>
+			</fieldset>
+		</div>
+		<div class="modal-footer">
+			<a href="#" id="modalFooterBtnSuccess" class="btn btn-success">Create Template</a>
+			<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	function buildTemplateTable(templates) {
+		$.map(templates, function(t){
+			updateTemplateTable(t);
+		});
+		$("#createTemplateDialog").modal("hide");
+	}
+	function updateTemplateTable(t) {
+		$("#templatesTBody").append("<tr id='template"+t.name+"'><td onClick=\"editTemplate('" + t.name + "');\">"+t.name+"</td><td>" +t.description+"</td></tr>");
+		$("#template"+t.name).data("json", t);
+	}
+	function createTemplate() {
+		$("#templateName").val("");
+		$("#templateDescription").val("");
+		$("#templateMIME").val("");
+		$("#templateBody").val("");
+		
+		$("#modalHeader").text("Create New Template");
+		$("a.btn-success").text("Create Template").click(function(){
+			//save the updated template
+			var data = {
+				"name": $("#templateName").val(),
+				"description": $("#templateDescription").val(),
+				"body": $("#templateBody").val(),
+			};
+			ricottaAPI.createTemplate(data, loadTemplates);
+		});
+	}
+	function editTemplate(templateName) {
+		var t = $("#template"+templateName).data("json");
+		$("#modalHeader").text("Update Template");
+		$("#templateName").val(t.name);
+		$("#templateDescription").val(t.description);
+		$("#templateMIME").val(t.mimeType);
+		$("#templateBody").val(t.body);
+		
+		$("#createTemplateDialog").modal("show");
+		$("a.btn-success").text("Update Template").click(function(){
+			//save the updated template
+			var data = {
+				"description": $("#templateDescription").val(),
+				"body": $("#templateBody").val(),
+			};
+			ricottaAPI.updateTemplate(t.name, data, loadTemplates);
+		});
+	}
+	function loadTemplates() {
+		$("#templatesTBody").empty();
+		ricottaAPI.getTemplates(function(t){
+			buildTemplateTable(t);
+		});
+	}
+	$(function(){
+		$("#createTemplateDialog").modal({show: false});
+		$("a#createTemplate").click(function(){
+			createTemplate();
+		});
+		loadTemplates();
+	});
+</script>

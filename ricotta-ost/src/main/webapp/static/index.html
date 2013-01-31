@@ -21,90 +21,105 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Ricotta</title>
-        <link type="text/css" href="css/blitzer/jquery-ui-1.8.17.custom.css" rel="stylesheet" />	
-        <link type="text/css" href="ricotta.custom.css" rel="stylesheet" />	
+        <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+        <link type="text/css" href="ricotta.custom.css" rel="stylesheet" />
+        
+        <!-- 
+        <link type="text/css" href="css/blitzer/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+         -->	
     </head>
     <body>
-        <div id="header" class="ui-widget">
-            <table id="headerTable" class="ui-widget" width="100%">
-                <tfoot>
-                    <tr>
-                        <td id="toast" colspan="6" style="text-align: center;"></td>
-                    </tr>
-                </tfoot>
-                <tbody  class="ui-widget ui-widget-content" >
-                    <tr>
-                        <td id="headerHome" class="ui-state-default">Home</td>
-                        <td id="headerProject" class="ui-state-default" style="display: none;">Project</td>
-                        <td id="headerView" class="ui-state-default" style="display: none;">View</td>
-                        <td id="headerContext" class="ui-state-default" style="display: none;">Context</td>
-                        <td id="headerLanguage" class="ui-state-default" style="display: none;">Lang</td>
-                        <td id="headerUser" style="text-align: right;" class="ui-state-default"><span id="headerUsername"></span> - <a id="headerUserAction" href="" >Login</a></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        
-        <div id="contents" class="ui-widget"></div>
-        
-        <div id="footer" class="ui-widget">
-        </div>
-        <div>
-            Ricotta translations management tool <a href="/classic/index.html">Classic view</a>
-        </div>
-        <div>For Ricotta, the GNU General Public License version 3 applies, <a href="/LICENSE">GPLv3</a>.
-        </div>
+    	<div class="navbar navbar-inverse navbar-fixed-top">
+			<div class="navbar-inner">
+        		<div class="container-fluid">
+          			<a class="brand" href="">Ricotta</a>
+          			<div class="nav-collapse collapse">
+            			<span class="navbar-text pull-right">
+	         				<span id="headerUsername"></span> - <a id="headerUserAction" href="" >Login</a>
+            			</span> 
+            			<ul class="nav">
+              				<li id="headerHome" class="active"><a href="index.html">Home</a></li>
+              				<li id="headerProject" class="hide" data-target="projects"><a>Projects</a></li>
+              				<li id="headerView" class="hide"><a>View</a></li>
+              				<li id="headerContext" class="hide"><a>Context</a></li>
+              				<li id="headerLanguage" class="hide"><a>Lang</a></li>
+							<!-- 
+	                        <td id="headerProject" class="ui-state-default" style="display: none;">Project</td>
+	                        <td id="headerView" class="ui-state-default" style="display: none;">View</td>
+	                        <td id="headerContext" class="ui-state-default" style="display: none;">Context</td>
+	                        <td id="headerLanguage" class="ui-state-default" style="display: none;">Lang</td>
+	                        <td id="headerUser" style="text-align: right;" class="ui-state-default"><span id="headerUsername"></span> - <a id="headerUserAction" href="" >Login</a></td>
+	                        -->
+            			</ul>
+          			</div>
+        		</div>
+      		</div>
+		</div>
+	    <div class="container-fluid">
+	    	<div id="ricotta_contents">
+	    		<div id="toast"></div>
+	    	</div>
+			
+    	</div><!--/.fluid-container-->
+    	<footer class="footer">
+		  	<div>Ricotta translations management tool.</div>
+		  	<div>For Ricotta, the GNU General Public License version 3 applies, <a href="/LICENSE">GPLv3</a>.</div>
+		</footer>
+		<!--       	
+        <div id="contents" class="ui-widget"></div> -->
         <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
-        <script type="text/javascript" src="js/jquery-ui-1.8.17.custom.min.js"></script>
-	<script type="text/javascript" src="ricotta_common.js"></script>
+        <script type="text/javascript" src="js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="js/jquery.iframe-post-form.js"></script>
+        <!-- <script type="text/javascript" src="js/jquery-ui-1.8.17.custom.min.js"></script> -->
+		<script type="text/javascript" src="ricotta_common.js"></script>
+		<script type="text/javascript" src="ricotta_API.js"></script>
         <script type="text/javascript">
-$.ajaxSetup( {
-    cache: false,
-    data: null
-});
-
-function showToast(s) {
-    $("#toast").text(s).show();
-}
-
-function hideToast() {
-    $("#toast").text("").hide();
-}
-
-$(document).ready(function() {
-    showToast("Checking login status...");
-    $.ajax({
-//        async: false,
-        type: "GET",
-        url: "/api/me/v10",
-        data: {
-            path: "/index.html"
-        },
-        dataType: "json",
-        success: function(data){
-            $("#headerUser").data("json", data);
-            $("#headerUsername").text(data.email);
-            $("#headerUserAction").text("Logout");
-            $("#headerUserAction").attr("href", data.url);
-            hideToast();
-            $("#contents").html("Loading...").load("home.html");
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            hideToast();
-            $("#headerUsername").text("Anonymous");
-            $("#headerUserAction").attr("href", jqXHR.getResponseHeader("Login-Logout-URL"));
-            $("#contents").html('<img src="/RicottaOverview.2.png" alt="Ricotta Overview" />');
-        }
-    });        
-});
-
-$("#headerHome").click(function() {
-    document.location = "index.html";
-});
-$("#headerProject").click(function() {
-    $("#contents").html("Loading...").load("project.html");
-});
+			$.ajaxSetup( {
+			    cache: false,
+			    data: null
+			});
+			
+			function showToast(s) {
+			    $("#toast").text(s).show();
+			}
+			
+			function hideToast() {
+			    $("#toast").text("").hide();
+			}
+			
+			$(document).ready(function() {
+			    showToast("Checking login status...");
+			    ricottaAPI.me(success, fail);
+			});
+			
+			function success(data) {
+				$("#headerUser").data("json", data);
+			    $("#headerUsername").text(data.email);
+			    $("#headerUserAction").text("Logout");
+			    $("#headerUserAction").attr("href", data.url);
+			    hideToast();
+			    $("#ricotta_contents").html("<div style='width:100%;text-align:center;'>Loading...</div>").load("home.html");
+			}
+			
+			function fail(jqXHR) {
+				hideToast();
+				
+				window.location.href= jqXHR.getResponseHeader("Login-Logout-URL");
+				/*
+			    $("#headerUsername").text("Anonymous");
+			    $("#headerUserAction").attr("href", jqXHR.getResponseHeader("Login-Logout-URL"));
+			    $("#contents").html('<img src="/RicottaOverview.2.png" alt="Ricotta Overview" />');
+			    */
+			}
+			//click on home link
+			$("#headerHome").click(function() {
+			    document.location = "index.html";
+			});
+			//click on project's name
+			$("#headerProject").click(function() {
+				$("#contents").empty();
+			    $("#ricotta_contents").html("<div style='width:100%;text-align:center;'>Loading...</div>").load("project.html");
+			});
         </script>
-        
     </body>
 </html>

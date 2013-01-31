@@ -1,8 +1,9 @@
-    <table>
-        <thead class="ui-widget-header">
+<div class="tokens">
+	<table  class="table table-striped table-bordered">
+        <thead>
 		<tr id="tokensHeadTR">
-			<th><span class="ui-icon ui-icon-trash" /></th>
-                        <th><span class="ui-icon ui-icon-disk" /></th>
+			<th><span class="icon-trash icon-black" /></th>
+            <th><span class="icon-hdd icon-black" /></th>
 			<th>Name</th>
 			<th>Description</th>
 			<th>Context</th>
@@ -13,187 +14,173 @@
         </tfoot>
         
     </table>
-<button id="buttonCreateToken">Create new token...</button>
-<div id="createTokenDialog">
-    <p class="validateTips"></p>
-    <form>
-        <fieldset>
-            <label for="toknName">Token name</label>
-            <input id="toknName" name="toknName"  class="text ui-widget-content ui-corner-all" /><br/>
-            <label for="toknDescription">Description</label>
-            <input id="toknDescription" name="toknDescription"  class="text ui-widget-content ui-corner-all" /><br/>
-            <label for="toknContext">Context</label>
-            <select id="toknContext" ><option value="_NO_CONTEXT_">_NO_CONTEXT_</option></select>
-        </fieldset>
-    </form>
+    <a data-toggle="modal" href="#createTokenDialog" class="btn btn-primary">Create new token...</a>
+	
+	<div id="createTokenDialog" class="modal hide fade in" style="display: none;">
+		<div class="modal-header">  
+			<a class="close" data-dismiss="modal">×</a>
+			<h3>Create new token</h3>
+		</div> 
+		<div class="modal-body">
+			<p class="validateTips"></p>
+		    <form>
+		        <fieldset>
+		            <label for="toknName">Token name</label>
+		            <input id="toknName" name="toknName"  class="text ui-widget-content ui-corner-all" /><br/>
+		            <label for="toknDescription">Description</label>
+		            <input id="toknDescription" name="toknDescription"  class="text ui-widget-content ui-corner-all" /><br/>
+		            <label for="toknContext">Context</label>
+		            <select id="toknContext" ><option value="_NO_CONTEXT_">_NO_CONTEXT_</option></select>
+		        </fieldset>
+		    </form>
+		</div>
+		<div class="modal-footer">
+			<a href="#" class="btn btn-success">Create Token</a>
+			<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+		</div>
+	</div>
+	<script type="text/javascript">
+	
+	function deleteToken(id) {
+	    alert("Delete " + id);
+	}
+	
+	function saveToken(id) {
+	    var p = $("#headerProject").data("json");
+	    
+	    var subsets = $(':checked[name="subsets_' + id + '"]').map(function() {
+	        return this.value;
+	    }).get();
+	    
+	    var body = {
+	            name: $("#name_" + id).val(),
+	            description: $("#description_" + id).val(),
+	            context: $("#context_" + id).val(),
+	            subsets: subsets.join(','),
+	            separator: ','
+	        };
+	    ricottaAPI.saveToken(p.name, id, body, function(){
+	    	updateModel(id, body.name, body.description, body.context, subsets, body.separator);
+	        clearChanged(id);
+	    });
+	}
+	
+	function updateModel(id, name, description, context, subsets, separator) {
+	    // find this token in data
+	    var p = $("#headerProject").data("json");
+	    $.map(p.tokens, function(t, i) {
+	        if (t.id == id) {
+	            t.name = name;
+	            t.description = description;
+	            t.context = context;
+	            t.subsets = subsets;
+	            return;
+	        }
+	    });
+	}
+	
+	function setChanged(id) {
+	    $("#delete_" + id).hide();
+	    $("#save_" + id).show();
+	}
+	
+	function clearChanged(id) {
+	    $("#delete_" + id).show();
+	    $("#save_" + id).hide();
+	}
+	
+	function buildCreateTokenDialog(p) {
+	    $.map(p.contexts, function(c, ci) {
+	        $("#toknContext").append('<option value="' + c.name + '">' + c.name + '</option>');
+	    });
+	}
+	
+	/**
+	 * Update the last saved token to the token table
+	 */
+	function updateTokenTable(p, t) {
+		$("#createTokenDialog").modal("hide");
+		$("#tokensTBody").append('<tr id="token_' + t.id + '"></tr>');
+	    
+	    // icons
+	    $("#token_" + t.id).append('<td style="text-align:center;">' +
+	        '<span id="delete_' + t.id + '" class="icon-trash icon-black" onClick="deleteToken(' + t.id + ');" />' +
+	        '</td>');
+	    $("#token_" + t.id).append('<td>' +
+	        '<span id="save_' + t.id + '" class="icon-hdd icon-black" onClick="saveToken(' + t.id + ');" style="display: none" />' +
+	        '</td>');
+	    
+	    $("#token_" + t.id).append('<td><input id="name_' + t.id + '" value="' + t.name + '" onChange="setChanged(' + t.id + ');" /></td>');
+	    $("#token_" + t.id).append('<td><input id="description_' + t.id + '" value="' + t.description + '" onChange="setChanged(' + t.id + ');" /></td>');
+	    $("#token_" + t.id).append('<td><select id="context_' + t.id + '" onChange="setChanged(' + t.id + ');" ><option value="_NO_CONTEXT_">_NO_CONTEXT_</option></select></td>');
+	    $.map(p.contexts, function(c, ci) {
+	        $("#context_" + t.id).append('<option value="' + c.name + '" ' + 
+	            (c.name == t.context ? 'selected="selected" ' : '') +
+	            '>' + c.name + '</option>');
+	    });
+	    $.map(p.subsets, function(s, si) {
+	        $("#token_" + t.id).append('<td><input type="checkbox" id="subset_' + t.id + '_' + s + '"' +
+	            ' name="subsets_' + t.id + '"' +
+	            ' value="' + s + '"' + 
+	            ' title="' + t.name + ':' + s + '" onChange="setChanged(' + t.id + ');" /></td>');
+	    });
+	    $.map(t.subsets, function(s, si) {
+	        $("#subset_" + t.id + "_" + s).attr("checked", "checked");
+	    });
+	}
+	
+	function buildTokensTable(p) {
+	    $.map(p.subsets, function(s, index) {
+	        $("#tokensHeadTR").append('<th title="' + s + '"><input type="checkbox" onClick="" /></th>');
+	    });
+	    $.map(p.tokens, function(t, index) {
+	    	updateTokenTable(p, t);
+	    });
+	}
+	function createToken() {
+		var p = $("#headerProject").data("json");
+	      var toknName = $("#toknName"),
+	          toknDescription = $("#toknDescription"),
+	          toknContext = $("#toknContext"),
+	          allFields = $([]).add(toknName, toknDescription, toknContext),
+	          tips = $( ".validateTips" );
+	
+	      var bValid = true;
+	      allFields.removeClass("ui-state-error");
+	      bValid = bValid && checkLength(toknName, "token name", 1, 64);
+	
+	      if (bValid) {
+	      	var data= {
+	              name: toknName.val(),
+	              description: toknDescription.val(),
+	              context: toknContext.val()
+	          };
+	      	
+	      	ricottaAPI.createToken(p.name, data, function(newToken){
+	      		//$("#createTokenDialog").dialog("close");
+	      		loadProject(p.name);
+	      		refreshContent("translations");
+	      		updateTokenTable(p, newToken);
+	      		//buildProjectTiles(p);
+	      		//updateToken();
+	      		setActiveMenu($(".nav-list"), $("li:first"));
+	      	}, updateTips);
+	      }
+	}
+	$(function() {
+		$("#createTokenDialog").modal({show: false});
+		
+		$("#createTokenDialog").find("a.btn-success").click(function(){
+			createToken();
+		});
+		
+		
+	    var p = $("#headerProject").data("json");
+	
+	    buildTokensTable(p);
+	    buildCreateTokenDialog(p);
+	});
+	
+	</script>
 </div>
-<script type="text/javascript">
 
-function deleteToken(id) {
-    alert("Delete " + id);
-}
-
-function saveToken(id) {
-    var p = $("#headerProject").data("json");
-    
-    var subsets = $(':checked[name="subsets_' + id + '"]').map(function() {
-        return this.value;
-    }).get();
-    
-    var body = {
-            name: $("#name_" + id).val(),
-            description: $("#description_" + id).val(),
-            context: $("#context_" + id).val(),
-            subsets: subsets.join(','),
-            separator: ','
-        };
-    
-    $.ajax({
-        type: "POST",
-        url: "/api/project/v10/" + p.name + "/token/" + id,
-        data: body,
-        dataType: "json",
-        success: function(data, textStatus, jqXHR){
-            updateModel(id, body.name, body.description, body.context, subsets, body.separator);
-            clearChanged(id);
-        },
-        error: function(req, textStatus, errorThrown) {}
-    });        
-    
-}
-
-function updateModel(id, name, description, context, subsets, separator) {
-    // find this token in data
-    var p = $("#headerProject").data("json");
-    $.map(p.tokens, function(t, i) {
-        if (t.id == id) {
-            t.name = name;
-            t.description = description;
-            t.context = context;
-            t.subsets = subsets;
-            return;
-        }
-    });
-}
-
-function setChanged(id) {
-    $("#delete_" + id).hide();
-    $("#save_" + id).show();
-}
-
-function clearChanged(id) {
-    $("#delete_" + id).show();
-    $("#save_" + id).hide();
-}
-
-function buildCreateTokenDialog(p) {
-    $.map(p.contexts, function(c, ci) {
-        $("#toknContext").append('<option value="' + c.name + '">' + c.name + '</option>');
-    });
-}
-
-function buildTokensTable(p) {
-    $.map(p.subsets, function(s, index) {
-        $("#tokensHeadTR").append('<th title="' + s + '"><input type="checkbox" onClick="" /></th>');
-    });
-    $.map(p.tokens, function(t, index) {
-//        alert("Token " + t.name);
-        $("#tokensTBody").append('<tr id="token_' + t.id + '"></tr>');
-        
-        // icons
-        $("#token_" + t.id).append('<td>' +
-            '<span id="delete_' + t.id + '" class="ui-icon ui-icon-trash" onClick="deleteToken(' + t.id + ');" />' +
-            '</td>');
-        $("#token_" + t.id).append('<td>' +
-            '<span id="save_' + t.id + '" class="ui-icon ui-icon-disk" onClick="saveToken(' + t.id + ');" style="display: none" />' +
-            '</td>');
-        
-        $("#token_" + t.id).append('<td><input id="name_' + t.id + '" value="' + t.name + '" onChange="setChanged(' + t.id + ');" /></td>');
-        $("#token_" + t.id).append('<td><input id="description_' + t.id + '" value="' + t.description + '" onChange="setChanged(' + t.id + ');" /></td>');
-        $("#token_" + t.id).append('<td><select id="context_' + t.id + '" onChange="setChanged(' + t.id + ');" ><option value="_NO_CONTEXT_">_NO_CONTEXT_</option></select></td>');
-        $.map(p.contexts, function(c, ci) {
-            $("#context_" + t.id).append('<option value="' + c.name + '" ' + 
-                (c.name == t.context ? 'selected="selected" ' : '') +
-                '>' + c.name + '</option>');
-        });
-        $.map(p.subsets, function(s, si) {
-            $("#token_" + t.id).append('<td><input type="checkbox" id="subset_' + t.id + '_' + s + '"' +
-                ' name="subsets_' + t.id + '"' +
-                ' value="' + s + '"' + 
-                ' title="' + t.name + ':' + s + '" onChange="setChanged(' + t.id + ');" /></td>');
-        });
-        $.map(t.subsets, function(s, si) {
-            $("#subset_" + t.id + "_" + s).attr("checked", "checked");
-        });
-    });
-}
-
-$("#buttonCreateToken").button().click(function() {
-    $("#createTokenDialog").dialog("open");
-});
-
-$("#createTokenDialog").dialog({
-    autoOpen: false,
-    height: 500,
-    width: 500,
-    modal: true,
-    title: "Enter the new token's details",
-    buttons: {
-        Cancel: function() {
-            $( this ).dialog("close");
-        },
-        "Create token": function() {
-            var p = $("#headerProject").data("json");
-            var toknName = $("#toknName"),
-                toknDescription = $("#toknDescription"),
-                toknContext = $("#toknContext"),
-                allFields = $([]).add(toknName, toknDescription, toknContext),
-                tips = $( ".validateTips" );
-
-            var bValid = true;
-            allFields.removeClass("ui-state-error");
-            bValid = bValid && checkLength(toknName, "token name", 1, 64);
-
-            if (bValid) {
-                $.ajax({
-                        async: false,
-                        type: "POST",
-                        url: "/api/project/v10/" + p.name + "/token",
-                        dataType: "json",
-                        data: {
-                            name: toknName.val(),
-                            description: toknDescription.val(),
-                            context: toknContext.val()
-                        }
-                    })
-                    .done(function(data){
-                            $("#createTokenDialog").dialog("close");
-                            loadProject(p.name);
-                        })
-                    .fail(function() {
-                            if (this.status == 409) {
-                                updateTips('name already taken');
-                            } else {
-                                updateTips(this.statusText);
-                            }
-                        });
-            }
-
-        }
-    },
-    close: function() {
-    },
-    open: function() {
-        updateTips("All form fields are required.");
-    }
-});
-    
-
-$(function() {
-    var p = $("#headerProject").data("json");
-
-    buildTokensTable(p);
-    buildCreateTokenDialog(p);
-});
-
-</script>

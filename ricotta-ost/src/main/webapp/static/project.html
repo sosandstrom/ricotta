@@ -1,38 +1,47 @@
-<div id="projectTabs" style="display: none;">
-    <ul>
-        <li><a href="translations.html"><span>Translations</span></a></li>
-        <li><a href="tokens.html"><span>Tokens</span></a></li>
-        <li><a href="contexts.html"><span>Contexts</span></a></li>
-        <li><a href="projLangs.html"><span>Languages</span></a></li>
-        <li><a href="users.html"><span>Users</span></a></li>
-    </ul>
+<div class="row-fluid">
+	<div class="left-nav">
+		<div class="well sidebar-nav">
+			<ul class="nav nav-list">
+				<li class="active" data-target="translations"><a>Translations</a></li>
+				<li data-target="subsets"><a>Subsets</a></li>
+		        <li data-target="tokens"><a>Tokens</a></li>
+		        <li data-target="contexts"><a>Contexts</a></li>
+		        <li data-target="projLangs"><a>Languages</a></li>
+		        <li data-target="users"><a>Users</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="contentContainer">
+		<div id="toast"></div>
+		<div class="contents" id="contents">
+		</div>
+	</div>
 </div>
 <script type="text/javascript">
 
 function loadProject(name) {
-    showToast("Loading project...");
-    $.ajax({
-        async: false,
-        type: "GET",
-        url: "/api/project/v10/" + name + "/token",
-        dataType: "json",
-        success: function(data){
-            hideToast();
-            $("#headerProject").data("json", data);
-            $("#projectTabs").show();
-        },
-        error: function(req, textStatus, errorThrown) {
-            showToast(textStatus);
-        }
-    });        
+    //showToast("Loading project...");
+    //move to api file. 
+    ricottaAPI.getProjectTokens(name, function(data){
+    	hideToast();
+        $("#headerProject").data("json", data);
+        //$("#projectTabs").show();
+    }, showToast);
 }
 
 $(function() {
-    $("#projectTabs").tabs();
+    
+    var firstTab = $(".nav-list li.active").attr("data-target");
+	loadContents(firstTab);
     
     var p = $("#headerProject").data("project");
-    $("#headerProject").text(p.name).show();
-    $("#headerView").hide();
+    
+    $("#headerProject").attr("class", "show").click(function(){
+    	refreshContent("translations")
+    });
+    $("#headerProject a").text(p.name);
+    
+    setActiveMenu($(".nav-collapse ul.nav"), $("#headerProject"));
 
     loadProject(p.name);
 });

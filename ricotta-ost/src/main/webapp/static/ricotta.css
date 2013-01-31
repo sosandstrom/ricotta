@@ -1,22 +1,22 @@
 @CHARSET "UTF-8";
 
 body {
-	font-family: "Liberation Sans", sans-serif;
+font-family: "Liberation Sans", sans-serif;
 }
 
 table {
-	border-style: solid;
-	border-color: gray;
-	border-width: 1px;
-	width: 95%;
+border-style: solid;
+border-color: gray;
+border-width: 1px;
+width: 95%;
 }
 
 thead {
-	background-color: #E0FFE0;
+background-color: #E0FFE0;
 }
 
 th {
-	text-align: left;
+text-align: left;
 }
 
 td {
@@ -24,18 +24,18 @@ td {
 }
 
 tfoot {
-	background-color: #F7F7F7;
+background-color: #F7F7F7;
 }
 
 .pageHeading {
-	font-size: larger;
-	background-color: lightgray;
+font-size: larger;
+background-color: lightgray;
 }
 
 .evenRowtrue {
-	background-color: #F0F0F0;
+background-color: #F0F0F0;
 }
 
 .evenRowfalse {
-	background-color: #FCFCFC;
+background-color: #FCFCFC;
 }

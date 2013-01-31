@@ -1,91 +1,180 @@
-    <table>
-        <thead class="ui-widget-header">
-		<tr>
-			<th><span class="ui-icon ui-icon-trash" /></th>
-                        <th><span class="ui-icon ui-icon-disk" /></th>
-			<th>Name</th>
-			<th>Description</th>
-		</tr>
-	</thead>
-        <tbody id="contextsBody" class="ricotta-text-small"></tbody>
+<div class="contexts">
+	<table class="table table-striped table-bordered">
+        <thead>
+			<tr>
+				<th><span class="icon-trash icon-black" /></th>
+	            <th><span class="icon-hdd icon-black" /></th>
+				<th>Context Name</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+        <tbody id="contextsListBody" class="ricotta-text-small"></tbody>
         <tfoot>
         </tfoot>
         
     </table>
-<button id="buttonAddContext">Add new context...</button>
-<script type="text/javascript">
-
-function updateUser(id, role) {
-    // find this user in data
-    var p = $("#headerProject").data("json");
-    $.map(p.users, function(t, i) {
-        if (t.keyString == id) {
-            t.role = role;
-            return;
-        }
-    });
-}
-
-function saveUser(id) {
-    showToast('Saving user role...');
-    var p = $("#headerProject").data("json");
-    
-    var body = {
-            role: $("#role_" + id).val()
-        };
-    
-    $.ajax({
-        type: "POST",
-        url: "/api/project/v10/" + p.name + "/user/" + id,
-        data: body,
-        dataType: "json",
-        success: function(data, textStatus, jqXHR){
-            updateUser(id, body.role);
-            clearChanged(id);
-            hideToast();
-        },
-        error: function(req, textStatus, errorThrown) {
-            showToast(textStatus);
-        }
-    });        
-    
-}
-
-function setChanged(id) {
-    $("#delete_" + id).hide();
-    $("#save_" + id).show();
-}
-
-function clearChanged(id) {
-    $("#delete_" + id).show();
-    $("#save_" + id).hide();
-}
-
-function buildContextsTable(p) {
-    $.map(p.contexts, function(t, index) {
-        var id = t.keyString;
-        $("#contextsBody").append('<tr id="context_' + id + '"></tr>');
-        
-        // icons
-        $("#context_" + id).append('<td>' +
-            '<span id="delete_' + id + '" class="ui-icon ui-icon-trash" onClick="deleteContext(\'' + id + '\');" />' +
-            '</td>');
-        $("#context_" + id).append('<td>' +
-            '<span id="save_' + id + '" class="ui-icon ui-icon-disk" onClick="saveContext(\'' + id + '\');" style="display: none" />' +
-            '</td>');
-//
-//        $("#context_" + id).append('<td>' + t.name + '</td>');
-//        $("#context_" + id).append('<td><input id="description_' + id + '" onChange="setChanged(\'' + id + '\');" value="' + t.description + '" /></td>');
-    });
-}
-
-$("#buttonAddContext").button().click(function() {
-
-});
-
-$(function() {
-    var p = $("#headerProject").data("json");
-    buildContextsTable(p);
-});
-
-</script>
+	
+	<a id="buttonAddContext" data-toggle="modal" href="#createContextDialog" class="btn btn-primary">Add new context...</a>
+	
+	<div id="createContextDialog" class="modal fade hide">
+		<div class="modal-header">
+			<a class="close" data-dismiss="modal">×</a>
+			<h3>Create new context</h3>
+		</div>
+		<div class="modal-body">
+			<div class="alert alert-error hide">
+  				<strong>Error! </strong><span class="validateTips"></span>
+			</div>  
+			<fieldset>
+				<label for="contextName">Context Name</label>
+				<input type="text" name="contextName" id="contextName" value="">
+			</fieldset>
+			<fieldset>
+				<label for="contextDescription">Context Description</label>
+				<input type="text" name="contextDescription" id="contextDescription" value="">
+			</fieldset>
+			<fieldset>
+				<input type="hidden" id="contextImgKey" value=""> 
+				<form action="" id="uploadContextImage" method="POST" enctype="multipart/form-data">
+					<label>Context Image</label>
+					<input type="file" id="contextImage" name="contextImage">
+				</form>
+				<a class="btn" id="uploadImage" onclick="uploadImage();" disabled="disabled">Upload Context Image...</a><span id="ajaxloader"></span>
+			</fieldset>
+		</div>
+		<div class="modal-footer">
+			<a href="#" class="btn btn-success" >Create Context</a>
+			<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+		</div>
+	</div>
+	<script type="text/javascript">
+	
+	function updateUser(id, role) {
+	    // find this user in data
+	    var p = $("#headerProject").data("json");
+	    $.map(p.users, function(t, i) {
+	        if (t.keyString == id) {
+	            t.role = role;
+	            return;
+	        }
+	    });
+	}
+	
+	/**
+	 * Update new after save success
+	 */
+	function updateNewUser(id, role) {
+		updateUser(id, body.role);
+	    clearChanged(id);
+	    hideToast();
+	}
+	
+	function saveUser(id) {
+	    showToast('Saving user role...');
+	    var p = $("#headerProject").data("json");
+	    
+	    var body = {
+	        role: $("#role_" + id).val()
+	    };
+	   	ricottaAPI.saveUser(p.name, id, function(d){
+	   		updateNewUser(id, body.role);
+	   	}, showToast);
+	}
+	
+	function setChanged(id) {
+	    $("#delete_" + id).hide();
+	    $("#save_" + id).show();
+	}
+	
+	function clearChanged(id) {
+	    $("#delete_" + id).show();
+	    $("#save_" + id).hide();
+	}
+	
+	function buildContextsTable(p) {
+	    $.map(p.contexts, function(t, index) {
+	        var id = t.keyString;
+	        $("#contextsListBody").append($('<tr id="context_' + index + '"></tr>'));
+	        
+	        // icons
+	        $("#context_" + index).append('<td>' +
+	            '<span id="delete_' + id + '" class="icon-trash icon-black" onClick="deleteContext(\'' + id + '\');" />' +
+	            '</td>');
+	        $("#context_" + index).append('<td>' +
+	            '<span id="save_' + id + '" class="icon-hdd icon-black" onClick="saveContext(\'' + id + '\');" style="display: none" />' +
+	            '</td>');
+	
+	        $("#context_" + index).append('<td>' + t.name + '</td>');
+	        $("#context_" + index).append('<td><input id="description_' + id + '" onChange="setChanged(\'' + id + '\');" value="' + t.description + '" /></td>');
+	    });
+	}
+	
+	function uploadImage() {
+		if(!$("#uploadImage").is(":disabled")) {
+			$(".modal-body span#ajaxloader").css("display", "inline-block");
+			var p = $("#headerProject").data("json");
+			ricottaAPI.uploadContextImage(p.name, function(blob){
+		    	var url = blob.uploadUrl.replace("GGPP", "localhost");
+		    	$("#uploadContextImage").attr("action", url);
+		    	$("#uploadContextImage").submit();
+		    });
+		}
+	}
+	function reload(p) {
+		loadProject(p.name);
+		refreshContent("contexts");
+		refreshContent("tokens");
+		refreshContent("translations");
+		$("#createContextDialog").modal("hide");
+	}
+	$(function() {
+		document.getElementById("contextImage").addEventListener("change", function(){
+			$("#uploadImage").removeAttr("disabled");
+		});
+		$("#buttonAddContext").click(function(){
+			$(".alert-error").removeClass("show").addClass("hide");
+			var ctxName = $("#contextName");
+	        var ctxDescription = $("#contextDescription");
+	        var ctxKey = $("#contextImgKey");
+	        var allFields = $([]).add(ctxName);
+	        allFields.removeClass("input_error");
+		});
+	    $("#createContextDialog").modal({show: false});
+	    var p = $("#headerProject").data("json");
+	    $(".btn-success").click(function(){
+	    	 var ctxName = $("#contextName"),
+	          ctxDescription = $("#contextDescription"),
+	          ctxKey = $("#contextImgKey"),
+	          allFields = $([]).add(ctxName),
+	          tips = $(".validateTips");
+	
+		      var bValid = true;
+		      allFields.removeClass("ui-state-error");
+		      bValid = bValid && checkEmpty(allFields);
+		      
+		      if(bValid) {
+			    	var data = {
+			    		"name": $("#contextName").val(),
+			    		"description": $("#contextDescription").val(),
+			    		"blobKey": $("#contextImgKey").val(),
+			    	};
+			    	ricottaAPI.createContext(p.name, data, function(){
+			    		reload(p);
+			    	});
+			  }
+		});
+	    $('#uploadContextImage').iframePostForm({
+			json : true,
+			complete : function (blob){
+				$("#contextImgKey").val(blob.blobKey);
+	    		$(".modal-body span#ajaxloader").removeAttr("style");
+	    		$("#uploadImage").attr("disabled", "disabled");
+			}
+		});
+	    
+	    buildContextsTable(p);
+	});
+	
+	</script>
+	
+</div>

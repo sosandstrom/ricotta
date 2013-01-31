@@ -57,17 +57,17 @@ import net.sf.mardao.api.dao.AEDDaoImpl;
 import org.xml.sax.SAXException;
 
 public class UberDaoBean extends AbstractDaoController implements UberDao, AdminTask {
-    public static final String NO_CONTEXT_NAME     = "_NO_CONTEXT_";
-    
-    static final Logger LOG = LoggerFactory.getLogger(UberDaoBean.class);
+    public static final String NO_CONTEXT_NAME = "_NO_CONTEXT_";
+
+    static final Logger        LOG             = LoggerFactory.getLogger(UberDaoBean.class);
 
     public void init() {
         populate();
         patchRoles();
         patchBranches();
     }
-    
-    protected static String getParam(Map<String,String[]> params, String name) {
+
+    protected static String getParam(Map<String, String[]> params, String name) {
         final String values[] = params.get(name);
         if (null != values && 0 < values.length) {
             return values[0];
@@ -77,38 +77,38 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
 
     @Override
     public Object processTask(String taskName, Map parameterMap) {
-        Map<String,String[]> params = parameterMap;
-        
+        Map<String, String[]> params = parameterMap;
+
         // write XML dump to BlobStore
         if ("dump_xml_to_blob".equals(taskName)) {
             return processDumpXmlToBlob();
         }
-        
+
         // parse XML and persist
         if ("persist_xml_blob".equals(taskName)) {
             return persistXmlBlob(params);
         }
-        
+
         return null;
     }
-    
+
     protected static Proj10 convert(Proj from) {
         if (null == from) {
             return null;
         }
-        
+
         final Proj10 to = new Proj10(from.getName(), from.getOwner());
-        
+
         return to;
     }
-    
+
     protected static List<Proj10> convertProjects(Collection<Proj> from) {
         final List<Proj10> to = new ArrayList<Proj10>();
-        
-        for (Proj entity : from) {
+
+        for(Proj entity : from) {
             to.add(convert(entity));
         }
-        
+
         return to;
     }
 
@@ -116,23 +116,23 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         if (null == from) {
             return null;
         }
-        
+
         final Tokn10 to = new Tokn10(from.getId(), from.getName(), from.getDescription());
-        
+
         to.setContext(null != from.getViewContext() ? from.getViewContext().getName() : "");
-        
+
         return to;
     }
 
     protected static List<Tokn10> convertTokens(List<Tokn> from) {
         final List<Tokn10> to = new ArrayList<Tokn10>();
-        
-        for (Tokn entity : from) {
+
+        for(Tokn entity : from) {
             to.add(convert(entity));
         }
-        
+
         Collections.sort(to, TOKEN_COMPARATOR);
-        
+
         return to;
     }
 
@@ -173,7 +173,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         }
         return u;
     }
-    
+
     /**
      * 
      * @param projectName
@@ -190,8 +190,9 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         Object projLangKey = createProjLang(branchKey, langCode, defaultLangKey, langKey);
         return projLangKey;
     }
-    
+
     public Collection<Proj> getProjectsByUsername(String username) {
+
         // owned projects first
         List<Proj> projects = new ArrayList<Proj>(projDao.findByOwner(username));
 
@@ -202,28 +203,28 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
                 projects.add(projDao.findByPrimaryKey(projName));
             }
         }
-        
+
         // unique and sort
         final TreeSet<Proj> returnValue = new TreeSet<Proj>(PROJ_COMPARATOR);
         returnValue.addAll(projects);
         return returnValue;
     }
-    
+
     public List<Proj10> getProjects(String username) {
         final Collection<Proj> projects = getProjectsByUsername(username);
         final List<Proj10> returnValue = convertProjects(projects);
-        
+
         // populate JSON properties
         Key projKey, branchKey;
-        for (Proj10 p10 : returnValue) {
+        for(Proj10 p10 : returnValue) {
             projKey = projDao.createKey(p10.getName());
             branchKey = branchDao.createKey(projKey, ProjectHandlerInterceptor.NAME_TRUNK);
-            
+
             // populate languages
             List<ProjLang> langs = new ArrayList<ProjLang>();
             p10.setProjLangs(langs);
-            for (ProjLang pl : projLangDao.findByBranch(branchKey)) {
-                
+            for(ProjLang pl : projLangDao.findByBranch(branchKey)) {
+
                 // exclude default language
                 if (null == pl.getDefaultLang()) {
                     p10.setDefProjLang(pl);
@@ -232,22 +233,23 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
                     langs.add(pl);
                 }
             }
-            
+
             // populate contexts
             p10.setContexts(ctxtDao.findByBranch(branchKey));
         }
-        
+
         return returnValue;
     }
-    
+
     private static List<Role> _roles = null;
+
     public List<Role> getRoles() {
         if (null == _roles) {
             _roles = roleDao.findAll();
         }
         return _roles;
     }
-    
+
     public Proj10 getTokens(String username, String projectName, String branchName) {
         final Proj10 proj = new Proj10(projectName, null);
         final Key projKey = projDao.createKey(projectName);
@@ -255,41 +257,41 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         final List<Tokn> entities = toknDao.findByBranch(branchKey);
         final List<Tokn10> tokens = convertTokens(entities);
         proj.setTokens(tokens);
-        
+
         // map the tokens by id
         final HashMap<Long, Tokn10> tokenMap = new HashMap<Long, Tokn10>();
-        for (Tokn10 t : tokens) {
+        for(Tokn10 t : tokens) {
             tokenMap.put(t.getId(), t);
         }
-        
+
         // populate contexts
         proj.setContexts(ctxtDao.findByBranch(branchKey));
-        
+
         // get languages for this project branch
         Tokn10 t10;
         proj.setProjLangs(projLangDao.findByBranch(branchKey));
-        for (ProjLang projLang : proj.getProjLangs()) {
+        for(ProjLang projLang : proj.getProjLangs()) {
             if (null == projLang.getDefaultLang()) {
                 proj.setDefProjLang(projLang);
             }
 
             // fetch translations for this language
             List<Trans> trans = transDao.findByProjLang(projLang.getPrimaryKey());
-            for (Trans t : trans) {
+            for(Trans t : trans) {
                 t10 = tokenMap.get(t.getToken());
                 t10.getTrans().put(projLang.getLangCode(), t.getLocal());
             }
         }
-        
+
         // get subsets for this project branch
         Key subsetKey;
         proj.setSubsets(subsetDao.findKeysByBranch(branchKey));
-        for (String subset : proj.getSubsets()) {
+        for(String subset : proj.getSubsets()) {
             subsetKey = subsetDao.createKey(branchKey, subset);
             List<Long> subTokens = subsetToknDao.findKeysBySubset(subsetKey);
-            
+
             LOG.debug("Subset {} has {}", subset, subTokens);
-            for (Long id : subTokens) {
+            for(Long id : subTokens) {
                 t10 = tokenMap.get(id);
                 if (null == t10) {
                     LOG.error("Incosistent token in subset {}: {}", subset, id);
@@ -298,10 +300,10 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
                 t10.getSubsets().add(subset);
             }
         }
-        
+
         // get project users
         proj.setUsers(projUserDao.findByProj(projKey));
-        
+
         return proj;
     }
 
@@ -480,7 +482,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         }
         return returnValue;
     }
-    
+
     public List<String> updateTrans(String projectName, String branchName, Long tokenId, String langCode, String value) {
         final Key projKey = projDao.createKey(projectName);
         final Key branchKey = branchDao.createKey(projKey, branchName);
@@ -490,9 +492,9 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
             return null;
         }
         final Trans t = transDao.findByPrimaryKey(projLangKey, tokenId);
-        
+
         final List<String> log = updateTrans(projLangKey, tokn, t, null, value, null == value || "".equals(value));
-        
+
         return log;
     }
 
@@ -553,8 +555,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         }
     }
 
-    public Tokn10 createToken(String projectName, String branchName, 
-            String name, String description, String context) {
+    public Tokn10 createToken(String projectName, String branchName, String name, String description, String context) {
         Tokn10 t10 = null;
         final Key projKey = projDao.createKey(projectName);
         final Key branchKey = branchDao.createKey(projKey, branchName);
@@ -572,7 +573,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         toknDao.persist(tokn);
 
         t10 = convert(tokn);
-        
+
         return t10;
     }
 
@@ -659,8 +660,8 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         final Tokn appTitle = toknDao.persist(branchKey, 1L, "The Application title as displayed to the user", "appTitle",
                 projects.getPrimaryKey());
         final Tokn tokenProject = toknDao.persist(branchKey, 2L, "The Project Entity", "project_Project_Android_Specific", null);
-        final Tokn tokenLong = toknDao.persist(branchKey, 3L, "A Really Long Token with Translations", "A Really Long Token with Translations", 
-                home.getPrimaryKey());
+        final Tokn tokenLong = toknDao.persist(branchKey, 3L, "A Really Long Token with Translations",
+                "A Really Long Token with Translations", home.getPrimaryKey());
 
         // subset tokens
         subsetToknDao.persist(ricottaOst.getPrimaryKey(), 1L);
@@ -672,7 +673,8 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         transDao.persist(plEN.getPrimaryKey(), appTitle.getId(), "Ricotta");
         transDao.persist(plGB.getPrimaryKey(), tokenProject.getId(), "Project");
         transDao.persist(plSV.getPrimaryKey(), tokenProject.getId(), "Projekt");
-        transDao.persist(plEN.getPrimaryKey(), tokenLong.getId(), "Ricotta is a Translations management</br>tool with complimentary build tools.");
+        transDao.persist(plEN.getPrimaryKey(), tokenLong.getId(),
+                "Ricotta is a Translations management</br>tool with complimentary build tools.");
 
     }
 
@@ -879,137 +881,173 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         // the proj
         projDao.deleteByCore(projKey);
     }
-    
+
     public Proj getProj(String name) {
         return projDao.findByPrimaryKey(name);
     }
 
-    protected static final Comparator<Proj> PROJ_COMPARATOR = new Comparator<Proj>() {
+    protected static final Comparator<Proj>   PROJ_COMPARATOR  = new Comparator<Proj>() {
 
-        @Override
-        public int compare(Proj o1, Proj o2) {
-            return o1.getName().compareToIgnoreCase(o2.getName());
-        }
-        
-    };
-    
+                                                                   @Override
+                                                                   public int compare(Proj o1, Proj o2) {
+                                                                       return o1.getName().compareToIgnoreCase(o2.getName());
+                                                                   }
+
+                                                               };
+
     protected static final Comparator<Tokn10> TOKEN_COMPARATOR = new Comparator<Tokn10>() {
 
-        @Override
-        public int compare(Tokn10 o1, Tokn10 o2) {
-            int returnValue = o1.getName().compareToIgnoreCase(o2.getName());
-            if (0 == returnValue) {
-                returnValue = o2.getContext().compareToIgnoreCase(o2.getContext());
-            }
-            return returnValue;
-        }
-    };
+                                                                   @Override
+                                                                   public int compare(Tokn10 o1, Tokn10 o2) {
+                                                                       int returnValue = o1.getName().compareToIgnoreCase(
+                                                                               o2.getName());
+                                                                       if (0 == returnValue) {
+                                                                           returnValue = o2.getContext().compareToIgnoreCase(
+                                                                                   o2.getContext());
+                                                                       }
+                                                                       return returnValue;
+                                                                   }
+                                                               };
 
-    public Tokn10 updateToken(String projectName, String branchName, Long tokenId, 
-            String name, String description, String context, String[] subs) {
+    public Tokn10 updateToken(String projectName, String branchName, Long tokenId, String name, String description,
+            String context, String[] subs) {
         Tokn10 t10 = null;
         final Key projKey = projDao.createKey(projectName);
         final Key branchKey = branchDao.createKey(projKey, branchName);
         final Tokn tokn = toknDao.findByPrimaryKey(branchKey, tokenId);
 
         LOG.debug("update {} for {}", tokenId, tokn);
-        
+
         if (null != tokn) {
             Set<String> subSet = new HashSet<String>();
             Collections.addAll(subSet, subs);
             tokn.setName(name);
             tokn.setDescription(description);
-            
+
             // context reference
             final Key viewContext = NO_CONTEXT_NAME.equals(context) ? null : ctxtDao.createKey(branchKey, context);
             tokn.setViewContext(viewContext);
-            
+
             toknDao.update(tokn);
-            
+
             // subsets (mutable)
             final List<Key> existing = subsetToknDao.findKeysByBranchKeyTokenId(branchKey, tokenId);
             final ArrayList<Key> remove = new ArrayList<Key>(existing);
-            for (Key stKey : existing) {
+            for(Key stKey : existing) {
                 if (subSet.remove(stKey.getParent().getName())) {
                     remove.remove(stKey);
                 }
             }
-            
+
             // remove remaining existing, insert remaining from subSet
             LOG.debug("deleting {}, inserting {}", remove, subSet);
             subsetToknDao.deleteByCore(remove);
             final List<SubsetTokn> insert = new ArrayList<SubsetTokn>();
             SubsetTokn st;
-            for (String s : subSet) {
+            for(String s : subSet) {
                 st = new SubsetTokn();
                 st.setSubset(subsetDao.createKey(branchKey, s));
                 st.setTokn(tokenId);
                 insert.add(st);
             }
             subsetToknDao.persist(insert);
-            
+
             t10 = convert(tokn);
         }
-        
+
         return t10;
+    }
+
+    public Template updateTemplate(String name, String description, String body) {
+        Template tpl = templateDao.findByPrimaryKey(name);
+        if (null != tpl) {
+            tpl.setDescription(description);
+            tpl.setBody(body);
+            templateDao.persist(tpl);
+        }
+        return tpl;
     }
 
     public ProjUser updateUser(String keyString, Long role) {
         ProjUser pu = null;
         final Key projUserKey = KeyFactory.stringToKey(keyString);
         final Key projKey = projUserKey.getParent();
-        
+
         pu = projUserDao.findByPrimaryKey(projKey, projUserKey.getName());
         if (null != pu) {
             pu.setRole(role);
             projUserDao.update(pu);
         }
-        
+
         return pu;
     }
 
     private Object processDumpXmlToBlob() {
         try {
-            final BlobKey returnValue = AEDDaoImpl.xmlWriteToBlobs(
-                    langDao, projDao, roleDao, templateDao, // AppUserDao,
-                    projUserDao, branchDao,
-                    ctxtDao, projLangDao, subsetDao,
-                    toknDao, transDao, subsetToknDao);
+            final BlobKey returnValue = AEDDaoImpl.xmlWriteToBlobs(langDao, projDao, roleDao, templateDao, // AppUserDao,
+                    projUserDao, branchDao, ctxtDao, projLangDao, subsetDao, toknDao, transDao, subsetToknDao);
             return returnValue;
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             LOG.error("IOException dumping XML", ex);
             return ex.getMessage();
-        } catch (SAXException ex) {
+        }
+        catch (SAXException ex) {
             LOG.error("SAXException dumping XML", ex);
             return ex.getMessage();
-        } catch (TransformerConfigurationException ex) {
+        }
+        catch (TransformerConfigurationException ex) {
             LOG.error("TransformerConfigurationException dumping XML", ex);
             return ex.getMessage();
         }
     }
-    
-    protected Object persistXmlBlob(Map<String,String[]> params) {
+
+    protected Object persistXmlBlob(Map<String, String[]> params) {
         try {
             String baseUrl = getParam(params, "baseUrl");
             String blobKey = getParam(params, "blobKey");
 
             if (null != baseUrl && null != blobKey) {
-                AEDDaoImpl.xmlParseFromBlobs(baseUrl, blobKey,
-                        langDao, projDao, roleDao, templateDao, // AppUserDao,
-                        projUserDao, branchDao,
-                        ctxtDao, projLangDao, subsetDao,
-                        toknDao, transDao, subsetToknDao);
+                AEDDaoImpl.xmlParseFromBlobs(baseUrl, blobKey, langDao, projDao, roleDao, templateDao, // AppUserDao,
+                        projUserDao, branchDao, ctxtDao, projLangDao, subsetDao, toknDao, transDao, subsetToknDao);
             }
             return blobKey;
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             LOG.error("IOException dumping XML", ex);
             return ex.getMessage();
-        } catch (SAXException ex) {
+        }
+        catch (SAXException ex) {
             LOG.error("SAXException dumping XML", ex);
             return ex.getMessage();
-        } catch (ParserConfigurationException ex) {
+        }
+        catch (ParserConfigurationException ex) {
             LOG.error("ParserConfigurationException dumping XML", ex);
             return ex.getMessage();
         }
+    }
+
+    public List<Subset> getSubset(String projectName, String branch) {
+        final Key projKey = projDao.createKey(projectName);
+        final Key branchKey = branchDao.createKey(projKey, branch);
+        return subsetDao.findByBranch(branchKey);
+    }
+
+    public Object createSubset(String projectName, String branchName, String subsetName, String subsetDescription) {
+        final Key projKey = projDao.createKey(projectName);
+        final Key branchKey = branchDao.createKey(projKey, branchName);
+        return createSubset((Key) branchKey, subsetName, subsetDescription);
+    }
+
+    public Object createContext(String projectName, String branchName, String name, String description, String blobKey) {
+        final Key projKey = projDao.createKey(projectName);
+        final Key branchKey = branchDao.createKey(projKey, branchName);
+        return createCtxt(branchKey, name, description, blobKey);
+    }
+
+    public List<Ctxt> getContexts(String projectName, String branchName) {
+        final Key projKey = projDao.createKey(projectName);
+        final Key branchKey = branchDao.createKey(projKey, branchName);
+        return ctxts(branchKey);
     }
 }

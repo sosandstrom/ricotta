@@ -1,0 +1,69 @@
+<div class="subsets">
+	<table  class="table table-striped table-bordered">
+		<thead>
+	        <tr>
+	            <th>Name</th><th>Description</th>
+	        </tr>
+	    </thead>
+	    <tbody id="subsetbody"></tbody>
+	</table>
+	<a data-toggle="modal" href="#createSubsetDialog" class="btn btn-primary">Create Subset...</a>
+	<div id="createSubsetDialog"  class="modal hide fade in" style="display: none;">
+		<div class="modal-header">
+			<a class="close" data-dismiss="modal">×</a>
+			<h3>Create new subset</h3>
+		</div>
+		<div class="modal-body">
+			<fieldset>
+				<label for="subsetName">Subset Name</label>
+				<input type="text" id="subsetName" value="">
+			</fieldset>
+			<fieldset>
+				<label for="subsetDescription">Subset Description</label>
+				<input type="text" id="subsetDescription" value="">
+			</fieldset>
+		</div>
+		<div class="modal-footer">
+			<a href="#" class="btn btn-success">Create Subset</a>
+			<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	function createNewSubset(projName) {
+		var data = {
+			"name": $("#subsetName").val(),
+			"description": $("#subsetDescription").val()
+		};
+		ricottaAPI.createSubset(projName, data, function() {
+			loadSubsets(projName);
+			//refresh token page
+			loadProject(projName);
+			refreshContent("tokens");
+		});
+	}
+	
+	function loadSubsets(projName) {
+		ricottaAPI.getSubsets(projName, buildSubsetsTable);
+	}
+	
+	function buildSubsetsTable(subsets) {
+		$("#subsetbody").empty();
+		$.map(subsets, function(s){
+			console.log(s);
+			$("#subsetbody").append("<tr><td>"+s.name+"</td><td>"+s.description+"</td>");
+		});
+	}
+	
+	$(function(){
+		var p = $("#headerProject").data("json");
+		$("#createSubsetDialog").modal({show: false});
+		$("#createSubsetDialog").find("a.btn-success").click(function(){
+			//create new subset
+			console.log(p.name);
+			createNewSubset(p.name);
+			$("#createSubsetDialog").modal("hide");
+		});
+		loadSubsets(p.name);
+	});
+</script>
