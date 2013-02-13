@@ -4,22 +4,26 @@
  */
 package com.wadpam.ricotta.model.v10;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 /**
- *
+ * 
  * @author os
  */
 public class Tokn10 {
-    private Long id;
-    private String name;
-    private String description;
-    private String context;
-    private final Map<String, String> trans = new HashMap<String, String>();
-    private final Set<String> subsets = new TreeSet<String>();
+    private Long                      id;
+    private String                    name;
+    private String                    description;
+    private String                    context;
+    private final Map<String, String> trans                = new HashMap<String, String>();
+    private final Set<String>         subsets              = new TreeSet<String>();
+    // list of translated language
+    private final List<String>        completedTranslation = new ArrayList<String>();
 
     public Tokn10(Long id, String name, String description) {
         this.id = id;
@@ -66,6 +70,11 @@ public class Tokn10 {
     public Set<String> getSubsets() {
         return subsets;
     }
-    
-    
+
+    /**
+     * @return the language code which are not yet translated
+     */
+    public List<String> getcompletedTranslation() {
+        return completedTranslation;
+    }
 }

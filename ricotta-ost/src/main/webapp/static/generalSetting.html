@@ -1,0 +1,356 @@
+<div class="generalSetting">
+	<div>
+		<label class="setting-label">Project Name</label>
+		<input type="text" class="modal-input" id="projectName" value=""/>
+	</div>
+	<div>
+		<label class="setting-label">Language</label>
+		<div class="description">
+			<table class="table table-striped table-bordered">
+				<thead>
+					<tr id="projLangsHeadTR">
+						<th>Language</th>
+						<th>Default Language</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody id="projLangsTBody"></tbody>
+			</table>
+			<a data-toggle="modal" class="btn btn-primary" href="#createProjLangDialog">+ Add Language</a>
+		</div>
+	</div>
+	<div class="clear">
+		<label class="setting-label">Users</label>
+		<div class="description">
+			<table class="table table-striped table-bordered">
+				<thead>
+					<tr>
+						<th>Email</th>
+						<th>Role</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody id="projUserTBody"></tbody>
+			</table>
+			<a data-toggle="modal" class="btn btn-primary" href="#addProjUserDialog">+ Add User</a>
+		</div>
+	</div>
+	<!-- subset -->
+	<div class="clear">
+		<label class="setting-label">Subsets</label>
+		<div class="description">
+			<table  class="table table-striped table-bordered">
+				<thead>
+			        <tr>
+			            <th>Name</th><th>Description</th><th>Action</th>
+			        </tr>
+			    </thead>
+			    <tbody id="subsetbody"></tbody>
+			</table>
+			<a data-toggle="modal" href="#createSubsetDialog" class="btn btn-primary">Create Subset...</a>
+			<div id="createSubsetDialog"  class="modal hide fade in" style="display: none;">
+				<div class="modal-header">
+					<a class="close" data-dismiss="modal">×</a>
+					<h3>Create new subset</h3>
+				</div>
+				<div class="modal-body">
+					<div>
+						<label class="modal-label" for="subsetName">Subset Name</label>
+						<input class="modal-input" type="text" id="subsetName" value="">
+					</div>
+					<div class="divider horiziontal-divider"></div>
+					<div>
+						<label class="modal-label" for="subsetDescription">Subset Description</label>
+						<input class="modal-input" type="text" id="subsetDescription" value="">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<a class="btn btn-success btn-create">Create Subset</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Language modal -->
+	<div id="createProjLangDialog" class="modal hide fade in" style="display: none;">
+		<div class="modal-header">  
+			<a class="close" data-dismiss="modal">×</a>
+			<h3>Add a language</h3>
+		</div> 
+		<div class="modal-body">
+			<p class="validateTips"></p>
+		    <form>
+				<div>
+		            <label class="modal-label" for="projLangCode">Language Code</label>
+		            <select class="modal-input" id="projLangCode" name="projLangCode"></select>
+				</div>
+				<div class="divider horiziontal-divider"></div>
+				<div>
+		            <label class="modal-label" for="projLangDefault">Default Language</label>
+		            <select class="modal-input" id="projLangDefault" name="projLangDefault"></select>
+				</div>
+		    </form>
+		</div>
+		<div class="modal-footer">
+			<a class="btn btn-success btn-create">Add Language</a>
+		</div>
+	    
+	</div>
+	<!-- create user modal -->
+	<div id="addProjUserDialog" class="modal hide fade in" style="display: none;">
+		<div class="modal-header">  
+			<a class="close" data-dismiss="modal">×</a>
+			<h3>Add a user</h3>
+		</div> 
+		<div class="modal-body">
+			<p class="validateTips"></p>
+		    <form>
+				<div>
+		            <label class="modal-label" for="projUserEmail">User Email</label>
+		            <input type="email" class="modal-input" id="projUserEmail" name="projUserEmail"/>
+				</div>
+				<div class="divider horiziontal-divider"></div>
+				<div>
+		            <label class="modal-label" for="projUserRole">User Role</label>
+		            <select class="modal-input" id="projUserRole" name="projUserRole"></select>
+				</div>
+		    </form>
+		</div>
+		<div class="modal-footer">
+			<a class="btn btn-success btn-create">Add User</a>
+		</div>
+	    
+	</div>
+</div>
+
+<script type="text/javascript">
+
+	var globalLang, globalRoles;
+	var pls = new Array();
+	
+	function updateUserRole(option, key) {
+		var p = $("#headerProject").data("project");
+		var role = option.find("option:selected").val();
+
+		ricottaAPI.updateUser(p.name, role, key, function() {}, function(){});
+	}
+	function buildProjUserTable(p) {
+		if(globalRoles == undefined) {
+			ricottaAPI.loadRoles(function(roles) {
+				globalRoles = roles;
+				appendUserRoleOption(roles);
+				appendProjectUser(p);
+			});
+		}
+		else {
+			appendUserRoleOption(globalRoles);
+			appendProjectUser(p);
+		}
+	}
+	function appendProjectUser(p) {
+		$("#projUserTBody").empty();
+		console.log(p.users);
+		$.map(p.users, function(u, i) {
+			$("#projUserTBody").append("<tr id='role_"+i+"'></tr>");
+			$("#role_"+i).append("<td>"+u.user+"</td>")
+							  .append("<td><select onchange=\"updateUserRole($(this), '"+u.keyString+"');\">"+getUserRole(u.role)+"</select></td>")
+							  .append("<td><span id='delete_" + u.user + "' class='icon-trash icon-black' onClick=\"deleteProUser('" + u.user + "');\">Delete</span></td>");
+			
+		});
+	}
+	function deleteProUser(email) {
+		var p = $("#headerProject").data("project");
+		ricottaAPI.deleteUser(p.name, email, function(){
+			loadProjectTokens(p.name);
+			buildProjUserTable($("#headerProject").data("project"));
+		},function(){});
+	}
+	function appendUserRoleOption(roles) {
+		$("#projUserRole").empty();
+		$.map(roles, function(r, i) {
+			$("#projUserRole").append("<option value='"+ r.grants +"'>"+ r.name +"</option>");
+		});
+	}
+	function getUserRole(role) {
+		var userRoleOption =  $("<select>");
+		$.map(globalRoles, function(r, i) {
+			if(role == r.grants) {
+				userRoleOption.append("<option value='"+r.grants+"' selected='selected'>"+r.name+"</option>");
+			}
+			else {
+				userRoleOption.append("<option value='"+r.grants+"'>"+r.name+"</option>");
+			}
+		});
+		return userRoleOption.html();
+	}
+	function buildProjLangsTable(p) {
+	    // build projLangs array
+	    $("#projLangDefault").empty();
+	    $("#projLangCode").empty();
+	    $("#projLangsTBody").empty();
+	    // load global langauges
+	    ricottaAPI.loadLanguages(function(data){
+	    	globalLang = data;
+	    	appendProjLangTable(p);
+	    	$.map(data, function(lang, index) {
+	            // only list if not already project language
+	            if (-1 == pls.indexOf(lang.simpleKey)) {
+	                $("#projLangCode").append('<option value="' + lang.simpleKey + '">' + lang.simpleKey + '</option>');
+	            }
+	        });
+	    });
+	}
+	
+	function appendProjLangTable(p) {
+		$("#projLangsTBody").empty();
+		addProjectLang(p);
+	}
+	function addProjectLang(p) {
+    	$.map(p.projLangs, function(t, index) {
+	        pls.push(t.langCode);
+	        // add to dialog select
+	        $("#projLangDefault").append('<option value="' + t.langCode + '" >' + t.langCode + '</option>');
+	        appendLanguageRow(t);
+	    });
+	}
+	function appendLanguageRow(t) {
+		$("#projLangsTBody").append('<tr id="pl_' + t.langCode + '"></tr>');
+        
+        $("#pl_" + t.langCode).append('<td>' + getLanguageName(t.langCode) + '</td>');
+        $("#pl_" + t.langCode).append('<td>' + getDefaultLanguage(t.defaultLang ? t.defaultLang.name : '') + '</td>');
+        // icons
+        $("#pl_" + t.langCode).append('<td>' +
+            '<span id="delete_' + t.langCode + '" class="icon-trash icon-black" onClick=\'deleteProjLang("' + t.langCode + '");\'> Delete </span>' +' </td>');
+	}
+	
+	function deleteProjLang(langCode) {
+		var p = $("#headerProject").data("project");
+		ricottaAPI.deleteProjLang(p.name, langCode, function(){
+			loadProjectTokens(p.name);
+			buildProjLangsTable($("#headerProject").data("project"));
+		}, function(){});
+	}
+	function getDefaultLanguage(langCode) {
+		var defaultLang = "No default language";
+		$.map(globalLang, function(l, i){
+			if(l.code == langCode) {
+				defaultLang = l.name;
+				return false;
+			}
+		});
+		return defaultLang;
+	}
+	function getLanguageName(langCode) {
+		var name;
+		$.map(globalLang, function(l, i) {
+			if(l.code == langCode) {
+				name = l.name;
+				return false;
+			}
+		});
+		return name;
+	}
+	function createProjLang() {
+		var p = $("#headerProject").data("project");
+	    var projLangCode = $("#projLangCode"),
+	        projLangDefault = $("#projLangDefault"),
+	        allFields = $([]).add(projLangCode, projLangDefault),
+	        tips = $( ".validateTips" );
+	
+	    var bValid = true;
+	    allFields.removeClass("ui-state-error");
+	
+	    if (bValid) {
+	    	var data = {
+	            langCode: projLangCode.val(),
+	            defaultLang: projLangDefault.val()
+	        };
+	    	
+	    	ricottaAPI.addProjectLanguage(p.name, data, function(d){
+	    		loadProjectTokens(p.name);
+	    		$("#projLangsTBody").empty();
+	            p = $("#headerProject").data("project");
+	            
+	            addProjectLang(p);//dont need to be reload the page content??
+	            $("#createProjLangDialog").modal('hide');
+	    	}, updateTips);
+	    }
+	    
+		//$("#createProjLangDialog").modal("hide");
+	}
+	function addProjUser() {
+		var p = $("#headerProject").data("project");
+		var userEmail = $("#projUserEmail"), 
+			allFields = $([]).add(userEmail),
+			tips = $("#addProjUserDialog .validateTips");
+		
+		var bValid = true;
+		bValid = bValid && checkEmpty(allFields);
+		if(bValid) {
+			ricottaAPI.addProjectUser(p.name, userEmail.val(), $("#projUserRole option:selected").val(), function(d){
+				loadProjectTokens(p.name);
+				buildProjUserTable($("#headerProject").data("project"));
+				$("#addProjUserDialog").modal("hide");
+			}, updateTips);
+		}
+	}
+	//Subset
+	function createNewSubset(projName) {
+		var subsetName = $("#subsetName").val();
+		var data = {
+			"name": $("#subsetName").val(),
+			"description": $("#subsetDescription").val()
+		};
+		ricottaAPI.createSubset(projName, data, function() {
+			loadProjectTokens(projName);
+			if(typeof appendNewSubsetToken === 'function') {
+				appendNewSubsetToken(subsetName);
+			}
+			loadProjectContent("generalSetting");
+			loadSubsets(projName);
+			$("#createSubsetDialog").modal("hide");
+		});
+	}
+	
+	function loadSubsets(projName) {
+		ricottaAPI.getSubsets(projName, buildSubsetsTable);
+	}
+	
+	function buildSubsetsTable(subsets) {
+		$("#subsetbody").empty();
+		$.map(subsets, function(s){
+			$("#subsetbody").append("<tr><td>"+s.name+"</td><td>"+s.description+"</td><td><span onclick='deleteSubset(\""+s.keyString+"\", \""+s.name+"\");' class='icon-trash icon-black'>Delete</span></td>");
+		});
+	}
+	function deleteSubset(keyString, s) {
+		var p = $("#headerProject").data("project");
+		ricottaAPI.deleteSubset(p.name, keyString, function(){
+			loadProjectTokens(p.name);
+			//this function is in the token page so, it might be undefined if the page is not loaded yet
+			if(typeof removeSubsetColumn === 'function') {
+				removeSubsetColumn(s);
+			}
+			loadProjectContent("generalSetting");
+			loadSubsets(p.name);
+		}, function(){});
+	}
+	//
+	$(function(){
+		var p = $("#headerProject").data("project");
+		$("#projectName").val(p.name);
+		$("#createProjLangDialog").modal({show: false});
+		$("#createProjLangDialog").find("a.btn-success").click(function(){
+			createProjLang();
+		});
+		$("#addProjUserDialog").find("a.btn-success").click(function(){
+			addProjUser();
+		});
+		$("#createSubsetDialog").find("a.btn-success").click(function(){
+			//create new subset
+			createNewSubset(p.name);
+			
+		});
+		buildProjLangsTable(p);
+		buildProjUserTable(p);
+		loadSubsets(p.name);
+	});
+</script>

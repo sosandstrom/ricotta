@@ -202,6 +202,32 @@
 		/**
 		 * Add user to the project
 		 */
+		addProjectUser: function(projName, email, role, successCallback, failCallBack){
+			var that = this;
+			$.ajax({
+				type: "POST",
+				url: that.backendUrl + "project/v10/" + projName + "/user",
+				data: {
+					"email": email,
+					"role": role
+				},
+				dataType: "json",
+				success: function(data) {
+					if(typeof successCallback === 'function') {
+						successCallback(data);
+					}
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					if(typeof failCallBack === 'function') {
+						console.log(textStatus);
+						if(jqXHR.status == 409) {
+							failCallBack("User " + email + " already added.");
+						}
+						console.log(errorThrown);
+					}
+				}
+			})
+		},
 		saveUser: function(projName, id, data, successCallback, failCallback) {
 			var that = this;
 			$.ajax({
@@ -243,6 +269,29 @@
 		        }
 		    });
 		},
+		getExportUrl: function(projName) {
+			var that = this;
+			return that.backendUrl + "project/v10/"+projName + "/export";
+		},
+		deleteProj: function(projName, successCallback, failCallback) {
+			var that = this;
+			$.ajax({
+		        async: false,
+		        type: "POST",
+		        url: that.backendUrl + "project/v10/"+projName + "/delete",
+		        dataType: "json",
+		        success: function(data){
+		        	if(typeof successCallback === 'function') {
+		        		successCallback(data);
+		        	}
+		        },
+		        error: function(req, textStatus, errorThrown) {
+		        	if(typeof failCallback === 'function') {
+		        		failCallback(req.status);
+		        	}
+		        }
+		    });
+		},
 		/**
 		 * Add the language to the project
 		 */
@@ -254,27 +303,16 @@
                 url: that.backendUrl + "project/v10/" + projName + "/projLang",
                 dataType: "json",
                 data: data
-                /*
-                data: {
-                    langCode: projLangCode.val(),
-                    defaultLang: projLangDefault.val()
-                }*/
             })
             .done(function(data){
             	if(typeof successCallback === 'function') {
             		successCallback(data);
             	}
-            	/*
-                $("#createProjLangDialog").dialog("close");
-                loadProject(p.name);
-                p = $("#headerProject").data("json");
-                buildProjLangsTable(p);*/
             })
             .fail(function() {
             	if(typeof failCallback === 'function') {
             		failCallback(this.statusText);
             	}
-                //updateTips(this.statusText);
             });
 		},
 		/**
@@ -385,7 +423,7 @@
 		        		successCallback(data);
 		        	}
 		            hideToast();
-		            $("#headerProject").data("json", data);
+		            $("#headerProject").data("project", data);
 		            $("#projectTabs").show();
 		        },
 		        error: function(req, textStatus, errorThrown) {
@@ -395,6 +433,24 @@
 		            showToast(textStatus);
 		        }
 		    });
+		},
+		getToken: function(tokenId, projName, successCallback, failCallback) {
+			var that =  this;
+			$.ajax({
+				url: that.backendUrl + "project/v10/" + projName + "/token/" + tokenId,
+				type: "GET",
+				dataType: "json",
+				success: function(token) {
+					if(typeof successCallback === 'function') {
+						successCallback(token);
+					}
+				},
+				error: function(jqXR, testStatus, errorThrown) {
+					if(typeof failCallback === 'function') {
+						failCallback(jqXR);
+					}
+				}
+			});
 		},
 		/**
 		 * @param projName the project contains the token
@@ -447,6 +503,139 @@
         		   }
         	   }
            });
+		},
+		updateTranslation: function(langCode, langVal, projName, tokenId, successCallback, failCallback) {
+			var that = this;
+			$.ajax({
+				url: that.backendUrl + "project/v10/" + projName + "/token/" + tokenId,
+				type: "POST",
+				dataType: "json",
+				data: {
+					"langCode": langCode,
+					"value": langVal
+				},
+				success: function(token) {
+					if(typeof successCallback === 'function') {
+						successCallback(token);
+					}
+				},
+				error: function(jqXR, textStatus, errorThrown) {
+					if(typeof failCallback === 'function') {
+						failCallback(jqXR);
+					}
+				}
+			});
+		},
+		deleteToken: function(tokenId, projName, successCallback, failCallback) {
+			var that = this;
+			$.ajax({
+				url: that.backendUrl + "project/v10/"+ projName +"/token/" + tokenId,
+				type: "DELETE",
+				dataType: 'json',
+				success: function() {
+					if(typeof successCallback === 'function') {
+						successCallback();
+					}
+				},
+				error: function() {
+					if(typeof failCallback === 'function') {
+						failCallback();
+					}
+				}
+			});
+		},
+		deleteUser: function(projName, email, successCallback, failCallback) {
+			var that = this;
+			$.ajax({
+				url: that.backendUrl + "project/v10/"+ projName + "/user?email="+email ,
+				type: "DELETE",
+				dataType: "json",
+				success: function() {
+					if(typeof successCallback === 'function') {
+						successCallback();
+					}
+				},
+				error: function(jqXR) {
+					if(typeof failCallback === 'function'){
+						failCallback(jqXR);
+					}
+				}
+			});
+		},
+		deleteProjLang: function(projName, langCode, successCallback, failCallBack) {
+			var that = this;
+			$.ajax({
+				url: that.backendUrl + "project/v10/"+projName+"/lang?langCode="+ langCode,
+				type: "DELETE",
+				dataType: "json",
+				success: function() {
+					if(typeof successCallback === 'function') {
+						successCallback();
+					} 
+				},
+				error: function(jqXR) {
+					if(typeof failCallBack === 'function') {
+						failCallBack(jqXR);
+					}
+				}
+			});
+		},
+		updateUser: function(projectName, role, keyString, successCallback, failCallback) {
+			var that = this;
+			$.ajax({
+				url: that.backendUrl + "project/v10/"+ projectName +"/user/" + keyString,
+				type: "POST",
+				dataType: "json",
+				data: {
+					"role": role,
+				},
+				success: function(projUser) {
+					if(typeof successCallback === 'function') {
+						successCallback();
+					}
+				},
+				error: function(jqXR) {
+					if(typeof failCallback === 'function') {
+						failCallback(jqXR);
+					}
+				}
+			});
+		},
+		deleteContext: function(projName, keyString, successCallback, failCallback) {
+			var that = this;
+			$.ajax({
+				url: that.backendUrl + "project/v10/"+ projName +"/context?keyString="+keyString,
+				type:"DELETE",
+				dataType: "json",
+				success: function(projUser) {
+					if(typeof successCallback === 'function') {
+						successCallback();
+					}
+				},
+				error: function(jqXR) {
+					if(typeof failCallback === 'function') {
+						failCallback(jqXR);
+					}
+				}
+			});
+		},
+		deleteSubset: function(projName, keyString, successCallback, failCallback) {
+			var that = this;
+			$.ajax({
+				url: that.backendUrl + "project/v10/"+ projName +"/subset?keyString="+keyString,
+				type:"DELETE",
+				dataType: "json",
+				success: function(projUser) {
+					if(typeof successCallback === 'function') {
+						successCallback();
+					}
+				},
+				error: function(jqXR) {
+					if(typeof failCallback === 'function') {
+						failCallback(jqXR);
+					}
+				}
+			});
 		}
 	};
 	if(typeof exports !== 'undefined') exports.RicottaAPI = RicottaAPI;

@@ -21,7 +21,8 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Ricotta</title>
-        <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+        <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="css/DT_bootstrap.css" rel="stylesheet" media="screen">
         <link type="text/css" href="ricotta.custom.css" rel="stylesheet" />
         
         <!-- 
@@ -34,22 +35,38 @@
         		<div class="container-fluid">
           			<a class="brand" href="">Ricotta</a>
           			<div class="nav-collapse collapse">
-            			<span class="navbar-text pull-right">
-	         				<span id="headerUsername"></span> - <a id="headerUserAction" href="" >Login</a>
-            			</span> 
+           				<ul class="nav navbar-text pull-right">
+           					<li><a id="headerUserAction" class="login" href="" >Login</a></li>
+           					<li class="dropdown">
+		         				<a class="dropdown-toggle" data-toggle="dropdown"><span class="icon-white icon-user"></span> <span id="headerUsername"></span> <b class="caret"></b></a>
+		         				<ul class="dropdown-menu">
+		         					<li class="divider"></li>
+			         				<li><a id="headerUserAction" href="" >Logout</a></li>
+		         				</ul>
+           					</li>
+           				</ul>
             			<ul class="nav">
-              				<li id="headerHome" class="active"><a href="index.html">Home</a></li>
+              				<li id="headerHome" class="hide"><a href="index.html">Home</a></li>
               				<li id="headerProject" class="hide" data-target="projects"><a>Projects</a></li>
               				<li id="headerView" class="hide"><a>View</a></li>
-              				<li id="headerContext" class="hide"><a>Context</a></li>
-              				<li id="headerLanguage" class="hide"><a>Lang</a></li>
-							<!-- 
-	                        <td id="headerProject" class="ui-state-default" style="display: none;">Project</td>
-	                        <td id="headerView" class="ui-state-default" style="display: none;">View</td>
-	                        <td id="headerContext" class="ui-state-default" style="display: none;">Context</td>
-	                        <td id="headerLanguage" class="ui-state-default" style="display: none;">Lang</td>
-	                        <td id="headerUser" style="text-align: right;" class="ui-state-default"><span id="headerUsername"></span> - <a id="headerUserAction" href="" >Login</a></td>
-	                        -->
+              				<li id="translationsOptions" class="hide">
+              					<ul class="nav">
+		              				<li id="headerContext" class="dropdown">
+		              					<a class="dropdown-toggle" data-toggle="dropdown" href="#">Contexts <b class="caret"></b></a>
+		              					<ul class="dropdown-menu" id="contexts">
+		              						<li class="active"><a data-target='' >All tokens</a></li>
+		              						<li class="divider"></li>
+		              					</ul>
+		              				</li>
+		              				<li id="headerLanguage" class="dropdown">
+		              					<a class="dropdown-toggle" data-toggle="dropdown" href="#">Languages <b class="caret"></b></a>
+		              					<ul class="dropdown-menu" id="languages">
+		              						<li class="active"><a data-target=''>Default</a></li>
+		              						<li class='divider'></li>
+		              					</ul>
+		              				</li>
+              					</ul>
+              				</li>
             			</ul>
           			</div>
         		</div>
@@ -58,17 +75,31 @@
 	    <div class="container-fluid">
 	    	<div id="ricotta_contents">
 	    		<div id="toast"></div>
+	    		<div id="welcome">
+		    		<div>
+		    			Ricotta is a translation management tool, with complimentary build tools, to efficiently manage localised resources in your software project.
+		    			Manage translation of apps, websites and documents better.
+		    		</div>
+		    		<div id="footer">
+		    			<p>
+		    				a powerful solution for managing localization from start to finish.
+		    			</p>
+		    		</div>
+	    		</div>
 	    	</div>
 			
     	</div><!--/.fluid-container-->
+    	<!-- 
     	<footer class="footer">
 		  	<div>Ricotta translations management tool.</div>
 		  	<div>For Ricotta, the GNU General Public License version 3 applies, <a href="/LICENSE">GPLv3</a>.</div>
-		</footer>
+		</footer>  -->
 		<!--       	
         <div id="contents" class="ui-widget"></div> -->
         <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
         <script type="text/javascript" src="js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="js/jquery.dataTables.js"></script>
+        <script type="text/javascript" src="js/DT_bootstrap.js"></script>
         <script type="text/javascript" src="js/jquery.iframe-post-form.js"></script>
         <!-- <script type="text/javascript" src="js/jquery-ui-1.8.17.custom.min.js"></script> -->
 		<script type="text/javascript" src="ricotta_common.js"></script>
@@ -95,21 +126,28 @@
 			function success(data) {
 				$("#headerUser").data("json", data);
 			    $("#headerUsername").text(data.email);
-			    $("#headerUserAction").text("Logout");
-			    $("#headerUserAction").attr("href", data.url);
+			    $(".dropdown-menu #headerUserAction").attr("href", data.url);
 			    hideToast();
 			    $("#ricotta_contents").html("<div style='width:100%;text-align:center;'>Loading...</div>").load("home.html");
+			    $(".pull-right #headerUserAction:first").hide();
+			    $(".dropdown-menu li").live("click", function(){
+			    	var page = $(this).data("target");//get the link page
+			    	setActiveMenu($(".pull-right .dropdown-menu"), $(this));
+			    	loadPage(page);
+			    });
 			}
 			
 			function fail(jqXHR) {
+				$(".dropdown").hide();
 				hideToast();
 				
-				window.location.href= jqXHR.getResponseHeader("Login-Logout-URL");
-				/*
-			    $("#headerUsername").text("Anonymous");
-			    $("#headerUserAction").attr("href", jqXHR.getResponseHeader("Login-Logout-URL"));
-			    $("#contents").html('<img src="/RicottaOverview.2.png" alt="Ricotta Overview" />');
-			    */
+				//window.location.href= jqXHR.getResponseHeader("Login-Logout-URL");
+				
+			    //$("#headerUsername").text("Anonymous");
+			    $(".pull-right #headerUserAction:first").attr("href", jqXHR.getResponseHeader("Login-Logout-URL"));
+			    //$("#contents").html('<img src="/RicottaOverview.2.png" alt="Ricotta Overview" />');
+			    //$("#ricotta_contents").append('<img src="/RicottaOverview.2.png" alt="Ricotta Overview" />');
+			    
 			}
 			//click on home link
 			$("#headerHome").click(function() {
@@ -119,6 +157,17 @@
 			$("#headerProject").click(function() {
 				$("#contents").empty();
 			    $("#ricotta_contents").html("<div style='width:100%;text-align:center;'>Loading...</div>").load("project.html");
+			});
+			$("#contexts li").live("click", function(){
+				setActiveMenu($("#contexts"), $(this));
+				var targetContext = $(this).find("a").data("target");
+				onContextChange(targetContext);
+			});
+			
+			$("#languages li").live("click", function() {
+				setActiveMenu($("#languages"), $(this));
+				var targetLanguage = $(this).find("a").data("target");
+				onLanguageChange(targetLanguage);
 			});
         </script>
     </body>

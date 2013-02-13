@@ -1,36 +1,41 @@
 <div class="languages">
-	<table id="languages" class="table table-striped table-bordered">
-	    <thead>
-	        <tr>
-	            <th>Code</th><th>Name</th>
-	        </tr>
-	    </thead>
-	    <tbody id="languagesBody"></tbody>
-	    <tfoot>
-	    </tfoot>
-	</table>
+<div> <h1>Languages </h1></div>
 	<a data-toggle="modal" href="#createLanguageDialog" class="btn btn-primary">Create new language...</a>
+	<div class="languageWrapper">
+		<table id="languages" class="table table-striped table-bordered">
+		    <thead>
+		        <tr>
+		            <th>Code</th><th>Name</th>
+		        </tr>
+		    </thead>
+		    <tbody id="languagesBody"></tbody>
+		    <tfoot>
+		    </tfoot>
+		</table>
+	</div>
 	<!-- 
 	<button id="createLanguageButton" >Create new language...</button> -->
 	<div id="createLanguageDialog"  class="modal hide fade in" style="display: none;">
 		<div class="modal-header">  
 			<a class="close" data-dismiss="modal">×</a>
-			<h3>Create new language</h3>
+			<h3>Add a language</h3>
 		</div> 
 		<div class="modal-body">
 			 <p class="validateTips"></p>
 		    <form>
-		        <fieldset>
-		            <label for="langCode">Language code</label>
-		            <input id="langCode" name="langCode"  class="text ui-widget-content ui-corner-all" />
-		            <label for="langName">Language name</label>
-		            <input id="langName" name="langName"  class="text ui-widget-content ui-corner-all" />
-		        </fieldset>
+		    	<div class="box">
+		            <label class="modal-label" for="langCode">Code</label>
+		            <input class="modal-input" id="langCode" name="langCode" type="text"/>
+		    	</div>
+		    	<div class="divider horiziontal-divider"></div>
+		    	<div class="box">
+		            <label class="modal-label" for="langName">Name/description</label>
+		            <input class="modal-input" id="langName" name="langName" type="text"/>
+		    	</div>
 		    </form>
 		</div>
 		<div class="modal-footer">
-			<a href="#" class="btn btn-success">Create Project</a>
-			<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+			<a href="#" class="btn btn-success btn-create">Add Language</a>
 		</div>
 	    
 	</div>
@@ -59,45 +64,6 @@
 	        langName = $("#langName"),
 	        allFields = $([]).add(langCode).add(langName),
 	        tips = $( ".validateTips" );
-	
-	    /*
-	    $("#createLanguageDialog").dialog({
-	        autoOpen: false,
-	        height: 500,
-	        width: 700,
-	        modal: true,
-	        title: "Enter the new language's details",
-	        buttons: {
-	            Cancel: function() {
-	                $( this ).dialog("close");
-	            },
-	            "Create language": function() {
-	                var bValid = true;
-	                allFields.removeClass("ui-state-error");
-	                bValid = bValid && checkLength(langCode, "language code", 2, 7);
-	                bValid = bValid && checkLength(langName, "language name", 4, 32);
-	
-	                if (bValid) {
-	                	var data = {
-	                        langCode: langCode.val(),
-	                        name: langName.val()
-	                    }
-	                	ricottaAPI.createLanguage(data, loadLanguages, updateTips);
-	                }
-	                
-	            }
-	        },
-	        close: function() {
-	            allFields.val( "" ).removeClass( "ui-state-error" );
-	        },
-	        open: function() {
-	            updateTips("All form fields are required.");
-	        }
-	    });
-	    
-	    $("#createLanguageButton").button().click(function() {
-	        $("#createLanguageDialog").dialog("open");
-	    });*/
 	    $("#createLanguageDialog").modal({show:false});
 	    
 	    $("#createLanguageDialog").find("a.btn-success").click(function(){

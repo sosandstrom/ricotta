@@ -6,12 +6,17 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,11 +28,15 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
 
+import net.sf.mardao.api.dao.AEDDaoImpl;
 import net.sf.mardao.api.domain.PrimaryKeyEntity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.Key;
@@ -50,11 +59,6 @@ import com.wadpam.ricotta.model.v10.Tokn10;
 import com.wadpam.ricotta.web.AbstractDaoController;
 import com.wadpam.ricotta.web.ProjectHandlerInterceptor;
 import com.wadpam.ricotta.web.admin.AdminTask;
-import java.util.*;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
-import net.sf.mardao.api.dao.AEDDaoImpl;
-import org.xml.sax.SAXException;
 
 public class UberDaoBean extends AbstractDaoController implements UberDao, AdminTask {
     public static final String NO_CONTEXT_NAME = "_NO_CONTEXT_";
@@ -250,6 +254,24 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         return _roles;
     }
 
+    public Tokn10 getToken10(String projectName, String branchName, Long tokenId) {
+        final Key projKey = projDao.createKey(projectName);
+        final Key branchKey = branchDao.createKey(projKey, branchName);
+        final Tokn token = toknDao.findByPrimaryKey(branchKey, tokenId);
+        Tokn10 tokn10 = convert(token);
+        List<ProjLang> projLangs = projLangDao.findByBranch(branchKey);
+        for(ProjLang projLang : projLangs) {
+            List<Trans> trans = transDao.findByProjLang(projLang.getPrimaryKey());
+            for(Trans t : trans) {
+                if (tokenId == t.getToken().longValue()) {
+                    tokn10.getTrans().put(projLang.getLangCode(), t.getLocal());
+                    tokn10.getcompletedTranslation().add(projLang.getLangCode());
+                }
+            }
+        }
+        return tokn10;
+    }
+
     public Proj10 getTokens(String username, String projectName, String branchName) {
         final Proj10 proj = new Proj10(projectName, null);
         final Key projKey = projDao.createKey(projectName);
@@ -276,10 +298,13 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
             }
 
             // fetch translations for this language
+            // Becuase there will be to many translateion data stored in the dom object, the translation shouldn't be loaded here.
+
             List<Trans> trans = transDao.findByProjLang(projLang.getPrimaryKey());
             for(Trans t : trans) {
                 t10 = tokenMap.get(t.getToken());
-                t10.getTrans().put(projLang.getLangCode(), t.getLocal());
+                // t10.getTrans().put(projLang.getLangCode(), t.getLocal());
+                t10.getcompletedTranslation().add(projLang.getLangCode());
             }
         }
 
@@ -302,7 +327,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         }
 
         // get project users
-        proj.setUsers(projUserDao.findByProj(projKey));
+        proj.setUsers(projUserDao.findByProj(branchKey.getParent()));
 
         return proj;
     }
@@ -809,6 +834,45 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
     }
 
     // --------------------- delete methods ----------------------
+    public void deleteToken(String branchName, String projName, Long tokenId) throws IllegalArgumentException {
+        final Key projKey = projDao.createKey(projName);
+        final Key branchKey = branchDao.createKey(projKey, branchName);
+        final Key tokenKey = toknDao.createKey(branchKey, tokenId);
+        final List<Key> ids = new ArrayList<Key>();
+        ids.add(tokenKey);
+        deleteTokns(ids);
+    }
+
+    /**
+     * Delete context
+     * 
+     * @param branchName
+     * @param projName
+     * @param contextName
+     */
+    public void deleteContext(String keyString) {
+        final Key contextKey = KeyFactory.stringToKey(keyString);
+
+        // Remove the context from existing token
+        final List<Tokn> tokens = toknDao.findByViewContext(contextKey);
+        for(Tokn token : tokens) {
+            token.setViewContext(null);
+            toknDao.update(token);
+        }
+
+        final Ctxt context = ctxtDao.findByPrimaryKey(contextKey.getParent(), contextKey.getName());
+        ctxtDao.delete(context);
+    }
+
+    public void deleteSubset(String keyString) {
+        final Key subsetKey = KeyFactory.stringToKey(keyString);
+
+        // delete the subse token
+        subsetToknDao.deleteByParent(subsetKey);
+        final Subset subSet = subsetDao.findByPrimaryKey(subsetKey.getParent(), subsetKey.getName());
+        subsetDao.delete(subSet);
+
+    }
 
     @Override
     public void deleteTokns(List<Key> keys) {
@@ -842,6 +906,21 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         }
     }
 
+    public void deleteProjLanguage(String branchName, String projName, String langCode) {
+        final Key projKey = projDao.createKey(projName);
+        final Key branchKey = branchDao.createKey(projKey, branchName);
+        final Key projLangKey = projLangDao.createKey(branchKey, langCode);
+
+        ProjLang projLang = projLangDao.findByPrimaryKey(branchKey, langCode);
+
+        // Delete translation
+        List<Long> transKeys = transDao.findKeysByProjLang(projLangKey);
+        transDao.delete(projLangKey, intersection(transKeys, transKeys));
+
+        // Delete proj language
+        projLangDao.delete(projLang);
+    }
+
     @Override
     public void deleteBranch(Key branchKey) {
         // tokens
@@ -866,6 +945,11 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
 
         // and itself
         branchDao.deleteByCore(branchKey);
+    }
+
+    public void deleteProj(String projectName) {
+        final Key projKey = projDao.createKey(projectName);
+        deleteProj(projKey);
     }
 
     public void deleteProj(Key projKey) {
@@ -1049,5 +1133,21 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         final Key projKey = projDao.createKey(projectName);
         final Key branchKey = branchDao.createKey(projKey, branchName);
         return ctxts(branchKey);
+    }
+
+    public Object createUser(String projectName, String email, long role) throws IllegalArgumentException {
+        final Key projKey = projDao.createKey(projectName);
+        final ProjUser existing = projUserDao.findByPrimaryKey(projKey, email);
+        if (null != existing) {
+            throw new IllegalArgumentException("User already added");
+        }
+
+        return createUser(projKey, email, role);
+    }
+
+    public void deleteProjectUser(String projName, String email) {
+        final Key projKey = projDao.createKey(projName);
+        final ProjUser projUser = projUserDao.findByPrimaryKey(projKey, email);
+        projUserDao.delete(projUser);
     }
 }

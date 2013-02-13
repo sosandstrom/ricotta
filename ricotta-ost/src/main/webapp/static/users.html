@@ -20,7 +20,7 @@
 	
 	function updateUser(id, role) {
 	    // find this user in data
-	    var p = $("#headerProject").data("json");
+	    var p = $("#headerProject").data("project");
 	    $.map(p.users, function(t, i) {
 	        if (t.keyString == id) {
 	            t.role = role;
@@ -32,7 +32,7 @@
 	
 	function saveUser(id) {
 	    showToast('Saving user role...');
-	    var p = $("#headerProject").data("json");
+	    var p = $("#headerProject").data("project");
 	    
 	    var body = {
 	            role: $("#role_" + id).val()
@@ -77,14 +77,10 @@
 	    });
 	}
 	
-	$("#buttonAddUser").button().click(function() {
-	
-	});
-	
 	$(function() {
 	    var roles = [];
 	    ricottaAPI.loadRoles(function(data){roles = data;}, showToast);
-	    var p = $("#headerProject").data("json");
+	    var p = $("#headerProject").data("project");
 	    buildUsersTable(p, roles);
 	});
 	

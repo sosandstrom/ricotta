@@ -15,7 +15,7 @@
 #thToken { width: 27%; }
 #thDescr { width: 28%; }
 #thTrans { width: 55%; }
-
+thead { background: #eeeeee; }
 #languages { width: 100%; }
 #thLanguages { width: 100%; }
 
@@ -25,9 +25,7 @@
 	clear:both;
 	margin-top:0;
 }
-.modal-body textarea{
-	width:98%;
-}
+
 .link {
 	cursor: pointer;
 }
@@ -50,6 +48,10 @@
 	vertical-align: middle;
 	display:none;
 }
+.modal-footer .btn-create {
+	width: 100%;
+	padding: 4px 0;
+}
 #ricotta_contents {
 	min-height: 100px;
 	margin-top: 41px;
@@ -57,4 +59,365 @@
 #toast{
 	width: 100%;
 	text-align:center;
+}
+.dropdown-menu .divider {
+	margin: 5px 1px;
+}
+table#tokens td {
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.table-striped tbody > tr > td{
+	vertical-align: middle;
+}
+
+.dropdown-menu li > a:hover,
+.dropdown-menu li > a:focus,
+.dropdown-submenu:hover > a {
+  color: #000000;
+  text-decoration: none;
+  background-color: #eeeeee;
+  background-repeat: repeat-x;
+  background-image: none;
+  cursor: pointer;
+  
+}
+
+#ricotta_contents #welcome {
+	top: 50%;
+	position: absolute;
+}
+#ricotta_contents #welcome #footer {
+	margin-top: 20%;
+}
+
+#welcome #footer p {
+	-webkit-margin-start: 30px;
+	margin-start: 30px;
+}
+.contentContainer {
+	width: 100%;
+	background:#ffffff;
+}
+
+h1 {
+	padding: 0 0 10px 0;
+}
+.pname {
+	font-weight: bold;
+	font-size: 15px;
+}
+
+.projectsItem{
+	border-bottom: 1px solid;
+	padding: 15px 0 10px 0;
+	-webkit-align-items: center;
+	overflow: auto;
+}
+.projectsItem #item {
+	float:left;
+	width: auto;
+	max-width: 78%;
+	clear:both;
+}
+.projectsItem #item .pname {
+	text-transform:capitalize;
+	cursor: pointer;
+	color: #0088cc;
+}
+.projectsItem #itemAction {
+	text-align: right;
+	float: right;
+	width: 128px;
+	margin-top: 10px;
+}
+
+.projectsItem #itemAction .item-icon{
+	display: inline-block;
+    height: 26px;
+    margin-top: 5px;
+    vertical-align: bottom;
+    width: 34px;
+}
+.projectsItem #itemAction .export {
+	background: url("img/export.png") no-repeat scroll 0 0 transparent;
+}
+
+.projectsItem #itemAction span.delete {
+	background: url("img/delete_bin.png") no-repeat scroll 0 0 transparent;
+}
+
+.projectsItem #itemAction div{
+	text-align: right;
+	float:left;
+}
+
+.projectsItem #itemAction div.delete {
+	float:right;
+	direction: rtl;
+}
+.navbar-inverse .nav > li > a.login {
+	color: #0088cc;
+}
+
+div.divider {
+	background-color: #e5e5e5;
+}
+
+div.vertical-divider {
+	width: 2px;
+	float: left;
+	margin: 0 6px 0 18px;
+	border-bottom: 1px solid #ffffff;
+}
+div.horiziontal-divider {
+	*width: 100%;
+	height: 1px;
+	margin: 15px 1px;
+	*margin: -5px 0 5px;
+	overflow: hidden;
+	border-bottom: 1px solid #ffffff;
+}
+.modal-body form {
+	margin: 0;
+}
+.modal-label {
+	float:left;
+	width: 30%;
+}
+.modal-body select.modal-input {
+	width: 70%;
+}
+.modal-body input[type="text"].modal-input, 
+.modal-body textarea.modal-input, 
+.modal-body input[type="email"].modal-input {
+	width: 67%;
+	margin: 0;
+}
+.templateWrapper, .languageWrapper {
+	margin-top: 10px;
+}
+.project {
+	padding: 10px 0;
+}
+.project > .row-fluid > div.span2 {
+	height: 40px;
+}
+
+.project > .row-fluid > div.span2 > .project-title > ul{
+	padding-left: 4px;
+}
+.span2 .project-title {
+	padding:8px 0px 8px 8px;
+}
+.project > .row-fluid > div.span10 {
+	background: #fff;
+	/*-webkit-border-radius: 4px;
+	border-radius: 4px;
+	height: 38px;*/
+	margin-left: 1%;
+	width: 82.0598290598291%;
+}
+
+.project .row-fluid .span10 .nav {
+	height: 38px;
+	border: 1px solid;
+	background: #000;
+	vertical-align: middle;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	margin-bottom: 0px;
+}
+
+.project .row-fluid .span10 .nav > div {
+	margin-top: 8px;	
+}
+
+.project .row-fluid .span10 .nav > ul {
+	list-style: none;
+}
+.project .row-fluid .span10 .nav > div{
+	float:left;
+	-webkit-margin-start: 20px;
+	-webkit-margin-end: 20px;
+	-moz-margin-start: 20px;
+	-moz-margin-end: 20px;
+}
+.project .row-fluid .span10 .nav > div > span {
+	-webkit-padding-start: 20px;
+	-webkit-padding-end: 20px;
+	-webkit-padding-before: 6px;
+	-webkit-padding-after: 7px;
+	
+	-moz-padding-start: 20px;
+	-moz-padding-end: 20px;
+	-moz-padding-before: 6px;
+	-moz-padding-after: 7px;
+	padding: 7px;
+	color: #ffffff;
+}
+
+.project .row-fluid .span10 .nav > div > span.selected {
+	background: #fff;
+	color: #000;
+	border-radius: 4px;
+	box-shadow:1px 1px 2px inset;
+	transition: all 1s ease;
+	-webkit-border-radius: 4px;
+	-webkit-box-shadow: 1px 1px 2px inset;
+	-webkit-transition: all 1s ease;
+}
+.project .row-fluid .span10 .nav > div >  span.selected-over {
+	background: #000;
+	color: #fff;
+	border-radius: 0;
+	box-shadow: 0 0 0;
+	-webkit-border-radius: 0;
+	-webkit-box-shadow: 0 0 0;
+}
+.project .row-fluid .span10 .nav > div > span:hover {
+	background: #fff;
+	color: #000;
+	-webkit-border-radius: 4px;
+	-webkit-box-shadow: 1px 1px 2px inset;
+	-webkit-transition: all 1s ease;
+	
+	border-radius: 4px;
+	box-shadow: 1px 1px 2px inset;
+	transition: all 1s ease;
+	
+	background-size: auto auto;
+}
+
+#projectSetting {
+	clear:both;
+	overflow: auto;
+}
+#projectSetting .generalSetting, 
+#projectSetting .contexts,
+#projectSetting .tokens {
+	padding: 30px 30px;
+	overflow: auto;
+}
+.generalSetting .setting-label {
+	float: left;
+	width: 15%;
+}
+.generalSetting .description {
+	float:left;
+	width:84%;
+}
+
+.generalSetting > div {
+	padding: 10px 0;
+}
+
+.generalSetting table {
+	table-layout: fixed;
+}
+
+td > select {
+	margin-bottom: 0;
+	width: 100%;
+}
+td > input[type="text"] {
+	margin-bottom: 0;
+}
+.clear {
+	clear:both;
+}
+
+.project .translation-sidebar {
+	min-height: 400px;
+	border: 1px solid #dddddd;
+	border-radius: 4px;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.translation-sidebar .translation-title {
+	background: #f5f5f5;
+	border-bottom: 1px solid #dddddd;
+	padding: 10px;
+}
+
+.translation-sidebar .translation-body {
+	padding: 10px 21px;
+}
+
+.translation-sidebar .translation-body select {
+	max-width: 100%;
+} 
+.translation-sidebar .translation-body .token-wrapper {
+	height: 250px;
+	border: 1px solid #dddddd;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+	overflow:auto;
+}
+
+.translation-sidebar .translation-body .token-wrapper > ul#translationToken {
+	list-style: none;
+	margin-left: 10px;
+}
+.translation-sidebar .translation-body .token-wrapper > ul#translationToken li {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	margin: 10px 0px 10px;
+}
+.translation-sidebar .translation-body .token-wrapper > ul#translationToken li > input[type="radio"] {
+	margin: 4px 5px 0;
+	padding-right: 5px;
+	padding-bottom: 5px;
+	float:left;
+}
+.translation-sidebar .translation-body .token-wrapper > ul#translationToken li > label {
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+}
+.translation-sidebar .translation-footer {
+	height: 25px;
+	padding: 10px 10px;
+	border-top: 1px solid #ddd;
+	background: #f5f5f5;
+}
+
+.span2 #projectname {
+	font-weight: bold;
+	text-transform:capitalize;
+}
+.icon-trash {
+	cursor: pointer;
+	padding-left: 20px
+}
+
+.translation_token #languageWrapper {
+	margin-top: 30px;
+}
+
+#translationTokenTitle .token-title {
+	font-weight: bold;
+	font-size: 20px; 
+}
+#translationTokenTitle .token-name {
+	color: #0088cc;
+}
+.translation_token #languageWrapper #translationBody {
+	float:left;
+	width: 70%;
+}
+.translation_token #languageWrapper #context {
+	float: left;
+	width: 20%;
+}
+
+.translation_token #languageWrapper label {
+	float:left;
+	width: 15%;
+}
+#languageWrapper > #translationBody textarea {
+	width: 500px;
+	max-width: 500px;
 }

@@ -1,49 +1,164 @@
-<div class="row-fluid">
-	<div class="left-nav">
-		<div class="well sidebar-nav">
-			<ul class="nav nav-list">
-				<li class="active" data-target="translations"><a>Translations</a></li>
-				<li data-target="subsets"><a>Subsets</a></li>
-		        <li data-target="tokens"><a>Tokens</a></li>
-		        <li data-target="contexts"><a>Contexts</a></li>
-		        <li data-target="projLangs"><a>Languages</a></li>
-		        <li data-target="users"><a>Users</a></li>
-			</ul>
+<div class="project">
+	<div class="row-fluid">
+		<div class="span2">
+			<div class="well sidebar-nav project-title">
+				<ul class="nav nav-list">
+					<li style="cursor:pointer;" onclick="reloadGeneralSetting();">
+						<span id="projectname"></span>
+					</li>
+				</ul>
+			</div>
+			<div class="translation-sidebar">
+				<div class="translation-title nav-list">
+					<span>Translation</span>
+				</div>
+				<div class="translation-body">
+					<div id="selectedToken"></div>
+					<div class="context-filter">
+						<label for="contextFilter">Filter by context</label>
+						<select id="contextFilter" onchange="tokenFiltered();"><option value='-1'>Show all</option></select>
+					</div>
+					<div class="completion-filter">
+						<label for="completionFilter">Filter by completion</label>
+						<select id="completionFilter" onchange="tokenFiltered();">
+							<option value='-1'>Show all</option>
+							<option value='0'>Show all uncomplete</option>
+						</select>
+					</div>
+					<div class="token-wrapper">
+						<ul id="translationToken"></ul>
+					</div>
+				</div>
+				<div class="translation-footer">
+					<a id="addTranslation" class="btn btn-small btn-primary">Add String</a>
+				</div>
+			</div>
 		</div>
-	</div>
-	<div class="contentContainer">
-		<div id="toast"></div>
-		<div class="contents" id="contents">
+		<div class="divider vertical-divider"></div>
+		<div class="span10">
+			<div class="nav">
+				<div><span class="selected" data-target="generalSetting">General</span></div>
+				<div><span data-target="contexts">Upload Screenshots</span></div>
+				<div><span data-target="tokens">String Manger</span></div>
+			</div>
+			<div id="projectSetting">
+			</div>
 		</div>
 	</div>
 </div>
 <script type="text/javascript">
-
-function loadProject(name) {
-    //showToast("Loading project...");
-    //move to api file. 
-    ricottaAPI.getProjectTokens(name, function(data){
-    	hideToast();
-        $("#headerProject").data("json", data);
-        //$("#projectTabs").show();
+function reloadGeneralSetting() {
+	setProjectActiveMenu($('.span10 > .nav span:first'));
+	$('.span10 > .nav').removeClass('hide');
+	loadProjectContent('generalSetting');
+}
+function tokenFiltered() {
+	$("#translationToken").children().each(function(){
+		$(this).show();
+		if(($(this).data("context") != $("#contextFilter option:selected").val() 
+			&& $("#contextFilter option:selected").val() != "-1") 
+			|| ($.inArray($("#completionFilter option:selected").val(), $(this).data("uncompletTranslation")) < 0 
+					&& $("#completionFilter option:selected").val() != "-1")) {
+			$(this).hide();
+		}
+	});
+}
+function loadProjectTokens(pname) {
+    ricottaAPI.getProjectTokens(pname, function(data){
+        $("#headerProject").data("project", data);
     }, showToast);
 }
 
-$(function() {
-    
-    var firstTab = $(".nav-list li.active").attr("data-target");
-	loadContents(firstTab);
-    
-    var p = $("#headerProject").data("project");
-    
-    $("#headerProject").attr("class", "show").click(function(){
-    	refreshContent("translations")
-    });
-    $("#headerProject a").text(p.name);
-    
-    setActiveMenu($(".nav-collapse ul.nav"), $("#headerProject"));
+function updateVerticalDivider() {
+	$(".vertical-divider").css("height", $(window).height() + "px");
+	
+	if($("body").height() > $(window).height()) {
+		$(".vertical-divider").css("height", $("body").height() + "px");
+	}
+}
+function setProjectActiveMenu(selectedMenu) {
+	$(".span10 > .nav > div > span.selected").removeAttr("class");
+	selectedMenu.attr("class", "selected");
+}
 
-    loadProject(p.name);
+function setOverMenu() {
+	$(".span10 > .nav > div span.selected").addClass("selected-over");
+}
+function setCurrentMenuState() {
+	$(".span10 > .nav > div span.selected").removeClass("selected-over");
+}
+function appendUncompletTranslationFilter() {
+	var p = $("#headerProject").data("project");
+	$.map(p.projLangs, function(l, i) {
+		$("#completionFilter").append("<option value='"+l.langCode+"'>"+l.langCode +" (Uncompleted)</option>");
+	});
+}
+function appendTranslationContextFilter() {
+	var p = $("#headerProject").data("project");
+	$.map(p.contexts, function(context, i){
+		$("#contextFilter").append("<option value='"+ context.name +"'>"+ context.name +"</option>");
+	});
+}
+function appendTranslationTokens() {
+	$("#translationToken").empty();
+	var p = $("#headerProject").data("project");
+	console.log(p.tokens);
+	$.map(p.tokens, function(token, i) {
+		var uncompleteTrans = token.completeTranslation;
+		var label = token.description == ''? token.name : token.description;
+		$("#translationToken").append("<li id='trans_token_"+i+"' data-context='"+token.context+"'><input onclick=\"loadTranslation('"+token.id+"')\" type='radio' name='token' id='radio"+token.id+"' value='"+token.id+"'>"+
+										   "<label for='radio"+token.id+"'>" + label +"</label>"+
+									   "</li>");
+		
+		$("#trans_token_"+i).data("uncompletTranslation", getUncompleteTranslation(p.projLangs, token.completedTranslation));
+	});
+}
+
+function getUncompleteTranslation(projLangs, completedTranslation) {
+	var unCompleteTranslation = $([]).add(0);
+	$.map(projLangs, function(l, i){
+		if(completedTranslation.indexOf(l.langCode) < 0) {
+			unCompleteTranslation.push(l.langCode);
+		}
+	});
+	return unCompleteTranslation;
+}
+function loadTranslation(tokenId) {
+	$(".span10 > .nav").addClass("hide");
+	$("#selectedToken").data("tokenId", tokenId);
+	if(!$(".translations").is(":visible")) {
+		loadProjectContent("translations");
+	}
+	else {
+		refreshTranslation();
+	}
+}
+
+$(function() {
+    var p = $("#headerProject").data("project");
+    $("#projectname").text(p.name);
+    loadProjectTokens(p.name);
+    loadProjectContent("generalSetting");
+    $(".span10 span").bind("click", function(){
+    	loadProjectContent($(this).data("target"));
+    });
+    updateVerticalDivider();
+    $(".span10 > .nav > div > span").bind("click", function(){
+    	updateVerticalDivider();
+    	setProjectActiveMenu($(this));
+    });
+    $(".span10 > .nav > div > span").bind("mouseover", function(){
+    	setOverMenu();
+    });
+    $(".span10 > .nav > div > span").bind("mouseout", function(){
+    	setCurrentMenuState();
+    });
+    $("#addTranslation").bind("click", function(){
+    	addTranslation();
+    });
+    appendUncompletTranslationFilter(p);
+    appendTranslationContextFilter();
+    appendTranslationTokens();
 });
 
 </script>

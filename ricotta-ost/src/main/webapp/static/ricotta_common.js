@@ -30,14 +30,12 @@ function getShort(s, len) {
     return s.substring(0,len-3) + '...';
 }
 
-function updateTips( t ) {
-    var tips = $( ".validateTips" );
-        tips
-                .text( t )
-                .addClass( "ui-state-highlight" );
+function updateTips(t) {
+    var tips = $(".validateTips");
+        tips.text(t);
         setTimeout(function() {
-                tips.removeClass( "ui-state-highlight", 1500 );
-        }, 500 );
+            tips.removeClass( "ui-state-highlight", 1500);
+        }, 500);
 }
 
 function checkLength( o, n, min, max ) {
@@ -83,10 +81,16 @@ function setActiveMenu(context, elm) {
 	elm.addClass("active");
 }
 
-function refreshContent(page) {
+function refreshPageContent(page) {
 	if($("."+page).length > 0) {
 		$("."+page).load(page + ".html");
 	}
+}
+
+function refreshProjectContent(page) {
+	$.get(page + ".html", function(content) {
+		$("#projectSetting").append(content);
+	});
 }
 
 function refreshMenu() {
@@ -97,24 +101,39 @@ function refreshMenu() {
 	});
 }
 
-function loadContents(page) {
+function loadPage(page) {
+	showToast("Loading...");
 	$("#contents .show").removeClass("show").addClass("hide");
 	if($("."+page).length == 0) {
 		$.get(page + ".html", function(content) {
 			$("#contents").append(content);
 			$("."+page).addClass("show");
+			hideToast();
 		});
 	}
 	else { 
 		$("."+page).removeClass("hide").addClass("show");
+		hideToast();
 	}
 }
 
-window.addEventListener("DOMContentLoaded", function(){
-    $(".nav-list li").live("click", function(){
-    	var page = $(this).data("target");//get the link page
-    	setActiveMenu($(".nav-list"), $(this));
-    	loadContents(page);
-    	//$("#tabContents").load(page);
-    });
-});
+function loadProjectContent(pageContent) {
+	//showToast()
+	$("#projectSetting .show").removeClass("show").addClass("hide");
+	if($("."+pageContent).length == 0) {
+		$.get(pageContent + ".html", function(content) {
+			$("#projectSetting").append(content);
+			$("."+pageContent).addClass("show");
+			hideToast();
+		});
+	}
+	else { 
+		$("."+pageContent).removeClass("hide").addClass("show");
+		hideToast();
+	}
+}
+
+function replaceClass(obj, oldClass, newClass) {
+	obj.removeClass(oldClass);
+	obj.addClass(newClass);
+}

@@ -43,7 +43,7 @@
 	}
 	
 	function saveProjLang(id) {
-	    var p = $("#headerProject").data("json");
+	    var p = $("#headerProject").data("project");
 	    
 	    var subsets = $(':checked[name="subsets_' + id + '"]').map(function() {
 	        return this.value;
@@ -65,7 +65,7 @@
 	
 	function updateModel(id, name, description, context, subsets, separator) {
 	    // find this token in data
-	    var p = $("#headerProject").data("json");
+	    var p = $("#headerProject").data("project");
 	    $.map(p.projLangs, function(t, i) {
 	        if (t.langCode == id) {
 	            t.name = name;
@@ -113,9 +113,6 @@
 	        $("#pl_" + t.langCode).append('<td>' +
 	            '<span id="delete_' + t.langCode + '" class="icon-trash icon-black" onClick="deleteProjLang("' + t.langCode + '");" />' +
 	            '</td>');
-	//        $("#pl_" + t.langCode).append('<td>' +
-	//            '<span id="save_' + t.langCode + '" class="ui-icon ui-icon-disk" onClick="saveProjLang(' + t.langCode + ');" style="display: none" />' +
-	//            '</td>');
 	        
 	        $("#pl_" + t.langCode).append('<td>' + t.langCode + '</td>');
 	        $("#pl_" + t.langCode).append('<td>' + (t.defaultLang ? t.defaultLang.name : '') + '</td>');
@@ -132,57 +129,9 @@
 	    });
 	    
 	}
-	/*
-	$("#buttonCreateProjLang").button().click(function() {
-	    $("#createProjLangDialog").dialog("open");
-	});
-	
-	$("#createProjLangDialog").dialog({
-	    autoOpen: false,
-	    height: 500,
-	    width: 500,
-	    modal: true,
-	    title: "Select language to add to project",
-	    buttons: {
-	        Cancel: function() {
-	            $( this ).dialog("close");
-	        },
-	        "Add Language": function() {
-	            var p = $("#headerProject").data("json");
-	            var projLangCode = $("#projLangCode"),
-	                projLangDefault = $("#projLangDefault"),
-	                allFields = $([]).add(projLangCode, projLangDefault),
-	                tips = $( ".validateTips" );
-	
-	            var bValid = true;
-	            allFields.removeClass("ui-state-error");
-	
-	            if (bValid) {
-	            	var data = {
-	                    langCode: projLangCode.val(),
-	                    defaultLang: projLangDefault.val()
-	                };
-	            	
-	            	ricottaAPI.addProjectLanguage(p.name, data, function(d){
-	            		$("#createProjLangDialog").dialog("close");
-	                    loadProject(p.name);
-	                    p = $("#headerProject").data("json");
-	                    buildProjLangsTable(p);
-	            	}, updateTips);
-	            }
-	
-	        }
-	    },
-	    close: function() {
-	    },
-	    open: function() {
-	        updateTips("All form fields are required.");
-	    }
-	});
-	*/
 	
 	function createProjLang() {
-		var p = $("#headerProject").data("json");
+		var p = $("#headerProject").data("project");
         var projLangCode = $("#projLangCode"),
             projLangDefault = $("#projLangDefault"),
             allFields = $([]).add(projLangCode, projLangDefault),
@@ -199,9 +148,9 @@
         	
         	ricottaAPI.addProjectLanguage(p.name, data, function(d){
                 loadProject(p.name);
-                refreshContent("translations");
-                p = $("#headerProject").data("json");
-                buildProjLangsTable(p);
+                refreshPageContent("translations");
+                p = $("#headerProject").data("project");
+                //buildProjLangsTable(p);
         	}, updateTips);
         }
         
@@ -213,7 +162,7 @@
 		$("#createProjLangDialog").find("a.btn-success").click(function(){
 			createProjLang();
 		});
-	    var p = $("#headerProject").data("json");
+	    var p = $("#headerProject").data("project");
 	
 	    buildProjLangsTable(p);
 	});

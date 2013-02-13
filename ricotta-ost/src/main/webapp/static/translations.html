@@ -1,271 +1,106 @@
-<div class="translations">
-	<table id="projectTiles" class="table table-striped table-bordered">
-	    <tbody>
-	        <tr>
-	            <td id="tileContexts" style="vertical-align: top;">
-	                <table id="contexts" class="table table-striped table-bordered">
-	                    <thead>
-	                        <tr>
-	                            <th id="thContexts">Contexts</th>
-	                        </tr>
-	                    </thead>
-	                    <tbody id="contextsBody">
-	                        <tr>
-	                            <td>
-	                                <input type="radio" id="contextALL" name="context" checked="checked" value="" onChange="onContextChange(this.value);"/>
-	                                <label for="contextALL">All tokens</label>
-	                            </td>
-	                        </tr>
-	                    </tbody>
-	                    <tfoot>
-	                    </tfoot>
-	                </table>
-	            </td>
-	            <td id="tileTokens" style="vertical-align: top;">    
-	                <table id="tokens" class="table table-striped table-bordered">
-	                    <thead>
-	                        <tr id="tileTokensHeader">
-	                            <th id="thToken">Token</th>
-	                            <th id="thDescr">Description</th>
-	                            <th id="thTrans">Translation</th>
-	                        </tr>
-	                    </thead>
-	                    <tbody id="tokensBody" class="ricotta-text-small"></tbody>
-	                    <tfoot>
-	                    </tfoot>
-	                </table>
-	            </td>
-	            <td id="tileLanguages" style="vertical-align: top;">
-	                <table id="languages" class="table table-striped table-bordered">
-	                    <thead>
-	                        <tr>
-	                            <th id="thLanguages">Languages</th>
-	                        </tr>
-	                    </thead>
-	                    <tbody id="languagesBody">
-	                        <tr id="languageTRdefault">
-	                            <td>
-	                                <input type="radio" id="langDefault" name="language" checked="checked" value="" onChange="onLanguageChange(this.value);" />
-	                                <label id="langDefaultLabel" for="langDefault">Default</label>
-	                            </td>
-	                        </tr>
-	                    </tbody>
-	                    <tfoot>
-	                    </tfoot>
-	                </table>
-	            </td>
-	        </tr>
-	    </tbody>
-	</table>
-	
-	<!-- Modal popup -->
-	<div id="editTransDialog" class="modal hide fade in" style="display: none;">
-		<div class="modal-header">
-			<a class="close" data-dismiss="modal">×</a>
-			<h3>Update Translation</h3>
+<div class="translations" style="position:relative;">
+	<div class="translation_token">
+		<div id="translationTokenTitle">
+			
 		</div>
-		<div class="modal-body">
-			<form>
-		        <input id="editTransId" name="editTransId" type="hidden" />
-		        <div id="editTransToken" class="text ui-widget-content ui-corner-all"></div>
-		        <label for="editTransDescription">Description</label>
-		        <br/>
-		        <textarea id="editTransDescription" cols="55" rows="3" name="editTransDescription"  class="text ui-widget-content ui-corner-all" readonly="readonly"></textarea>
-		        <br/>
-		        <label for="editTransTrans">Translation</label>
-		        <br/>
-		        <textarea id="editTransTrans" cols="55" rows="6" name="editTransTrans"  class="text ui-widget-content ui-corner-all" ></textarea>
-		        <br/>
-		        <label id="editTransDefaultLabel" for="editTransDefault">Default</label>
-		        <br/>
-		        <textarea id="editTransDefault" cols="55" rows="3" name="editTransDefault"  class="text ui-widget-content ui-corner-all" readonly="readonly"></textarea>
-		    </form>
-		</div>
-		<div class="modal-footer">
-			<a href="#" class="btn btn-success">Update</a>
-			<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+		<div id="languageWrapper">
+			<div id="translationBody">
+			</div>
+			<div id="context">
+			
+			</div>
 		</div>
 	</div>
+</div>
+<script type="text/javascript">
+    
+function editTranslation(id) {
+    var defLang = $("#langDefault").val();
+    var langCode = $("#languages").data("sel");
+
+    // populate dialog fields
+    $("#editTransId").val(id);
+    $("#editTransToken").text($("#t_" + id + "_name").attr('title'));
+    $("#editTransDescription").val($("#t_" + id + "_description").attr('title'));
+    $("#editTransTrans").val($("#t_" + id + "_" + langCode).text());
+    if (defLang == langCode) {
+        $("#editTransDefault").hide();
+        $("#editTransDefaultLabel").hide();
+    }
+    else {
+        $("#editTransDefault").show();
+        $("#editTransDefaultLabel").show();
+        $("#editTransDefault").val($("#t_" + id + "_" + defLang).text());
+    }
+
+    // open dialog
+    //$("#editTransDialog").dialog("open");
+    $("#editTransDialog").modal("show");
+}
+
+   function appendLanguage(obj, index, trans) {
+   	var transVal = trans[obj.langCode] != undefined? trans[obj.langCode] : "";
+       	$("#languageWrapper > #translationBody").append("<fieldset><label for='trans_"+obj.langCode+"'>"+obj.langCode+"</label>"+
+														"<textarea rows='6' data-langcode='"+obj.langCode+"'type='text' id='trans_" +obj.langCode+ "' value='"+ transVal +"' </fieldset>");
+   }
+    
+function buildContextImage(pName, blobKey) {
+	$("#languageWrapper > #context").append("<span class='context-title'>Context<br/><img src='/api/blob/v10/"+pName+"?key="+ blobKey.keyString + "'/></span>");
+}
+
+function buildTranslation(p, token) {
 	
-	<script type="text/javascript">
+	$("#translationTokenTitle").append("<span class='token-title'>" + token.description +"</span>")
+						  	   .append("<br/><span class='token-name'>" + token.name + "</span>");
 	
-		function imagePreview(context, pName) {
-			var xOffset = 10;
-			var yOffset = 20;
-			context.bind("mouseover", function(e){
-				var contextData = $(this).data("json");
-				if(contextData.blobKey != null) {
-					$("body").append("<p id='preview'><img src='/api/blob/v10/"+pName+"?key="+ contextData.blobKey.keyString +"' alt='Context image preview' /><br/>"+ contextData.name +"</p>");
-					$("#preview").css({
-						"top": (e.pageY - xOffset) + "px",
-						"left": (e.pageX + yOffset) + "px"
-					}).fadeIn("fast");
-				}
-			});
-			context.bind("mousemove", function(e){
-				$("#preview").css({
-					"top": (e.pageY - xOffset) + "px",
-					"left": (e.pageX + yOffset) + "px"
-				});
-			});
-			context.bind("mouseout", function(){
-				$("#preview").remove();
-			});
-		}
-	    function appendContext(obj, index, pName) {
-	        $("#contextsBody")
-	        .append($("<tr class='link' id=\"contextTR" + index + "\">")
-	        		.append("<td><input type=\"radio\" id=\"contextCH" + obj.name + "\" name=\"context\" value=\"" + obj.name + "\" onChange=\"onContextChange(this.value);\" /><label for=\"contextCH" + obj.name + "\">"+ obj.name + "</label></td>")
-	        ).append("</tr>");
-	        $("#contextTR" + index).data("json", obj);
-	        imagePreview($("#contextTR"+index), pName);
-	    }
-	    
-	    function onContextChange(contextName) {
-	        $("#contexts").data("sel", contextName);
-	        updateTokens();
-	    }
-	    
-	    function appendToken(obj, index, defProjLang, projLangs) {
-	        var langCode = defProjLang.langCode;
-	        var defLang = langCode;
-	        $("#tokensBody")
-	            .append("<tr id=\"tokenTR" + obj.id + 
-	                        "\" onclick=\"editTranslation('" + obj.id + "');\">" + "</tr>");
-	        $("#tokenTR" + obj.id).addClass("context_" + getSafe(obj.context)).addClass("token");
-	        $("#tokenTR" + obj.id)
-	            .append('<td id="t_' + obj.id + '_name" title="' + obj.name + '">' + getShort(obj.name, 20) + "</td>")
-	            .append('<td id="t_' + obj.id + '_description" title="' + obj.description + '">' + getShort(obj.description,20) + "</td>")
-	            .append('<td id="t_' + obj.id + '_' + defLang + '"><textarea rows="1" cols="40">' +
-	                (obj.trans[defLang] ? obj.trans[defLang] : '') + '</textarea></td>');
-	        // set the class attributes on this translation:
-	        $("#t_" + obj.id + "_" + defLang).addClass("lang_" + defLang).addClass("translation");
-	
-	        // add additional language columns
-	        $.map(projLangs, function(projLang, pi){
-	            if (projLang.defaultLang) {
-	                langCode = projLang.langCode;
-	                $("#tokenTR" + obj.id)
-	                    .append("<td id=\"t_" + obj.id + "_" + langCode + 
-	                        "\" class=\"" + (obj.trans[langCode] ? "" : "default-trans") + 
-	                        "\" title=\"" + (obj.trans[defLang] ? obj.trans[defLang] : "[no default translation]") + "\"><textarea rows=\"1\" cols=\"40\">" + 
-	                        (obj.trans[langCode] ? obj.trans[langCode] : "") + 
-	                        "</textarea></td>");
-	                // set the class attributes on this translation:
-	                $("#t_" + obj.id + "_" + langCode).addClass("lang_" + langCode).addClass("translation");
-	            }
-	        });
-	    }
-	    
-	function onTokenUpdateSuccess(p, id, langCode, value) {
-	    $("#tokensBody").empty();
-	    $.map(p.tokens, function(t, index) {
-	        
-	        // find the updated token
-	        if (t.id == id) {
-	            
-	            // only update the value
-	            t.trans[langCode] = value;
-	        }
-	        appendToken(t, index, p.defProjLang, p.projLangs);
-	    });
-	    //$("#editTransDialog").dialog("close"); //closed the edit token dialog after update success
-	    $("#editTransDialog").modal("hide");
-	    updateTokens();
-	}    
-	    
-	function editTranslation(id) {
-	    var defLang = $("#langDefault").val();
-	    var langCode = $("#languages").data("sel");
-	
-	    // populate dialog fields
-	    $("#editTransId").val(id);
-	    $("#editTransToken").text($("#t_" + id + "_name").attr('title'));
-	    $("#editTransDescription").val($("#t_" + id + "_description").attr('title'));
-	    $("#editTransTrans").val($("#t_" + id + "_" + langCode).text());
-	    if (defLang == langCode) {
-	        $("#editTransDefault").hide();
-	        $("#editTransDefaultLabel").hide();
-	    }
-	    else {
-	        $("#editTransDefault").show();
-	        $("#editTransDefaultLabel").show();
-	        $("#editTransDefault").val($("#t_" + id + "_" + defLang).text());
-	    }
-	
-	    // open dialog
-	    //$("#editTransDialog").dialog("open");
-	    $("#editTransDialog").modal("show");
-	}
-	
-	    function updateTokens() {
-	        var context = $("#contexts").data("sel");
-	        if ("" == context) {
-	            $(".token").show();
-	        }
-	        else {
-	            // show selected context only
-	            $(".token").hide();
-	            $(".context_" + getSafe(context)).show();
-	        }
-	        
-	        // show selected language only
-	        var langCode = $("#languages").data("sel");
-	        $(".translation").hide();
-	        $(".lang_" + langCode).show();
-	    }
-	    
-	    function appendLanguage(obj, index) {
-	        if (obj.defaultLang) {
-	            $("#languagesBody")
-	                .append("<tr id=\"languageTR" + obj.langCode + "\"></tr>");
-	            $("#languageTR" + obj.langCode)
-	                .append("<td>" +
-	                "<input type=\"radio\" id=\"lang_" + obj.langCode + "\" name=\"language\" value=\"" + obj.langCode + "\" onChange=\"onLanguageChange(this.value);\" />" +
-	                "<label for=\"lang_" + obj.langCode + "\">"+ obj.langCode + " [" + obj.defaultLang.name + "]" + "</label>" +
-	                "</td>");
-	//            $("#languageTR" + obj.langCode).data("json", obj);
-	            
-	            $("#tileTokensHeader")
-	                .append('<th id="thTrans_' + obj.langCode + '">Translation (' + obj.langCode + ')</th>');
-	            $("#thTrans_" + obj.langCode).addClass("lang_" + obj.langCode).addClass("translation");
-	        }
-	        else {
-	            $("#langDefaultLabel").text(obj.langCode);
-	            $("#langDefault").val(obj.langCode);
-	            
-	            $("#thTrans").text("Translation (" + obj.langCode + ")");
-	            $("#thTrans").addClass("lang_" + obj.langCode).addClass("translation");
-	        }
-	    }
-	    
-	    function onLanguageChange(langCode) {
-	        $("#languages").data("sel", langCode);
-	        updateTokens();
-	    }
-	
-	function buildProjectTiles(p) {
-	    $.map(p.contexts, function(c, index) {
-	        appendContext(c, index, p.name);
-	    });
-	    $.map(p.projLangs, function(l, index) {
-	        appendLanguage(l, index);
-	    });
-	    $.map(p.tokens, function(t, index) {
-	        appendToken(t, index, p.defProjLang, p.projLangs);
-	    });
-	}
-	
-	$(function() {
-		$("#editTransDialog").modal({show:false});
-	    var p = $("#headerProject").data("json");
+	/*if(token.context) {
 		
-	    $("#contexts").data("sel", "");
-	    $("#languages").data("sel", p.defProjLang);
-	
-	    buildProjectTiles(p);
-	    updateTokens();
+	}*/
+	$.map(p.contexts, function(c, index){
+		if(null != c.blobKey && c.name == token.context) {
+			buildContextImage(p.name, c.blobKey);
+		}
+	});
+	$.map(p.projLangs, function(l, index){
+		//$("#languageWrapper").append();
+		appendLanguage(l, index, token.trans);
 	});
 	
-	</script>
-</div>
+}
+function showError() {
+	
+}
+function addTranslation() {
+	var p = $("#headerProject").data("project");
+	var tokenId = $("#selectedToken").data("tokenId");
+	var langCode = new Array(), langVal = new Array();
+	$("#languageWrapper #translationBody textarea").each(function(){
+		langCode.push($(this).data("langcode"));
+		langVal.push($(this).val());
+	});
+	
+	ricottaAPI.updateTranslation(langCode, langVal, p.name, tokenId, function(){}, function(){});
+	
+}
+function refreshTranslation() {
+	var p = $("#headerProject").data("project");
+	var tokenId = $("#selectedToken").data("tokenId");
+	$("#translationTokenTitle, #translationBody, #context").empty();
+	ricottaAPI.getToken(tokenId, p.name, function(token){buildTranslation(p, token)}, showError);
+}
+$(function() {
+	$("#editTransDialog").modal({show:false});
+    var p = $("#headerProject").data("project");
+    //get the token with given token id and build the translation field
+    var tokenId = $("#selectedToken").data("tokenId");
+    $(".translation").children(":first").attr("class", "translation_token"+tokenId);
+    ricottaAPI.getToken(tokenId, p.name, function(token){buildTranslation(p, token)}, showError);
+    /*
+    $("#contexts").data("sel", "");
+    $("#languages").data("sel", p.defProjLang);
+
+    buildProjectTiles(p);
+    updateTokens();*/
+});
+
+</script>
