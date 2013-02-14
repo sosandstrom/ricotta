@@ -46,7 +46,7 @@
 	</build>
 	
 	<scm>
-		<developerConnection>scm:hg:https://bitbucket.org/f94os/ricotta-ost</developerConnection>
-		<url>https://bitbucket.org/f94os/ricotta-ost/src</url>
+            <url>https://github.com/sosandstrom/ricotta</url>
+            <developerConnection>scm:git:ssh://git@github.com/sosandstrom/ricotta.git</developerConnection>
 	</scm>
 </project>

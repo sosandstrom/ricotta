@@ -88,6 +88,8 @@
 		<property name="uberDao" ref="uberDao" />
 	</bean>
         
+        <bean id="pingController" class="com.wadpam.open.task.PingController" />
+        
 	<bean id="restController" class="com.wadpam.ricotta.web.RestController">
 		<property name="uberDao" ref="uberDao" />
 	</bean>
