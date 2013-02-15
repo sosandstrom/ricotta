@@ -1004,7 +1004,9 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
 
         if (null != tokn) {
             Set<String> subSet = new HashSet<String>();
-            Collections.addAll(subSet, subs);
+            if (null != subs) {
+                Collections.addAll(subSet, subs);
+            }
             tokn.setName(name);
             tokn.setDescription(description);
 

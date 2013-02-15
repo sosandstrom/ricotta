@@ -250,7 +250,7 @@ public class RestController {
     public ResponseEntity<Tokn10> updateToken(@PathVariable String projectName, @PathVariable Long tokenId,
             @RequestParam String name, @RequestParam String description, @RequestParam String context,
             @RequestParam String subsets, @RequestParam(value = "separator", defaultValue = ",") String separator) {
-        final String[] subs = subsets.split(separator);
+        final String[] subs = subsets.isEmpty() ? null : subsets.split(separator);
         final Tokn10 body = uberDao.updateToken(projectName, ProjectHandlerInterceptor.NAME_TRUNK, tokenId, name, description,
                 context, subs);
         if (null == body) {
