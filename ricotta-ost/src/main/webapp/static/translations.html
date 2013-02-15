@@ -1,14 +1,14 @@
 <div class="translations" style="position:relative;">
 	<div class="translation_token">
-		<div id="translationTokenTitle">
-			
+		<div id="translationTokenTitle"></div>
+		<div class="alert alert-success hide">
+			<a class="close" data-dismiss="alert">×</a> 
+			<span id="successMessage"></span>
 		</div>
 		<div id="languageWrapper">
 			<div id="translationBody">
 			</div>
-			<div id="context">
-			
-			</div>
+			<div id="context"></div>
 		</div>
 	</div>
 </div>
@@ -38,14 +38,33 @@ function editTranslation(id) {
     $("#editTransDialog").modal("show");
 }
 
-   function appendLanguage(obj, index, trans) {
-   	var transVal = trans[obj.langCode] != undefined? trans[obj.langCode] : "";
-       	$("#languageWrapper > #translationBody").append("<fieldset><label for='trans_"+obj.langCode+"'>"+obj.langCode+"</label>"+
-														"<textarea rows='6' data-langcode='"+obj.langCode+"'type='text' id='trans_" +obj.langCode+ "' value='"+ transVal +"' </fieldset>");
-   }
+function appendLanguage(obj, index, trans) {
+	var transVal = trans[obj.langCode] != undefined? trans[obj.langCode] : "";
+	$("#languageWrapper > #translationBody").append("<fieldset><label for='trans_"+obj.langCode+"'>"+obj.langCode+"</label>"+
+													"<textarea onchange='enableCancel();' rows='6' data-langcode='"+obj.langCode+"'type='text' id='trans_" +obj.langCode+ "'>"+ transVal +"</textarea> </fieldset>");
+	
+}
+
+function enableCancel() {
+	if(!$("#successMessage").parent().hasClass("hide")) {
+		$("#successMessage").parent().addClass("hide");
+	}
+	$("#cancelTranslation").removeAttr("disabled");
+	$("#cancelTranslation").removeClass("btn-disabled");
+}
+
+function disableCancel() {
+	$("#cancelTranslation").attr("disabled", "disabled");
+	$("#cancelTranslation").addClass("btn-disabled");
+}
     
-function buildContextImage(pName, blobKey) {
-	$("#languageWrapper > #context").append("<span class='context-title'>Context<br/><img src='/api/blob/v10/"+pName+"?key="+ blobKey.keyString + "'/></span>");
+function buildContextImage(pName, blobKey,cName) {
+	if(blobKey.keyString != "") {
+		$("#languageWrapper > #context").append("<span class='context-title'>Context<br/><img src='/api/blob/v10/"+pName+"?key="+ blobKey.keyString + "'/></span>");
+	}
+	else {
+		$("#languageWrapper > #context").append("<span class='context-title'>Context<br/>"+cName+"</span>");
+	}
 }
 
 function buildTranslation(p, token) {
@@ -57,14 +76,17 @@ function buildTranslation(p, token) {
 		
 	}*/
 	$.map(p.contexts, function(c, index){
-		if(null != c.blobKey && c.name == token.context) {
-			buildContextImage(p.name, c.blobKey);
+		console.log(c.blobKey);
+		if(c.blobKey != "" && null != c.blobKey && c.name == token.context) {
+			buildContextImage(p.name, c.blobKey, c.name);
 		}
 	});
 	$.map(p.projLangs, function(l, index){
 		//$("#languageWrapper").append();
 		appendLanguage(l, index, token.trans);
 	});
+	
+	$("#languageWrapper > #translationBody").append("<div id='translationAction'><span><a onclick='addTranslation();' class='btn btn-primary'>Save</a></span><span><a onclick='refreshTranslation($(this));' class='btn btn-disabled' id='cancelTranslation' disabled='disabled'>Cancel</a></span></div>");
 	
 }
 function showError() {
@@ -79,10 +101,16 @@ function addTranslation() {
 		langVal.push($(this).val());
 	});
 	
-	ricottaAPI.updateTranslation(langCode, langVal, p.name, tokenId, function(){}, function(){});
+	ricottaAPI.updateTranslation(langCode, langVal, p.name, tokenId, function(){
+		$("#successMessage").text("Translation saved...").parent().removeClass("hide");
+	}, function(){});
 	
 }
-function refreshTranslation() {
+function refreshTranslation(btn) {
+	$("#successMessage").parent().addClass("hide");
+	if(btn != undefined && btn.hasClass("btn-disabled")) {
+		return false;
+	}
 	var p = $("#headerProject").data("project");
 	var tokenId = $("#selectedToken").data("tokenId");
 	$("#translationTokenTitle, #translationBody, #context").empty();

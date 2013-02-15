@@ -116,6 +116,7 @@
 		ricottaAPI.deleteContext(p.name, keyString, function(){
 			loadProjectTokens(p.name);
 			buildContextsTable($("#headerProject").data("project"));
+			appendTranslationContextFilter($("#headerProject").data("project"));
 			if(typeof refreshToken === 'function') {
     			refreshToken();
     		}
@@ -193,6 +194,7 @@
     		if(typeof refreshToken === 'function') {
     			refreshToken();
     		}
+    		appendTranslationContextFilter($("#headerProject").data("project"));
     		$("#createContextDialog").modal("hide");
     	});
 	}

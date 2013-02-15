@@ -344,22 +344,23 @@
                 type: "POST",
                 url: that.backendUrl + "lang/v10",
                 dataType: "json",
-                data: data
-            })
-            .done(function(data){
-            	if(typeof successCallback === 'function') {
-            		successCallback(data);
-            	}
-             })
-            .fail(function() {
-            	if(typeof failCallback === 'function') {
-        			if (this.status == 409) {
-        				failCallback('name already taken');
-        			} else {
-        				failCallback(this.statusText);
-        			}
-            	}
-            })
+                data: data,
+                success: function(data) {
+                	if(typeof successCallback === 'function') {
+                		successCallback(data);
+                	}
+                },
+                error: function(jqXR, statusText, errorThrown) {
+                	if(typeof failCallback === 'function') {
+                		if (jqXR.status == 409) {
+                			failCallback('Name already taken');
+                		} else {
+                			failCallback(errorThrow);
+                		}
+                	}
+                }
+            });
+
 		},
 		/**
 		 * Create new project
@@ -377,21 +378,22 @@
                 data: {
                     name: projectName,
                     defaultLang: defaultLang
+                },
+                success: function(data) {
+                	if(typeof successCallback === 'function') {
+                		successCallback(data);
+                	}
+                },
+                error: function(jqXR, statusText, errorThrown) {
+                	if(typeof failCallback === 'function') {
+                		if (jqXR.status == 409) {
+                			failCallback('<strong>Error!</strong> Name already taken');
+                		} else {
+                			failCallback(errorThrown);
+                		}
+                	}
                 }
-            })
-            .done(function(data){
-            	if(typeof successCallback === 'function') {
-            		successCallback(data);
-            	}
-            })
-            .fail(function() {
-            	if(typeof failCallback === 'function') {
-            		if (this.status == 409) {
-                        failCallback('name already taken');
-                    } else {
-                        failCallback(this.statusText);
-                    }
-            	}
+                
             });
 		},
 		/**

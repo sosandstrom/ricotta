@@ -16,21 +16,18 @@
 					<div id="selectedToken"></div>
 					<div class="context-filter">
 						<label for="contextFilter">Filter by context</label>
-						<select id="contextFilter" onchange="tokenFiltered();"><option value='-1'>Show all</option></select>
+						<select id="contextFilter" onchange="tokenFiltered();"></select>
 					</div>
 					<div class="completion-filter">
 						<label for="completionFilter">Filter by completion</label>
-						<select id="completionFilter" onchange="tokenFiltered();">
-							<option value='-1'>Show all</option>
-							<option value='0'>Show all uncomplete</option>
-						</select>
+						<select id="completionFilter" onchange="tokenFiltered();"></select>
 					</div>
 					<div class="token-wrapper">
 						<ul id="translationToken"></ul>
 					</div>
 				</div>
 				<div class="translation-footer">
-					<a id="addTranslation" class="btn btn-small btn-primary">Add String</a>
+					<a id="addTranslation" class="btn btn-small btn-primary" data-toggle="modal" href="#createTokenDialog">Add String</a>
 				</div>
 			</div>
 		</div>
@@ -43,6 +40,35 @@
 			</div>
 			<div id="projectSetting">
 			</div>
+		</div>
+	</div>
+	<!-- Create Token Dialog should be global -->
+	<div id="createTokenDialog" class="modal hide fade in" style="display: none;">
+		<div class="modal-header">
+			<a class="close" data-dismiss="modal">×</a>
+			<h3>Create new token</h3>
+		</div> 
+		<div class="modal-body">
+			<p class="validateTips"></p>
+		    <form>
+		        <div>
+		            <label class="modal-label" for="toknName">Token name</label>
+		            <input class="modal-input" type="text" id="toknName" name="toknName"/><br/>
+		        </div>
+		        <div class="divider horiziontal-divider"></div>
+		        <div>
+		            <label class="modal-label" for="toknDescription">Description</label>
+		            <input class="modal-input" type="text" id="toknDescription" name="toknDescription"/><br/>
+		        </div>
+		        <div class="divider horiziontal-divider"></div>
+		        <div>
+		            <label class="modal-label" for="toknContext">Context</label>
+		            <select class="modal-input" id="toknContext" ><option value="_NO_CONTEXT_">_NO_CONTEXT_</option></select>
+		        </div>
+		    </form>
+		</div>
+		<div class="modal-footer">
+			<a class="btn btn-success btn-create">Create Token</a>
 		</div>
 	</div>
 </div>
@@ -87,14 +113,17 @@ function setOverMenu() {
 function setCurrentMenuState() {
 	$(".span10 > .nav > div span.selected").removeClass("selected-over");
 }
-function appendUncompletTranslationFilter() {
-	var p = $("#headerProject").data("project");
+function appendUncompletTranslationFilter(p) {
+	$("#completionFilter").empty();
+	$("#completionFilter").append("<option value='-1'>Show all</option><option value='0'>Show all uncomplete</option>");
 	$.map(p.projLangs, function(l, i) {
 		$("#completionFilter").append("<option value='"+l.langCode+"'>"+l.langCode +" (Uncompleted)</option>");
 	});
 }
 function appendTranslationContextFilter() {
+	$("#contextFilter").empty();
 	var p = $("#headerProject").data("project");
+	$("#contextFilter").append("<option value='-1'>Show all</option>");
 	$.map(p.contexts, function(context, i){
 		$("#contextFilter").append("<option value='"+ context.name +"'>"+ context.name +"</option>");
 	});
@@ -102,7 +131,6 @@ function appendTranslationContextFilter() {
 function appendTranslationTokens() {
 	$("#translationToken").empty();
 	var p = $("#headerProject").data("project");
-	console.log(p.tokens);
 	$.map(p.tokens, function(token, i) {
 		var uncompleteTrans = token.completeTranslation;
 		var label = token.description == ''? token.name : token.description;
@@ -131,7 +159,57 @@ function loadTranslation(tokenId) {
 	}
 	else {
 		refreshTranslation();
+		if(!$("#successMessage").parent().hasClass("hide")) {
+			$("#successMessage").parent().addClass("hide");
+		}
 	}
+	if(typeof disableCancel === 'function') {
+		disableCancel();
+	}
+}
+function createToken() {
+	var p = $("#headerProject").data("project");
+	$("#createTokenDialog .validateTips").text("");
+      var toknName = $("#toknName"),
+          toknDescription = $("#toknDescription"),
+          toknContext = $("#toknContext"),
+          allFields = $([]).add(toknName, toknDescription, toknContext),
+          tips = $(".validateTips");
+
+      var bValid = true;
+      allFields.removeClass("ui-state-error");
+      bValid = bValid && checkLength(toknName, "token name", 1, 64);
+
+      if (bValid) {
+      	var data= {
+              name: toknName.val(),
+              description: toknDescription.val(),
+              context: toknContext.val()
+          };
+      	
+      	ricottaAPI.createToken(p.name, data, function(newToken){
+      		loadProjectTokens(p.name);
+      		if($(".tokens").length > 0) {
+	      		updateTokenTable(p, newToken);
+	      		//destroy the table data and re-init
+	      		if(tokenTable != undefined) {
+		      		tokenTable.fnDestroy();
+	      		}
+	      		
+	      		tokenTable = $("#tableToken").dataTable();
+	    	    $("#tableToken_filter input").keyup(function(){
+	    	    	tokenTable.fnFilter($(this).val(), 0, false, false);
+	    	    });
+      		}
+      		appendTranslationTokens();
+      		
+      	}, updateTips);
+      }
+      $("#createTokenDialog").modal("hide");
+}
+
+function refreshSideBar() {
+	
 }
 
 $(function() {
@@ -153,9 +231,13 @@ $(function() {
     $(".span10 > .nav > div > span").bind("mouseout", function(){
     	setCurrentMenuState();
     });
+    /*
     $("#addTranslation").bind("click", function(){
     	addTranslation();
-    });
+    });*/
+    $("#createTokenDialog").find("a.btn-success").click(function(){
+		createToken();
+	});
     appendUncompletTranslationFilter(p);
     appendTranslationContextFilter();
     appendTranslationTokens();

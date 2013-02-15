@@ -17,34 +17,6 @@
     </table>
     <a data-toggle="modal" href="#createTokenDialog" class="btn btn-primary">Create new token...</a>
 	
-	<div id="createTokenDialog" class="modal hide fade in" style="display: none;">
-		<div class="modal-header">  
-			<a class="close" data-dismiss="modal">×</a>
-			<h3>Create new token</h3>
-		</div> 
-		<div class="modal-body">
-			<p class="validateTips"></p>
-		    <form>
-		        <div>
-		            <label class="modal-label" for="toknName">Token name</label>
-		            <input class="modal-input" type="text" id="toknName" name="toknName"/><br/>
-		        </div>
-		        <div class="divider horiziontal-divider"></div>
-		        <div>
-		            <label class="modal-label" for="toknDescription">Description</label>
-		            <input class="modal-input" type="text" id="toknDescription" name="toknDescription"/><br/>
-		        </div>
-		        <div class="divider horiziontal-divider"></div>
-		        <div>
-		            <label class="modal-label" for="toknContext">Context</label>
-		            <select class="modal-input" id="toknContext" ><option value="_NO_CONTEXT_">_NO_CONTEXT_</option></select>
-		        </div>
-		    </form>
-		</div>
-		<div class="modal-footer">
-			<a class="btn btn-success btn-create">Create Token</a>
-		</div>
-	</div>
 	<script type="text/javascript">
 	var tokenTable;
 	function deleteToken(name, id) {
@@ -166,42 +138,7 @@
 	    	updateTokenTable(p, t);
 	    });
 	}
-	function createToken() {
-		var p = $("#headerProject").data("project");
-	      var toknName = $("#toknName"),
-	          toknDescription = $("#toknDescription"),
-	          toknContext = $("#toknContext"),
-	          allFields = $([]).add(toknName, toknDescription, toknContext),
-	          tips = $(".validateTips");
 	
-	      var bValid = true;
-	      allFields.removeClass("ui-state-error");
-	      bValid = bValid && checkLength(toknName, "token name", 1, 64);
-	
-	      if (bValid) {
-	      	var data= {
-	              name: toknName.val(),
-	              description: toknDescription.val(),
-	              context: toknContext.val()
-	          };
-	      	
-	      	ricottaAPI.createToken(p.name, data, function(newToken){
-	      		loadProjectTokens(p.name);
-	      		updateTokenTable(p, newToken);
-	      		appendTranslationTokens();
-	      		//destroy the table data and re-init
-	      		if(tokenTable != undefined) {
-		      		tokenTable.fnDestroy();
-	      		}
-	      		
-	      		tokenTable = $("#tableToken").dataTable();
-	    	    $("#tableToken_filter input").keyup(function(){
-	    	    	tokenTable.fnFilter($(this).val(), 0, false, false);
-	    	    });
-	      		
-	      	}, updateTips);
-	      }
-	}
 	function appendNewSubsetToken(s) {
 		var p = $("#headerProject").data("project");
 		//destroy the table data and re-init
@@ -250,9 +187,6 @@
 	}
 	$(function() {
 		$("#createTokenDialog").modal({show: false});
-		$("#createTokenDialog").find("a.btn-success").click(function(){
-			createToken();
-		});
 	    var p = $("#headerProject").data("project");
 	    buildTokensTable(p);
 	    buildCreateTokenDialog(p);

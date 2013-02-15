@@ -32,10 +32,11 @@ function getShort(s, len) {
 
 function updateTips(t) {
     var tips = $(".validateTips");
-        tips.text(t);
-        setTimeout(function() {
-            tips.removeClass( "ui-state-highlight", 1500);
-        }, 500);
+        tips.html(t);
+        console.log(tips.parent());
+        if(tips.parent().hasClass("hide")) {
+        	tips.parent().addClass("show");
+        }
 }
 
 function checkLength( o, n, min, max ) {

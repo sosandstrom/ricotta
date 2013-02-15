@@ -412,7 +412,16 @@ td > input[type="text"] {
 	float: left;
 	width: 20%;
 }
-
+.translation_token #languageWrapper div#translationAction {
+	margin-left: 15%;
+	width: 300px;
+}
+.translation_token #languageWrapper div#translationAction span{
+	padding-right: 15px;
+}
+.translation_token #languageWrapper div#translationAction span a {
+	width: 70px;
+}
 .translation_token #languageWrapper label {
 	float:left;
 	width: 15%;
@@ -420,4 +429,7 @@ td > input[type="text"] {
 #languageWrapper > #translationBody textarea {
 	width: 500px;
 	max-width: 500px;
+}
+p.validateTips {
+	margin: 0;	
 }

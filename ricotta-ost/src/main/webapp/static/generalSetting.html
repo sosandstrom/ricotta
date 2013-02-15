@@ -203,6 +203,7 @@
 	function appendProjLangTable(p) {
 		$("#projLangsTBody").empty();
 		addProjectLang(p);
+		appendUncompletTranslationFilter(p);
 	}
 	function addProjectLang(p) {
     	$.map(p.projLangs, function(t, index) {
@@ -227,6 +228,7 @@
 		ricottaAPI.deleteProjLang(p.name, langCode, function(){
 			loadProjectTokens(p.name);
 			buildProjLangsTable($("#headerProject").data("project"));
+			appendUncompletTranslationFilter($("#headerProject").data("project"));
 		}, function(){});
 	}
 	function getDefaultLanguage(langCode) {
@@ -271,6 +273,7 @@
 	            p = $("#headerProject").data("project");
 	            
 	            addProjectLang(p);//dont need to be reload the page content??
+	            appendUncompletTranslationFilter(p);
 	            $("#createProjLangDialog").modal('hide');
 	    	}, updateTips);
 	    }
