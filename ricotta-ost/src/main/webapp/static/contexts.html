@@ -137,45 +137,48 @@
 	}
 	
 	function deleteContext(keyString, cname) {
-		var p = $("#headerProject").data("project");
-		ricottaAPI.deleteContext(p.name, keyString, function(){
-			//remove context from table
-			$("#contextsListBody tr").each(function(){
-				if($(this).data("id") == keyString) {
-					$(this).remove();
-					return false;
-				}
-			});
-			//remove context from filter option
-			$("#contextFilter option[value='"+cname+"']").remove();
-
-			//
-			if(tokenTable != undefined) {
-				for(var i in tokenTable.fnGetData()){
-					var selectOption = $(tokenTable.fnGetData()[i][5]);
-	    	 		selectOption.find("option[value='"+cname+"']").remove();
-	    	 		//wrap the select option into a div and get its contents to relcace the old one
-	    	 		tokenTable.fnGetData()[i][5] = $('<div>').append(selectOption).html();
-				}
-				//remove from the current display table
-				tokenTable.$('tr').each(function(index){
-					var contextCol = $(this).find("td").eq(4);
-					contextCol.find("option[value='"+cname+"']").remove();
-					var newContext = contextCol.html();
-					tokenTable.fnUpdate(newContext, index, 5);
+		var p = $("#headerProject").data("project"),
+			deleteMessage = confirm("Are you sure you want to delete contect: " + cname +"?");
+		if(deleteMessage) {
+			ricottaAPI.deleteContext(p.name, keyString, function(){
+				//remove context from table
+				$("#contextsListBody tr").each(function(){
+					if($(this).data("id") == keyString) {
+						$(this).remove();
+						return false;
+					}
 				});
-				tokensArrDataTable = tokenTable.fnGetData();
-			}
-			else {
-				//remove context from token table
-				for(var i in tokensArrDataTable) {
-	    	 		var selectOption = $(tokensArrDataTable[i][5]);
-	    	 		selectOption.find("option[value='"+cname+"']").remove();
-	    	 		//wrap the select option into a div and get its contents to relcace the old one
-	    	 		tokensArrDataTable[i][5] = $('<div>').append(selectOption).html();
-	    	 	}
-			}
-		}, function(){});
+				//remove context from filter option
+				$("#contextFilter option[value='"+cname+"']").remove();
+	
+				//
+				if(tokenTable != undefined) {
+					for(var i in tokenTable.fnGetData()){
+						var selectOption = $(tokenTable.fnGetData()[i][5]);
+		    	 		selectOption.find("option[value='"+cname+"']").remove();
+		    	 		//wrap the select option into a div and get its contents to relcace the old one
+		    	 		tokenTable.fnGetData()[i][5] = $('<div>').append(selectOption).html();
+					}
+					//remove from the current display table
+					tokenTable.$('tr').each(function(index){
+						var contextCol = $(this).find("td").eq(4);
+						contextCol.find("option[value='"+cname+"']").remove();
+						var newContext = contextCol.html();
+						tokenTable.fnUpdate(newContext, index, 5);
+					});
+					tokensArrDataTable = tokenTable.fnGetData();
+				}
+				else {
+					//remove context from token table
+					for(var i in tokensArrDataTable) {
+		    	 		var selectOption = $(tokensArrDataTable[i][5]);
+		    	 		selectOption.find("option[value='"+cname+"']").remove();
+		    	 		//wrap the select option into a div and get its contents to relcace the old one
+		    	 		tokensArrDataTable[i][5] = $('<div>').append(selectOption).html();
+		    	 	}
+				}
+			}, function(){});
+		}
 	}
 	function uploadImage() {
 		var p = $("#headerProject").data("project");
