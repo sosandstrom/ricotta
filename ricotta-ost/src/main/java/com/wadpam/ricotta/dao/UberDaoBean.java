@@ -186,13 +186,14 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
      * @param defaultLang
      * @return the primaryKey to the created ProjLang
      */
-    public Object addProjLang(String projectName, String branchName, String langCode, String defaultLang) {
+    public ProjLang addProjLang(String projectName, String branchName, String langCode, String defaultLang) {
         final Key projKey = projDao.createKey(projectName);
         final Key branchKey = branchDao.createKey(projKey, branchName);
         final Key langKey = langDao.createKey(langCode);
         final Key defaultLangKey = null != defaultLang ? langDao.createKey(defaultLang) : null;
-        Object projLangKey = createProjLang(branchKey, langCode, defaultLangKey, langKey);
-        return projLangKey;
+        createProjLang(branchKey, langCode, defaultLangKey, langKey);
+        final ProjLang projLang = projLangDao.findByPrimaryKey(branchKey, langCode);
+        return projLang;
     }
 
     public Collection<Proj> getProjectsByUsername(String username) {

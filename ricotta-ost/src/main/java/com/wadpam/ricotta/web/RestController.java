@@ -36,6 +36,7 @@ import com.wadpam.ricotta.dao.UberDaoBean;
 import com.wadpam.ricotta.domain.Ctxt;
 import com.wadpam.ricotta.domain.Lang;
 import com.wadpam.ricotta.domain.Proj;
+import com.wadpam.ricotta.domain.ProjLang;
 import com.wadpam.ricotta.domain.ProjUser;
 import com.wadpam.ricotta.domain.Role;
 import com.wadpam.ricotta.domain.Subset;
@@ -134,10 +135,10 @@ public class RestController {
     }
 
     @RequestMapping(value = "project/v10/{projName}/projLang", method = RequestMethod.POST)
-    public ResponseEntity<Object> addProjLang(@PathVariable String projName, @RequestParam String langCode,
+    public ResponseEntity<ProjLang> addProjLang(@PathVariable String projName, @RequestParam String langCode,
             @RequestParam String defaultLang) {
-        Object projLangKey = uberDao.addProjLang(projName, ProjectHandlerInterceptor.NAME_TRUNK, langCode, defaultLang);
-        return new ResponseEntity(projLangKey, HttpStatus.OK);
+        ProjLang projLang = uberDao.addProjLang(projName, ProjectHandlerInterceptor.NAME_TRUNK, langCode, defaultLang);
+        return new ResponseEntity<ProjLang>(projLang, HttpStatus.OK);
     }
 
     @RequestMapping(value = "project/v10", method = RequestMethod.POST)
