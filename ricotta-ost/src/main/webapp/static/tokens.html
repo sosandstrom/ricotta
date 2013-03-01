@@ -15,32 +15,51 @@
         </tfoot>
         
     </table>
-    <a data-toggle="modal" href="#createTokenDialog" class="btn btn-primary">Create new token...</a>
+    <a data-toggle="modal" href="#createTokenDialog" class="btn btn-primary">+ Token</a>
 	
 	<script type="text/javascript">
-	var tokenTable;
-	function deleteToken(name, id) {
+	
+	function removeTokenFromSideBar(id) {
+		$("li#trans_token_"+id).remove();
+	}
+	function deleteToken(name, id, obj) {
 		var confirmDelete = confirm("Are you sure you want to delete token "+ name);
 		if(confirmDelete) {
 			var p = $("#headerProject").data("project");
-			//destroy the table data and re-init
-      		if(tokenTable != undefined) {
-	      		tokenTable.fnDestroy();
-      		}
+			
+			//need to remove from oaData
+			var anSelected = tokenTable.$(obj.parent().parent());//retrieved it tr
+			//we can use this value to remove the token from the current token data table array
+			var deleteToken = $(anSelected[0]).find("td").eq(2).children()[0].value;
+			for(i in tokensArrDataTable) {
+				var tokenDataTable = tokensArrDataTable[i];
+				if(tokenDataTable[0] === deleteToken) {
+					tokensArrDataTable.splice(i,1);
+				}
+			}
+			if ( anSelected.length !== 0 ) {
+				tokenTable.fnDeleteRow(anSelected[0], function(){}, true);
+			}
+			
 			ricottaAPI.deleteToken(id, p.name, function(){
-				$("#tokensTBody").empty();
-				loadProjectTokens(p.name);
-				appendTranslationTokens();
-				p = $("#headerProject").data("project");
-				$.map(p.tokens, function(t, index) {
-			    	updateTokenTable(p, t);
-			    });
-	      		tokenTable = $("#tableToken").dataTable();
-	    	    $("#tableToken_filter input").keyup(function(){
-	    	    	tokenTable.fnFilter($(this).val(), 0, false, false);
-	    	    });
+				removeTokenFromSideBar(id);
 			}, function(){});
 		}
+	}
+	
+	
+	function refreshToken() {
+		tokenTable = $("#tableToken").dataTable({
+  			"bSort": false,
+  			"bInfo": true,
+  			"aaData": tokensArrDataTable,
+  			"bDeferRender": true,
+  			"asStripClasses": null
+  		});
+	    tokenTable.fnSetColumnVis(0, false);
+	    $("#tableToken_filter input").keyup(function(){
+	    	tokenTable.fnFilter($(this).val(), 0, false, false);
+	    });
 	}
 	
 	function saveToken(id) {
@@ -87,12 +106,6 @@
 	    $("#save_" + id).hide();
 	}
 	
-	function buildCreateTokenDialog(p) {
-	    $.map(p.contexts, function(c, ci) {
-	        $("#toknContext").append('<option value="' + c.name + '">' + c.name + '</option>');
-	    });
-	}
-	
 	/**
 	 * Update the last saved token to the token table
 	 */
@@ -103,7 +116,7 @@
 	    $("#token_"+t.id).append("<td style='display:none'>"+t.name+"</td>");
 	    // icons
 	    $("#token_" + t.id).append('<td style="text-align:center;">' +
-	        '<span id="delete_' + t.id + '" class="icon-trash icon-black" onClick="deleteToken(\''+t.name+'\', ' + t.id + ');" />' +
+	        '<span id="delete_' + t.id + '" class="icon-trash icon-black" onClick="deleteToken(\''+t.name+'\', ' + t.id + ', $(this));" />' +
 	        '</td>');
 	    $("#token_" + t.id).append('<td>' +
 	        '<span id="save_' + t.id + '" class="icon-hdd icon-black" onClick="saveToken(' + t.id + ');" style="display: none" />' +
@@ -127,10 +140,12 @@
 	        $("#subset_" + t.id + "_" + s).attr("checked", "checked");
 	    });
 	}
+	
+	
 	function appendSubset(p) {
-		$.map(p.subsets, function(s, index) {
-	        $("#tokensHeadTR").append('<th data-subset="'+s+'" title="' + s + '"><input type="checkbox" onClick="" /></th>');
-	    });
+		for(var i in tokenSubsetHeader) {
+			$("#tokensHeadTR").append(tokenSubsetHeader[i]);
+		}
 	}
 	function buildTokensTable(p) {
 		appendSubset(p);
@@ -139,30 +154,6 @@
 	    });
 	}
 	
-	function appendNewSubsetToken(s) {
-		var p = $("#headerProject").data("project");
-		//destroy the table data and re-init
-  		if(tokenTable != undefined) {
-      		tokenTable.fnDestroy();
-  		}
-  		//buildTokensTable(p);
-  		 $("#tokensHeadTR").append('<th data-subset="'+s+'" title="' + s + '"><input type="checkbox" onClick="" /></th>');
-  		 
-  		$("#tokensTBody").find("tr").each(function(){
-  			var id = $(this).attr("id");
-  			var tokenId = id.substring(6); //retrieve the token id from Ex: token_1
-  			var tokenName = $(this).find("td").eq(0).text();
-  			$(this).append('<td data-subset="'+s+'"><input type="checkbox" id="subset_' + tokenId + '_' + s + '"' +
-  		            ' name="subsets_' + tokenId + '"' +
-  		            ' value="' + s + '"' + 
-  		            ' title="' + tokenName + ':' + s + '" onChange="setChanged(' + tokenId + ');" /></td>');
-  		});
-  		
-		tokenTable = $("#tableToken").dataTable();
-	    $("#tableToken_filter input").keyup(function(){
-	    	tokenTable.fnFilter($(this).val(), 0, false, false);
-	    });
-	}
 	function removeSubsetColumn(subset) {
 		var index;
 		if(tokenTable != undefined) {
@@ -180,17 +171,32 @@
 			$(this).find("td").eq(index).remove();
 		});
 		
-		tokenTable = $("#tableToken").dataTable();
-		$("#tableToken_filter input").keyup(function(){
+		tokenTable = $("#tableToken").dataTable({
+  			"bSort": false,
+  			"bInfo": true,
+  			"aaData": tokensArrDataTable,
+  			"bDeferRender": true,
+  			"asStripClasses": null
+  		});
+	    tokenTable.fnSetColumnVis(0, false);
+	    $("#tableToken_filter input").keyup(function(){
 	    	tokenTable.fnFilter($(this).val(), 0, false, false);
 	    });
 	}
+		
+	
 	$(function() {
 		$("#createTokenDialog").modal({show: false});
 	    var p = $("#headerProject").data("project");
-	    buildTokensTable(p);
-	    buildCreateTokenDialog(p);
-	    tokenTable = $("#tableToken").dataTable();
+	    appendSubset(p);
+	    tokenTable = $("#tableToken").dataTable({
+  			"bSort": false,
+  			"bInfo": true,
+  			"aaData": tokensArrDataTable,
+  			"bDeferRender": true,
+  			"asStripClasses": null
+  		});
+	    tokenTable.fnSetColumnVis(0, false);
 	    $("#tableToken_filter input").keyup(function(){
 	    	tokenTable.fnFilter($(this).val(), 0, false, false);
 	    });

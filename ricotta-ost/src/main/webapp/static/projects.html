@@ -1,13 +1,13 @@
 <div class="projects">
 	<div> <h1>Projects </h1></div>
-	<a data-toggle="modal" href="#createProjectDialog" class="btn btn-primary">Create new project...</a>
+	<a data-toggle="modal" href="#createProjectDialog" class="btn btn-primary" onclick="setDefaultLang();">+ Project</a>
 	<div id="projects"></div>
 	
 	<!-- using modal instead  -->
 	<div id="createProjectDialog" class="modal hide fade in" style="display: none;">
 		<div class="modal-header">  
 			<a class="close" data-dismiss="modal">×</a>
-			<h3>Create a project</h3>
+			<h3>Create a Project</h3>
 		</div> 
 		<div class="modal-body">
 			<div class="alert alert-error hide">  
@@ -23,24 +23,54 @@
 		        <div class="divider horiziontal-divider"></div>
 		        <div class="createProjectContent">
 			        <div class="box">
-			        	<label class="modal-label" id="pDefaultLang" for="defaultLang">First Language</label>
+			        	<label class="modal-label" id="pDefaultLang" for="defaultLang">Source language</label>
 			            <select class="modal-input" id="defaultLang"></select>
 			        </div>
 		        </div>
 		    </form>
 		</div>
 		<div class="modal-footer">
-			<a class="btn btn-success btn-create">Create Project</a>
+			<a class="btn btn-success btn-create">Save</a>
 		</div>
 	</div>
 	
 	<script type="text/javascript">
+	var globalLang;
+	function setDefaultLang() {
+		$("#defaultLang").val("en_GB");
+	}
+	function getLanguageName(langCode) {
+		var name;
+		$.map(globalLang, function(l, i) {
+			if(l.code == langCode) {
+				name = l.name;
+				return false;
+			}
+		});
+		return name;
+	}
 	
+	function loadGlobalLanguage() {
+		ricottaAPI.loadLanguages(function(data){
+	    	globalLang = data;
+	    });
+	}
+	/**
+	 * Remove out the space
+	 */
+	function trim(str) {
+		var splitStr = str.split(" ");
+		var newStr = "";
+		for(var i in splitStr){
+			newStr += splitStr[i];
+		}
+	    return newStr;
+	}
 	function populateProjects(data) {
 		$("#createProjectDialog").modal("hide");
 	    $("#projects").empty();
 	    $.map(data, function(p, i) {
-	    	$("#projects").append("<div id='projectItem"+p.name+"' class='projectsItem'>"+
+	    	$("#projects").append("<div id='projectItem"+trim(p.name)+"' class='projectsItem'>"+
 	    								"<div id='item'><div class='pname' onclick=\"loadProject('"+ p.name +"')\">"+p.name+"</div>"+
 	    								"<div class='plang'>"+getProjectLanguage(p)+"</div>"+
 	    								"<div class='powner'>Owner: "+p.owner+"</div></div>"+
@@ -49,7 +79,7 @@
 	    									"<div class='delete' onclick='deleteProj(\""+p.name+"\");'><span class='item-icon delete'></span><br/>Delete</div>"+
 	    								"</div>"+
 	    						  "</div>");
-	        $("#projectItem" + p.name).data("json", p);
+	        $("#projectItem" + trim(p.name)).data("json", p);
 	    });
 	}
 	
@@ -58,11 +88,14 @@
 	}
 	
 	function deleteProj(projName) {
-		ricottaAPI.deleteProj(projName, function(){refreshPageContent("projects");alert(projName + " was deleted.");}, function(status){
-			if("404" == status) {
-				alert("Project " + projName + " already deleted.");
-			}
-		});
+		var confirmDelete = confirm("Are you sure you want to delete project: "+ projName);
+		if(confirmDelete) {
+			ricottaAPI.deleteProj(projName, function(){refreshPageContent("projects");}, function(status){
+				if("404" == status) {
+					alert("Project " + projName + " already deleted.");
+				}
+			});
+		}
 	}
 	/**
 	 * Return the languages of project in strings
@@ -70,16 +103,18 @@
 	function getProjectLanguage(p) {
 		var lang = "";
 		if(p.defProjLang) {
-			lang += p.defProjLang.langCode + ", ";
+			lang += getLanguageName(p.defProjLang.langCode) + ", ";
 		}
 		$.map(p.projLangs, function(l, index) {
-	        lang += l.langCode + ", ";
+	        lang += getLanguageName(l.langCode) + ", ";
 	    });
 		return lang.substring(0, lang.length - 2);//remove the last comma
 	}
 	function loadProject(projectName) {
 	    // copy json from table to header
-	    var p = $("#projectItem" + projectName).data("json");
+	    console.log(trim(projectName));
+	    var p = $("#projectItem" + trim(projectName)).data("json");
+	    console.log(p);
 	    $("#headerProject").data("project", p);
 	    
 	    // load project contents
@@ -88,10 +123,9 @@
 	}
 	
 	function populateLanguage() {
-		ricottaAPI.loadLanguages(function(languages) {
-			$.map(languages, function(l, i){
-				$("#defaultLang").append("<option value='"+ l.code +"'>" + l.name + "</option>");
-			})
+		loadGlobalLanguage();
+		$.map(globalLang, function(l, i){
+			$("#defaultLang").append("<option value='"+ l.code +"'>" + l.name + "</option>");
 		});
 	}
 	
@@ -110,7 +144,6 @@
 	        	var projectName = projName.val();
 	        	var defaultLang = $("#defaultLang option:selected").val();
 	        	ricottaAPI.createProject(projectName, defaultLang, populateProjects, function(err){
-	        		console.log("error");
 	        		updateTips(err);
 	        	});
 	        }

@@ -76,7 +76,6 @@ function buildTranslation(p, token) {
 		
 	}*/
 	$.map(p.contexts, function(c, index){
-		console.log(c.blobKey);
 		if(c.blobKey != "" && null != c.blobKey && c.name == token.context) {
 			buildContextImage(p.name, c.blobKey, c.name);
 		}

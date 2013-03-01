@@ -108,6 +108,13 @@ public class RestController {
         return new ResponseEntity<Object>(ctx, HttpStatus.OK);
     }
 
+    @RequestMapping(value = "project/v10/{projName}/context/{ctxName}", method = RequestMethod.POST)
+    public ResponseEntity<Ctxt> updateContext(@PathVariable String projName, @PathVariable String ctxName,
+            @RequestParam String description) {
+        Ctxt ctx = uberDao.updateContext(projName, ProjectHandlerInterceptor.NAME_TRUNK, ctxName, description);
+        return new ResponseEntity<Ctxt>(ctx, HttpStatus.OK);
+    }
+
     @RequestMapping(value = "project/v10/{projName}/context", method = RequestMethod.DELETE)
     public ResponseEntity deleteContext(@PathVariable String projName, @RequestParam String keyString) {
         uberDao.deleteContext(keyString);
@@ -159,8 +166,11 @@ public class RestController {
 
     @RequestMapping(value = "project/v10/{projectName}/token", method = RequestMethod.POST, params = {"name", "description"})
     public ResponseEntity<Tokn10> createToken(@PathVariable String projectName, @RequestParam String name,
-            @RequestParam String description, @RequestParam String context) {
-        final Tokn10 body = uberDao.createToken(projectName, ProjectHandlerInterceptor.NAME_TRUNK, name, description, context);
+            @RequestParam String description, @RequestParam String context, @RequestParam(required = false) String subsets) {
+        Tokn10 body = uberDao.createToken(projectName, ProjectHandlerInterceptor.NAME_TRUNK, name, description, context);
+        if (null != subsets) {
+            body = updateTokn(projectName, body.getId(), body.getName(), body.getDescription(), context, subsets, ",");
+        }
         if (null == body) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
@@ -225,15 +235,16 @@ public class RestController {
     }
 
     @RequestMapping(value = "project/v10/{projectName}/user", method = RequestMethod.POST)
-    public ResponseEntity<Object> createUser(@PathVariable String projectName, @RequestParam Long role, @RequestParam String email) {
-        Object roleKey = null;
+    public ResponseEntity<ProjUser> createUser(@PathVariable String projectName, @RequestParam Long role,
+            @RequestParam String email) {
+        ProjUser projUser = null;
         try {
-            roleKey = uberDao.createUser(projectName, email, role);
+            projUser = uberDao.createUser(projectName, email, role);
         }
         catch (IllegalArgumentException alreadyExists) {
             return new ResponseEntity(HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<Object>(roleKey, HttpStatus.OK);
+        return new ResponseEntity<ProjUser>(projUser, HttpStatus.OK);
     }
 
     @RequestMapping(value = "project/v10/{projectName}/user/{keyString}", method = RequestMethod.POST)
@@ -250,13 +261,19 @@ public class RestController {
     public ResponseEntity<Tokn10> updateToken(@PathVariable String projectName, @PathVariable Long tokenId,
             @RequestParam String name, @RequestParam String description, @RequestParam String context,
             @RequestParam String subsets, @RequestParam(value = "separator", defaultValue = ",") String separator) {
-        final String[] subs = subsets.isEmpty() ? null : subsets.split(separator);
-        final Tokn10 body = uberDao.updateToken(projectName, ProjectHandlerInterceptor.NAME_TRUNK, tokenId, name, description,
-                context, subs);
+        final Tokn10 body = this.updateTokn(projectName, tokenId, name, description, context, subsets, separator);
         if (null == body) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity(body, HttpStatus.OK);
+    }
+
+    private Tokn10 updateTokn(String projectName, Long tokenId, String name, String description, String context, String subsets,
+            String separator) {
+        final String[] subs = subsets.isEmpty() ? null : subsets.split(separator);
+        final Tokn10 body = uberDao.updateToken(projectName, ProjectHandlerInterceptor.NAME_TRUNK, tokenId, name, description,
+                context, subs);
+        return body;
     }
 
     @RequestMapping(value = "project/v10/{projectName}/token/{tokenId}", method = RequestMethod.DELETE)

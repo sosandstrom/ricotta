@@ -219,11 +219,9 @@
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					if(typeof failCallBack === 'function') {
-						console.log(textStatus);
 						if(jqXHR.status == 409) {
 							failCallBack("User " + email + " already added.");
 						}
-						console.log(errorThrown);
 					}
 				}
 			})
@@ -612,6 +610,27 @@
 				success: function(projUser) {
 					if(typeof successCallback === 'function') {
 						successCallback();
+					}
+				},
+				error: function(jqXR) {
+					if(typeof failCallback === 'function') {
+						failCallback(jqXR);
+					}
+				}
+			});
+		},
+		updateContext: function(projName, contextName, description, successCallback, failCallback) {
+			var that = this;
+			$.ajax({
+				url: that.backendUrl + "project/v10/" + projName +"/context/" + contextName,
+				type: "POST",
+				dataType: "json",
+				data: {
+					description: description,
+				},
+				success: function(ctx) {
+					if(typeof successCallback === 'function') {
+						successCallback(ctx);
 					}
 				},
 				error: function(jqXR) {

@@ -14,38 +14,38 @@
         
     </table>
 	
-	<a id="buttonAddContext" data-toggle="modal" href="#createContextDialog" class="btn btn-primary">Add new context...</a>
+	<a id="buttonAddContext" data-toggle="modal" href="#createContextDialog" class="btn btn-primary">+ Context</a>
 	
 	<div id="createContextDialog" class="modal fade hide">
 		<div class="modal-header">
 			<a class="close" data-dismiss="modal">×</a>
-			<h3>Create new context</h3>
+			<h3>Create Context</h3>
 		</div>
 		<div class="modal-body">
 			<div class="alert alert-error hide">
   				<strong>Error! </strong><span class="validateTips"></span>
 			</div>  
 			<div>
-				<label class="modal-label" for="contextName">Context Name</label>
+				<label class="modal-label" for="contextName">Name</label>
 				<input type="text" class="modal-text" name="contextName" id="contextName" value="">
 			</div>
 			<div class="divider horiziontal-divider"></div>
 			<div>
-				<label class="modal-label" for="contextDescription">Context Description</label>
+				<label class="modal-label" for="contextDescription">Description</label>
 				<input type="text" class="modal-text" name="contextDescription" id="contextDescription" value="">
 			</div>
-			<div class="divider horiziontal-divider></div>
+			<div class="divider horiziontal-divider"></div>
 			<div>
 				<input type="hidden" id="contextImgKey" value="">
 				<form action="" id="uploadContextImage" method="POST" enctype="multipart/form-data">
-					<label class="modal-label">Context Image</label>
+					<label class="modal-label">Image</label>
 					<input type="file" id="contextImage" name="contextImage">
 				</form>
 				<!-- <a class="btn" id="uploadImage" onclick="uploadImage();" disabled="disabled">Upload Context Image...</a><span id="ajaxloader"></span> -->
 			</div>
 		</div>
 		<div class="modal-footer">
-			<a class="btn btn-success btn-create" >Create Context</a>
+			<a class="btn btn-success btn-create" >Save</a>
 		</div>
 	</div>
 	<script type="text/javascript">
@@ -95,31 +95,86 @@
 	function buildContextsTable(p) {
 		$("#contextsListBody").empty();
 	    $.map(p.contexts, function(t, index) {
-	        var id = t.keyString;
-	        $("#contextsListBody").append($('<tr id="context_' + index + '"></tr>'));
-	        
-	        // icons
-	        $("#context_" + index).append('<td>' +
-	            '<span id="delete_' + id + '" class="icon-trash icon-black" onClick="deleteContext(\'' + id + '\');">Delete</span>' +
-	            '</td>');
-	        $("#context_" + index).append('<td>' +
-	            '<span id="save_' + id + '" class="icon-hdd icon-black" onClick="saveContext(\'' + id + '\');" style="display: none">Update</span>' +
-	            '</td>');
-	
-	        $("#context_" + index).append('<td>' + t.name + '</td>');
-	        $("#context_" + index).append('<td><input type="text" id="description_' + id + '" onChange="setChanged(\'' + id + '\');" value="' + t.description + '" /></td>');
+	    	appendContext(t);
 	    });
 	}
+	//this function can be called for the first context loading or adding new context
+	function appendContext(context) {
+		var p = $("#headerProject").data("project"),
+			blobKey = context.blobKey != null? context.blobKey.keyString : '',
+			id = context.keyString,
+			elm = '<input type="text" id="description_' + id + '" onChange="setChanged(\'' + id + '\');" value="' + context.description + '" />';
+		
+		if(blobKey != '') {
+			elm += '<span style="margin-left:20px;"><a class="lightbox" href="/api/blob/v10/'+p.name+'?key='+ blobKey +'" title="'+ context.description +'<br/>'+ context.name+'">Preview</span>';
+		}
+		
+        $("#contextsListBody").append($('<tr data-id="'+id+'">')
+        		 						.append('<td><span id="delete_' + id + '" class="icon-trash icon-black" onClick="deleteContext(\'' + id + '\', \''+context.name+'\');">Delete</span></td>')
+        		 						.append('<td><span id="save_' + id + '" class="icon-hdd icon-black" onClick="updateContext(\'' + context.name + '\',\''+id+'\' );" style="display: none">Update</span>')
+        		 						.append('<td>' + context.name + '</td>')
+        		 						.append('<td>'+elm+'</td>')
+        		 					  .append('</tr>'));
+        $("#contextsListBody .lightbox").lightBox({
+        	imageLoading: 'img/loading.gif',
+	    	imageBtnClose: 'img/lightbox-btn-close.gif',
+	    	imageBtnPrev: 'img/lightbox-btn-prev.gif',
+	    	imageBtnNext: 'img/lightbox-btn-next.gif',
+	    	imageLoading: 'img/lightbox-ico-loading.gif',
+	    	imageBlank: 'img/lightbox-blank.gif',
+	    	txtImage: 'Context'
+        });
+	}
 	
-	function deleteContext(keyString) {
+	function updateContext(name, id) {
+		var p = $("#headerProject").data("project"),
+			description = $("#description_"+id).val();
+		
+		ricottaAPI.updateContext(p.name, name, description, function(){
+			$("#delete_"+id).show();
+			$("#save_"+id).hide();
+		});
+	}
+	
+	function deleteContext(keyString, cname) {
 		var p = $("#headerProject").data("project");
 		ricottaAPI.deleteContext(p.name, keyString, function(){
-			loadProjectTokens(p.name);
-			buildContextsTable($("#headerProject").data("project"));
-			appendTranslationContextFilter($("#headerProject").data("project"));
-			if(typeof refreshToken === 'function') {
-    			refreshToken();
-    		}
+			//remove context from table
+			$("#contextsListBody tr").each(function(){
+				if($(this).data("id") == keyString) {
+					$(this).remove();
+					return false;
+				}
+			});
+			//remove context from filter option
+			$("#contextFilter option[value='"+cname+"']").remove();
+
+			//
+			if(tokenTable != undefined) {
+				for(var i in tokenTable.fnGetData()){
+					var selectOption = $(tokenTable.fnGetData()[i][5]);
+	    	 		selectOption.find("option[value='"+cname+"']").remove();
+	    	 		//wrap the select option into a div and get its contents to relcace the old one
+	    	 		tokenTable.fnGetData()[i][5] = $('<div>').append(selectOption).html();
+				}
+				//remove from the current display table
+				tokenTable.$('tr').each(function(index){
+					var contextCol = $(this).find("td").eq(4);
+					contextCol.find("option[value='"+cname+"']").remove();
+					var newContext = contextCol.html();
+					tokenTable.fnUpdate(newContext, index, 5);
+				});
+				tokensArrDataTable = tokenTable.fnGetData();
+			}
+			else {
+				//remove context from token table
+				for(var i in tokensArrDataTable) {
+	    	 		var selectOption = $(tokensArrDataTable[i][5]);
+	    	 		selectOption.find("option[value='"+cname+"']").remove();
+	    	 		//wrap the select option into a div and get its contents to relcace the old one
+	    	 		tokensArrDataTable[i][5] = $('<div>').append(selectOption).html();
+	    	 	}
+			}
 		}, function(){});
 	}
 	function uploadImage() {
@@ -175,10 +230,16 @@
 		});
 	    
 	    buildContextsTable(p);
-	    if(typeof refreshToken === 'function') {
-			refreshToken();
-		}
 	    $("#createContextDialog").modal("hide");
+	    $("a.lightbox").lightBox({
+	    	imageLoading: 'img/loading.gif',
+	    	imageBtnClose: 'img/lightbox-btn-close.gif',
+	    	imageBtnPrev: 'img/lightbox-btn-prev.gif',
+	    	imageBtnNext: 'img/lightbox-btn-next.gif',
+	    	imageLoading: 'img/lightbox-ico-loading.gif',
+	    	imageBlank: 'img/lightbox-blank.gif',
+	    	txtImage: 'Context'
+	    });
 	});
 	
 	function createNewContext(p) {
@@ -187,14 +248,33 @@
     		"description": $("#contextDescription").val(),
     		"blobKey": $("#contextImgKey").val(),
     	};
-    	ricottaAPI.createContext(p.name, data, function(){
-    		loadProjectTokens(p.name);
-    		buildContextsTable($("#headerProject").data("project"));
-    		//refreshProjectContent("tokens");
-    		if(typeof refreshToken === 'function') {
-    			refreshToken();
+    	ricottaAPI.createContext(p.name, data, function(context){
+    		//retrieve the select option from array
+    		//add new context and override the old one
+    		if(typeof tokenTable != 'undefined') {
+    			for(var i in tokenTable.fnGetData()){
+					var selectOption = $(tokenTable.fnGetData()[i][5]).append("<option value='"+context.name+"'>"+context.name+"</option>");
+	    	 		//wrap the select option into a div and get its contents to relcace the old one
+	    	 		tokenTable.fnGetData()[i][5] = $('<div>').append(selectOption).html();
+				}
+				//remove from the current display table
+				tokenTable.$('tr').each(function(index){
+					var contextCol = $(this).find("td").eq(4);
+					contextCol.find("select").append("<option value='"+context.name+"'>"+context.name+"</option>");
+					var newContext = contextCol.html();
+					tokenTable.fnUpdate(newContext, index, 5);
+				});
+				tokensArrDataTable = tokenTable.fnGetData();
     		}
-    		appendTranslationContextFilter($("#headerProject").data("project"));
+    		else {
+	    	 	for(var i in tokensArrDataTable) {
+	    	 		var selectOption = $(tokensArrDataTable[i][5]).append("<option value='"+context.name+"'>"+context.name+"</option>");
+	    	 		//wrap the select option into a div and get its contents to relcace the old one
+	    	 		tokensArrDataTable[i][5] = $('<div>').append(selectOption).html();
+	    	 	}
+    		}
+    		appendContext(context);
+    		appendContextFilter(context);
     		$("#createContextDialog").modal("hide");
     	});
 	}

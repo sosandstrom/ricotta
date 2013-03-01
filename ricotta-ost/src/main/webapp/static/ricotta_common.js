@@ -33,7 +33,6 @@ function getShort(s, len) {
 function updateTips(t) {
     var tips = $(".validateTips");
         tips.html(t);
-        console.log(tips.parent());
         if(tips.parent().hasClass("hide")) {
         	tips.parent().addClass("show");
         }

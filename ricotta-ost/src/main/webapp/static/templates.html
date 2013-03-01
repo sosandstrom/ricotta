@@ -1,6 +1,6 @@
 <div class="templates">
 	<div> <h1>Templates </h1></div>
-	<a id="createTemplate" data-toggle="modal" href="#createTemplateDialog" class="btn btn-primary">Create Template</a>
+	<a id="createTemplate" data-toggle="modal" href="#createTemplateDialog" class="btn btn-primary">+ Template</a>
 	<div class="templateWrapper">
 		<table  class="table table-striped table-bordered">
 			<thead>
@@ -14,7 +14,7 @@
 	<div id="createTemplateDialog"  class="modal hide fade in" style="display: none;">
 		<div class="modal-header">
 			<a class="close" data-dismiss="modal">×</a>
-			<h3 id="modalHeader">Create template</h3>
+			<h3 id="modalHeader">Add New Template</h3>
 		</div>
 		<div class="modal-body">
 			<div class="box">
@@ -38,7 +38,7 @@
 			</div>
 		</div>
 		<div class="modal-footer">
-			<a href="#" id="modalFooterBtnSuccess" class="btn btn-success btn-create">Create Template</a>
+			<a href="#" id="modalFooterBtnSuccess" class="btn btn-success btn-create">Save</a>
 		</div>
 	</div>
 </div>
@@ -59,8 +59,8 @@
 		$("#templateMIME").val("");
 		$("#templateBody").val("");
 		
-		$("#modalHeader").text("Create New Template");
-		$("a.btn-success").text("Create Template").click(function(){
+		$("#modalHeader").text("Add New Template");
+		$("a.btn-success").click(function(){
 			//save the updated template
 			var data = {
 				"name": $("#templateName").val(),
@@ -79,7 +79,7 @@
 		$("#templateBody").val(t.body);
 		
 		$("#createTemplateDialog").modal("show");
-		$("a.btn-success").text("Update Template").click(function(){
+		$("a.btn-success").click(function(){
 			//save the updated template
 			var data = {
 				"description": $("#templateDescription").val(),

@@ -23,6 +23,7 @@
         <title>Ricotta</title>
         <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
         <link href="css/DT_bootstrap.css" rel="stylesheet" media="screen">
+        <link href="css/jquery.lightbox-0.5.css" rel="stylesheet"/>
         <link type="text/css" href="ricotta.custom.css" rel="stylesheet" />
         
         <!-- 
@@ -33,7 +34,7 @@
     	<div class="navbar navbar-inverse navbar-fixed-top">
 			<div class="navbar-inner">
         		<div class="container-fluid">
-          			<a class="brand" href="">Ricotta</a>
+          			<a class="brand" href="javascript:home();">Ricotta</a>
           			<div class="nav-collapse collapse">
            				<ul class="nav navbar-text pull-right">
            					<li><a id="headerUserAction" class="login" href="" >Login</a></li>
@@ -101,7 +102,7 @@
         <script type="text/javascript" src="js/jquery.dataTables.js"></script>
         <script type="text/javascript" src="js/DT_bootstrap.js"></script>
         <script type="text/javascript" src="js/jquery.iframe-post-form.js"></script>
-        <!-- <script type="text/javascript" src="js/jquery-ui-1.8.17.custom.min.js"></script> -->
+		<script type="text/javascript" src="js/jquery.lightbox-0.5.min.js"></script>
 		<script type="text/javascript" src="ricotta_common.js"></script>
 		<script type="text/javascript" src="ricotta_API.js"></script>
         <script type="text/javascript">
@@ -109,7 +110,15 @@
 			    cache: false,
 			    data: null
 			});
-			
+			function home() {
+				delete tokensArrDataTable; 
+				delete tokenSubsetHeader; 
+				if(typeof tokenTable !== 'undefined' && tokenTable != null) {
+					tokenTable.fnDestroy();
+					delete tokenTable;// = undefined;
+				} 
+				loadPage('projects');
+			}
 			function showToast(s) {
 			    $("#toast").text(s).show();
 			}

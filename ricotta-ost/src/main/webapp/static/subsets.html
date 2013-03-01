@@ -50,7 +50,6 @@
 	function buildSubsetsTable(subsets) {
 		$("#subsetbody").empty();
 		$.map(subsets, function(s){
-			console.log(s);
 			$("#subsetbody").append("<tr><td>"+s.name+"</td><td>"+s.description+"</td>");
 		});
 	}

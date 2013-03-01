@@ -27,16 +27,16 @@
 					</div>
 				</div>
 				<div class="translation-footer">
-					<a id="addTranslation" class="btn btn-small btn-primary" data-toggle="modal" href="#createTokenDialog">Add String</a>
+					<a id="addTranslation" class="btn btn-small btn-primary" data-toggle="modal" href="#createTokenDialog">+ Token</a>
 				</div>
 			</div>
 		</div>
 		<div class="divider vertical-divider"></div>
-		<div class="span10">
+		<div class="span13">
 			<div class="nav">
-				<div><span class="selected" data-target="generalSetting">General</span></div>
-				<div><span data-target="contexts">Upload Screenshots</span></div>
-				<div><span data-target="tokens">String Manger</span></div>
+				<div class="menu"><span class="selected" data-target="generalSetting">General</span></div>
+				<div class="menu"><span data-target="contexts">Manage Contexts</span></div>
+				<div class="menu"><span data-target="tokens">Manage Tokens</span></div>
 			</div>
 			<div id="projectSetting">
 			</div>
@@ -63,35 +63,97 @@
 		        <div class="divider horiziontal-divider"></div>
 		        <div>
 		            <label class="modal-label" for="toknContext">Context</label>
-		            <select class="modal-input" id="toknContext" ><option value="_NO_CONTEXT_">_NO_CONTEXT_</option></select>
+		            <select class="modal-input" id="toknContext" ><option value="_NO_CONTEXT_">NO Context</option></select>
+		        </div>
+		        <div class="divider horiziontal-divider"></div>
+		        <div>
+		            <label class="modal-label" for="toknSubset">Subset</label>
+		            <select class="modal-input" id="toknSubset" style="max-height: 170px;" multiple></select>
 		        </div>
 		    </form>
 		</div>
 		<div class="modal-footer">
-			<a class="btn btn-success btn-create">Create Token</a>
+			<a class="btn btn-success btn-create">Save</a>
 		</div>
 	</div>
 </div>
 <script type="text/javascript">
+//this array is used only once. it will be removed after tokens table already generated except the token subset header.
+var tokensArrDataTable, 
+	tokenSubsetHeader, 
+	tokenTable;
 function reloadGeneralSetting() {
-	setProjectActiveMenu($('.span10 > .nav span:first'));
-	$('.span10 > .nav').removeClass('hide');
+	setProjectActiveMenu($('.span13 > .nav span:first'));
+	$('.span13 > .nav').removeClass('hide');
 	loadProjectContent('generalSetting');
 }
 function tokenFiltered() {
-	$("#translationToken").children().each(function(){
-		$(this).show();
-		if(($(this).data("context") != $("#contextFilter option:selected").val() 
-			&& $("#contextFilter option:selected").val() != "-1") 
-			|| ($.inArray($("#completionFilter option:selected").val(), $(this).data("uncompletTranslation")) < 0 
-					&& $("#completionFilter option:selected").val() != "-1")) {
-			$(this).hide();
-		}
+	var d = new Date();
+	console.log("start: " + d.getTime());
+	$("#translationToken li").hide();
+	var filtered = false;
+	if($("#contextFilter option:selected").val() != "-1") {
+		$("#translationToken li[data-context='"+$("#contextFilter option:selected").val()+"']").show();
+		filtered = true;
+	}
+	
+	var incompleteTransFilter = $("#completionFilter option:selected").val();
+	if(incompleteTransFilter != "-1") {
+		filtered = true;
+		$("#translationToken li").each(function(){
+			if($.inArray(incompleteTransFilter, $(this).data("uncompletTranslation")) < 0) {
+				$("#translationToken li[data-uncompletTranslation='"+$("#completionFilter option:selected").val()+"']").show();
+			}
+		});
+	}
+	
+	var d = new Date();
+	if(!filtered) {
+		$("#translationToken li").show();
+	}
+}
+function addTokenDataTableArr() {
+	var p = $("#headerProject").data("project");
+	tokensArrDataTable = [];
+	tokenSubsetHeader = [];
+	
+	$.map(p.tokens, function(t, i){
+		tokensArrDataTable.push(addTokenDataTable(p, t));
+	});
+	$.map(p.subsets, function(s, si) {
+        //var sToken = '<th data-subset="'+s+'" title="' + s + '"><input type="checkbox" onClick="" /></th>';
+        var sToken = '<th data-subset="'+s+'" title="' + s + '">' + s + '</th>';
+		tokenSubsetHeader.push(sToken);
 	});
 }
+
+function addTokenDataTable(p, t) {
+	var selectContext = '<select id="context_' + t.id + '" onChange="setChanged(' + t.id + ');" ><option value="_NO_CONTEXT_">No Context</option>';
+	$.map(p.contexts, function(c, ci) {
+		selectContext += ('<option value="' + c.name + '" ' + (c.name == t.context ? 'selected="selected" ' : '') +'>' + c.name + '</option>');
+    });
+	var arr = [t.name,
+	           '<span id="delete_' + t.id + '" class="icon-trash icon-black" onClick="deleteToken(\''+t.name+'\', ' + t.id + ', $(this));" />', 
+			   '<span id="save_' + t.id + '" class="icon-hdd icon-black" onClick="saveToken(' + t.id + ');" style="display: none" />',
+			   '<input type="text" id="name_' + t.id + '" value="' + t.name + '" onChange="setChanged(' + t.id + ');" />',
+			   '<input type="text" id="description_' + t.id + '" value="' + t.description + '" onChange="setChanged(' + t.id + ');" />',
+			   selectContext];
+	$.map(p.subsets, function(s, si) {
+		var checked = "";
+		$.map(t.subsets, function(ts, tsi) {
+			if(ts.id == s.id && ts != 'null') checked = "checked";
+			else checked = "";
+	    });
+        var sToken = '<input '+ checked +' type="checkbox" id="subset_' + t.id + '_' + s + '"' +' name="subsets_' + t.id + '"' +' value="' + s + '"' + ' title="' + t.name + ':' + s + '" onChange="setChanged(' + t.id + ');"/>';
+		arr.push(sToken);
+    });
+	return arr;
+}
+
 function loadProjectTokens(pname) {
     ricottaAPI.getProjectTokens(pname, function(data){
         $("#headerProject").data("project", data);
+        addTokenDataTableArr();
     }, showToast);
 }
 
@@ -103,43 +165,55 @@ function updateVerticalDivider() {
 	}
 }
 function setProjectActiveMenu(selectedMenu) {
-	$(".span10 > .nav > div > span.selected").removeAttr("class");
+	$(".span13 > .nav > div > span.selected").removeAttr("class");
 	selectedMenu.attr("class", "selected");
 }
 
 function setOverMenu() {
-	$(".span10 > .nav > div span.selected").addClass("selected-over");
+	$(".span13 > .nav > div span.selected").addClass("selected-over");
 }
 function setCurrentMenuState() {
-	$(".span10 > .nav > div span.selected").removeClass("selected-over");
+	$(".span13 > .nav > div span.selected").removeClass("selected-over");
 }
 function appendUncompletTranslationFilter(p) {
 	$("#completionFilter").empty();
 	$("#completionFilter").append("<option value='-1'>Show all</option><option value='0'>Show all uncomplete</option>");
 	$.map(p.projLangs, function(l, i) {
-		$("#completionFilter").append("<option value='"+l.langCode+"'>"+l.langCode +" (Uncompleted)</option>");
+		appendUncompletTranslation(l);
 	});
+}
+function appendUncompletTranslation(l) {
+	$("#completionFilter").append("<option value='"+l.langCode+"'>"+l.langCode +" (Uncompleted)</option>");
 }
 function appendTranslationContextFilter() {
 	$("#contextFilter").empty();
 	var p = $("#headerProject").data("project");
 	$("#contextFilter").append("<option value='-1'>Show all</option>");
 	$.map(p.contexts, function(context, i){
-		$("#contextFilter").append("<option value='"+ context.name +"'>"+ context.name +"</option>");
+		appendContextFilter(context);
 	});
 }
+//this function can be called from the context page to append new context
+function appendContextFilter(context) {
+	$("#contextFilter").append("<option value='"+ context.name +"'>"+ context.name +"</option>");
+}
+
 function appendTranslationTokens() {
 	$("#translationToken").empty();
 	var p = $("#headerProject").data("project");
 	$.map(p.tokens, function(token, i) {
-		var uncompleteTrans = token.completeTranslation;
-		var label = token.description == ''? token.name : token.description;
-		$("#translationToken").append("<li id='trans_token_"+i+"' data-context='"+token.context+"'><input onclick=\"loadTranslation('"+token.id+"')\" type='radio' name='token' id='radio"+token.id+"' value='"+token.id+"'>"+
-										   "<label for='radio"+token.id+"'>" + label +"</label>"+
-									   "</li>");
-		
-		$("#trans_token_"+i).data("uncompletTranslation", getUncompleteTranslation(p.projLangs, token.completedTranslation));
+		appendTokenSideBar(token, p.projLangs);
 	});
+}
+
+function appendTokenSideBar(token, projLangs) {
+	var uncompleteTrans = token.completeTranslation;
+	var label = token.name;
+	$("#translationToken").append("<li id='trans_token_"+token.id+"' data-context='"+token.context+"'><input onclick=\"loadTranslation('"+token.id+"')\" type='radio' name='token' id='radio"+token.id+"' value='"+token.id+"'>"+
+									   "<label for='radio"+token.id+"'>" + label +"</label>"+
+								   "</li>");
+	
+	$("#trans_token_"+token.id).data("uncompletTranslation", getUncompleteTranslation(projLangs, token.completedTranslation));
 }
 
 function getUncompleteTranslation(projLangs, completedTranslation) {
@@ -152,7 +226,7 @@ function getUncompleteTranslation(projLangs, completedTranslation) {
 	return unCompleteTranslation;
 }
 function loadTranslation(tokenId) {
-	$(".span10 > .nav").addClass("hide");
+	$(".span13 > .nav").addClass("hide");
 	$("#selectedToken").data("tokenId", tokenId);
 	if(!$(".translations").is(":visible")) {
 		loadProjectContent("translations");
@@ -179,29 +253,33 @@ function createToken() {
       var bValid = true;
       allFields.removeClass("ui-state-error");
       bValid = bValid && checkLength(toknName, "token name", 1, 64);
-
+      
       if (bValid) {
+    	var selectedSubset = $("#toknSubset").val(),
+    		subsets = null;
+    	if(selectedSubset != null) {
+    		subsets = selectedSubset.join(",");
+    	}
       	var data= {
               name: toknName.val(),
               description: toknDescription.val(),
-              context: toknContext.val()
+              context: toknContext.val(),
+              subsets: subsets,
           };
       	
       	ricottaAPI.createToken(p.name, data, function(newToken){
-      		loadProjectTokens(p.name);
+			//if tokens page is already loaded, update its table only. 
+			//otherwise, push the new token data to pre-generated datatable
+     		var newTokenDataTable = addTokenDataTable(p, newToken);
       		if($(".tokens").length > 0) {
-	      		updateTokenTable(p, newToken);
-	      		//destroy the table data and re-init
-	      		if(tokenTable != undefined) {
-		      		tokenTable.fnDestroy();
+	      		if(typeof tokenTable !== 'undefined') {
+	      			tokenTable.dataTable().fnAddData(newTokenDataTable);
 	      		}
-	      		
-	      		tokenTable = $("#tableToken").dataTable();
-	    	    $("#tableToken_filter input").keyup(function(){
-	    	    	tokenTable.fnFilter($(this).val(), 0, false, false);
-	    	    });
       		}
-      		appendTranslationTokens();
+      		else {
+	     		tokensArrDataTable.push(newTokenDataTable);
+      		}
+      		appendTokenSideBar(newToken, p.projLangs);
       		
       	}, updateTips);
       }
@@ -212,23 +290,34 @@ function refreshSideBar() {
 	
 }
 
+function buildCreateTokenDialog(p) {
+    $.map(p.contexts, function(c, ci) {
+        $("#toknContext").append('<option value="' + c.name + '">' + c.name + '</option>');
+    });
+    $.map(p.subsets, function(s, i){
+    	$("#toknSubset").append('<option value="'+ s +'">' + s + '</option>');
+    });
+}
 $(function() {
     var p = $("#headerProject").data("project");
     $("#projectname").text(p.name);
     loadProjectTokens(p.name);
+    p = $("#headerProject").data("project");
+    
     loadProjectContent("generalSetting");
-    $(".span10 span").bind("click", function(){
+    
+    $(".span13 span").bind("click", function(){
     	loadProjectContent($(this).data("target"));
     });
     updateVerticalDivider();
-    $(".span10 > .nav > div > span").bind("click", function(){
+    $(".span13 > .nav > div > span").bind("click", function(){
     	updateVerticalDivider();
     	setProjectActiveMenu($(this));
     });
-    $(".span10 > .nav > div > span").bind("mouseover", function(){
+    $(".span13 > .nav > div > span").bind("mouseover", function(){
     	setOverMenu();
     });
-    $(".span10 > .nav > div > span").bind("mouseout", function(){
+    $(".span13 > .nav > div > span").bind("mouseout", function(){
     	setCurrentMenuState();
     });
     /*
@@ -241,6 +330,7 @@ $(function() {
     appendUncompletTranslationFilter(p);
     appendTranslationContextFilter();
     appendTranslationTokens();
+    buildCreateTokenDialog(p);
 });
 
 </script>

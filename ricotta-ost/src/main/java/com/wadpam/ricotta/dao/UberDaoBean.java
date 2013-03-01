@@ -688,6 +688,11 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         final Tokn tokenLong = toknDao.persist(branchKey, 3L, "A Really Long Token with Translations",
                 "A Really Long Token with Translations", home.getPrimaryKey());
 
+        /*
+         * for(long i = 1; i < 10000; i++) { toknDao.persist(branchKey, i, "The Project Entity", i +
+         * "_project_Project_Android_Specific", null); }
+         */
+
         // subset tokens
         subsetToknDao.persist(ricottaOst.getPrimaryKey(), 1L);
         subsetToknDao.persist(ricottaOst.getPrimaryKey(), 2L);
@@ -1029,8 +1034,10 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
             LOG.debug("deleting {}, inserting {}", remove, subSet);
             subsetToknDao.deleteByCore(remove);
             final List<SubsetTokn> insert = new ArrayList<SubsetTokn>();
+            final List<String> ss = new ArrayList<String>();
             SubsetTokn st;
             for(String s : subSet) {
+                ss.add(s);
                 st = new SubsetTokn();
                 st.setSubset(subsetDao.createKey(branchKey, s));
                 st.setTokn(tokenId);
@@ -1039,9 +1046,25 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
             subsetToknDao.persist(insert);
 
             t10 = convert(tokn);
+            if (!ss.isEmpty()) {
+                for(String s : ss) {
+                    t10.getSubsets().add(s);
+                }
+            }
         }
 
         return t10;
+    }
+
+    public Ctxt updateContext(String projectName, String branchName, String ctxtName, String description) {
+        final Key projKey = projDao.createKey(projectName);
+        final Key branchKey = branchDao.createKey(projKey, branchName);
+
+        final Ctxt context = ctxtDao.findByPrimaryKey(branchKey, ctxtName);
+        context.setDescription(description);
+        ctxtDao.update(context);
+
+        return context;
     }
 
     public Template updateTemplate(String name, String description, String body) {
@@ -1122,13 +1145,15 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
     public Object createSubset(String projectName, String branchName, String subsetName, String subsetDescription) {
         final Key projKey = projDao.createKey(projectName);
         final Key branchKey = branchDao.createKey(projKey, branchName);
-        return createSubset((Key) branchKey, subsetName, subsetDescription);
+        createSubset((Key) branchKey, subsetName, subsetDescription);
+        return subsetDao.findByPrimaryKey(branchKey, subsetName);
     }
 
     public Object createContext(String projectName, String branchName, String name, String description, String blobKey) {
         final Key projKey = projDao.createKey(projectName);
         final Key branchKey = branchDao.createKey(projKey, branchName);
-        return createCtxt(branchKey, name, description, blobKey);
+        createCtxt(branchKey, name, description, blobKey);
+        return ctxtDao.findByPrimaryKey(branchKey, name);
     }
 
     public List<Ctxt> getContexts(String projectName, String branchName) {
@@ -1137,14 +1162,16 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         return ctxts(branchKey);
     }
 
-    public Object createUser(String projectName, String email, long role) throws IllegalArgumentException {
+    public ProjUser createUser(String projectName, String email, long role) throws IllegalArgumentException {
         final Key projKey = projDao.createKey(projectName);
         final ProjUser existing = projUserDao.findByPrimaryKey(projKey, email);
         if (null != existing) {
             throw new IllegalArgumentException("User already added");
         }
 
-        return createUser(projKey, email, role);
+        createUser(projKey, email, role);
+        final ProjUser projUser = projUserDao.findByPrimaryKey(projKey, email);
+        return projUser;
     }
 
     public void deleteProjectUser(String projName, String email) {
