@@ -287,8 +287,13 @@
 			allFields = $([]).add(userEmail),
 			tips = $("#addProjUserDialog .validateTips");
 		
+		var email = userEmail.val();
+		if(email != "" && !validateEmail(email)) {
+			tips.text("Invalid user email address");
+			updateTips();
+		}
 		var bValid = true;
-		bValid = bValid && checkEmpty(allFields);
+		bValid = bValid && checkEmpty(allFields) && validateEmail(email);
 		if(bValid) {
 			ricottaAPI.addProjectUser(p.name, userEmail.val(), $("#projUserRole option:selected").val(), function(d){
 				var newIndex = $("#projUserTBody tr").length + 1;

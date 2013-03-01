@@ -144,3 +144,17 @@ function clearLastText() {
 	$(".modal-body input[type='text']").val("");
 	$(".modal-body input[type='email']").val("");
 }
+
+/**
+ * validate the input email. Normally it should used in the add user dialog
+ * @param email
+ * @returns {Boolean}
+ */
+function validateEmail(email) {
+	//console.log("validate: "+  email);
+	var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+	if(mailformat.test(email)) {
+		return true;  
+	}
+	return false;
+}
