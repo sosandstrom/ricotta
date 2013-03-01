@@ -118,18 +118,19 @@ function loadPage(page) {
 }
 
 function loadProjectContent(pageContent) {
-	//showToast()
+	$("#ajaxLoader").show();
 	$("#projectSetting .show").removeClass("show").addClass("hide");
 	if($("."+pageContent).length == 0) {
 		$.get(pageContent + ".html", function(content) {
 			$("#projectSetting").append(content);
 			$("."+pageContent).addClass("show");
-			hideToast();
+			//hideToast();
+			$("#ajaxLoader").hide();
 		});
 	}
 	else { 
 		$("."+pageContent).removeClass("hide").addClass("show");
-		hideToast();
+		$("#ajaxLoader").hide();
 	}
 }
 
