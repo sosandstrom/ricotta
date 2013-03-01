@@ -27,7 +27,7 @@
 					</div>
 				</div>
 				<div class="translation-footer">
-					<a id="addTranslation" class="btn btn-small btn-primary" data-toggle="modal" href="#createTokenDialog">+ Token</a>
+					<a id="addTranslation" class="btn btn-small btn-primary" data-toggle="modal" href="#createTokenDialog" onclick="clearLastText();">+ Token</a>
 				</div>
 			</div>
 		</div>
@@ -50,7 +50,9 @@
 			<h3>Create new token</h3>
 		</div> 
 		<div class="modal-body">
-			<p class="validateTips"></p>
+			<div class="alert alert-error hide">  
+  				<p class="validateTips"></p>
+			</div>
 		    <form>
 		        <div>
 		            <label class="modal-label" for="toknName">Token name</label>
@@ -283,8 +285,8 @@ function createToken() {
       		appendTokenSideBar(newToken, p.projLangs);
       		
       	}, updateTips);
+	      $("#createTokenDialog").modal("hide");
       }
-      $("#createTokenDialog").modal("hide");
 }
 
 function refreshSideBar() {
