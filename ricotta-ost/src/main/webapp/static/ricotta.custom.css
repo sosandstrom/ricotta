@@ -439,3 +439,10 @@ div.menu span{
 [class^="icon-"], [class*="icon-"] {
 	width: 1px;
 }
+
+#templatesTBody tr{
+	cursor: pointer;
+}
+#templatesTBody tr:hover {
+	background: #eee !important;
+}
