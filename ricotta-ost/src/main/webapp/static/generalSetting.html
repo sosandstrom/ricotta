@@ -88,7 +88,9 @@
 				<div class="divider horiziontal-divider"></div>
 				<div>
 		            <label class="modal-label" for="projLangDefault">Default Language</label>
-		            <select class="modal-input" id="projLangDefault" name="projLangDefault"></select>
+		            <select class="modal-input" id="projLangDefault" name="projLangDefault">
+		            	<option value="-1">No default language</option>
+		            </select>
 				</div>
 		    </form>
 		</div>
@@ -195,7 +197,7 @@
 		p = $("#headerProject").data("project");
 	    // build projLangs array
 	    $("#projLangCode").empty();
-	    $("#projLangDefault").empty();
+	    $("#projLangDefault option").not(":first").remove();
 	    $.map(p.projLangs, function(t, index) {
 	    	$("#projLangDefault").append('<option value="' + t.langCode + '" >' + t.langCode + '</option>');
 	    });
@@ -209,7 +211,7 @@
 	function buildProjLangsTable() {
 		p = $("#headerProject").data("project");
 	    // build projLangs array
-	    $("#projLangDefault").empty();
+	    $("#projLangDefault option").not(":first").remove();
 	    $("#projLangCode").empty();
 	    $("#projLangsTBody").empty();
 	    // load global langauges globalLang is ready loaded in the projects page
@@ -260,15 +262,12 @@
 			}
 			var langList = $("#headerProject").data("project").projLangs;
 			//remove from project header as well???
-			$.map(langList, function(l, i){
-				if(l.langCode == langCode) {
-					$("#headerProject").data("project").projLangs.splice(i, 1);
-					return;
-				}
-			});
-		}
 		
-		if(confirmDelete) {
+			for(var i in langList) {
+				if(langList[i].langCode != undefined && langList[i].langCode == langCode) {
+					$("#headerProject").data("project").projLangs.splice(i, 1);
+				}
+			}
 			ricottaAPI.deleteProjLang(p.name, langCode, function(){
 				//remove the language from table
 				$("#projLangsTBody tr[id='pl_"+langCode+"']").remove();
@@ -276,7 +275,6 @@
 				$("#completionFilter option[value='"+langCode+"']").remove();
 			}, function(){});
 		}
-		
 	}
 	function getDefaultLanguage(langCode) {
 		var defaultLang = "No default language";
@@ -301,7 +299,7 @@
 	    if (bValid) {
 	    	var data = {
 	            langCode: projLangCode.val(),
-	            defaultLang: projLangDefault.val()
+	            defaultLang: projLangDefault.val() != -1? projLangDefault.val() : null, 
 	        };
 	    	
 	    	ricottaAPI.addProjectLanguage(p.name, data, function(d){
