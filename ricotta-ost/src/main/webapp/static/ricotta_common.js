@@ -143,6 +143,7 @@ function clearLastText() {
 	$(".modal-body .alert").removeClass("show");
 	$(".modal-body input[type='text']").val("");
 	$(".modal-body input[type='email']").val("");
+	$(".modal-body input[type='file']").val("");
 }
 
 /**
