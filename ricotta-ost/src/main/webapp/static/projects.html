@@ -90,7 +90,8 @@
 	function deleteProj(projName) {
 		var confirmDelete = confirm("Are you sure you want to delete project: "+ projName);
 		if(confirmDelete) {
-			ricottaAPI.deleteProj(projName, function(){refreshPageContent("projects");}, function(status){
+			refreshPageContent("projects");
+			ricottaAPI.deleteProj(projName, function(){}, function(status){
 				if("404" == status) {
 					alert("Project " + projName + " already deleted.");
 				}
@@ -112,9 +113,7 @@
 	}
 	function loadProject(projectName) {
 	    // copy json from table to header
-	    console.log(trim(projectName));
 	    var p = $("#projectItem" + trim(projectName)).data("json");
-	    console.log(p);
 	    $("#headerProject").data("project", p);
 	    
 	    // load project contents
