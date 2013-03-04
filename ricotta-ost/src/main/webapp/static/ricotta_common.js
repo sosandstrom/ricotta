@@ -153,7 +153,7 @@ function clearLastText() {
  */
 function validateEmail(email) {
 	//console.log("validate: "+  email);
-	var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+	var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,4})+$/;
 	if(mailformat.test(email)) {
 		return true;  
 	}
