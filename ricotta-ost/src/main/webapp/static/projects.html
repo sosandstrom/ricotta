@@ -119,8 +119,12 @@
 	    $("#headerProject").data("project", p);
 	    
 	    // load project contents
-	   	refreshPageContent("project");
 	   	loadPage("project");
+	    //load general setting contents
+	   	loadProjectContent("generalSetting");
+	    //set the default selected menu
+	   	setProjectActiveMenu($('.span13 > .nav span:first'));
+		$('.span13 > .nav').removeClass('hide');
 	}
 	
 	function populateLanguage() {
