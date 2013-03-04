@@ -136,7 +136,7 @@ function addTokenDataTable(p, t) {
     });
 	var arr = [t.name,
 	           '<span id="delete_' + t.id + '" class="icon-trash icon-black" onClick="deleteToken(\''+t.name+'\', ' + t.id + ', $(this));" />', 
-			   '<span id="save_' + t.id + '" class="icon-hdd icon-black" onClick="saveToken(' + t.id + ');" style="display: none" />',
+			   '<span id="save_' + t.id + '" class="icon-hdd icon-black" onClick="saveToken(' + t.id + ');" style="display: none; margin-right: 5px;" > Update </span>',
 			   '<input type="text" id="name_' + t.id + '" value="' + t.name + '" onChange="setChanged(' + t.id + ');" />',
 			   '<input type="text" id="description_' + t.id + '" value="' + t.description + '" onChange="setChanged(' + t.id + ');" />',
 			   selectContext];
