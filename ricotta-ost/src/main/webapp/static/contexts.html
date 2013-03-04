@@ -94,12 +94,18 @@
 	
 	function buildContextsTable(p) {
 		$("#contextsListBody").empty();
+		if (p.contexts.length == 0){
+			$("#contextsListBody").append("<tr id='noDataAvailable'><td colspan=4>No data available in table</td></tr>");
+			return;
+		}
 	    $.map(p.contexts, function(t, index) {
 	    	appendContext(t);
 	    });
 	}
 	//this function can be called for the first context loading or adding new context
 	function appendContext(context) {
+		$("#contextsListBody tr#noDataAvailable").remove();
+		
 		var p = $("#headerProject").data("project"),
 			blobKey = context.blobKey != null? context.blobKey.keyString : '',
 			id = context.keyString,
