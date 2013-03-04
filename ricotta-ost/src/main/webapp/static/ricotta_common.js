@@ -140,8 +140,9 @@ function replaceClass(obj, oldClass, newClass) {
 }
 
 function clearLastText() {
-	$(".modal-body .alert").removeClass("show");
+	$(".modal-body .alert").removeClass("show").addClass("hide");
 	$(".modal-body input[type='text']").val("");
+	$(".modal-body input[type='email']").removeClass("input_error");
 	$(".modal-body input[type='email']").val("");
 	$(".modal-body input[type='file']").val("");
 }
