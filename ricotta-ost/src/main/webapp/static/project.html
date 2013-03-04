@@ -92,7 +92,6 @@ function reloadGeneralSetting() {
 }
 function tokenFiltered() {
 	var d = new Date();
-	console.log("start: " + d.getTime());
 	$("#translationToken li").hide();
 	var filtered = false;
 	if($("#contextFilter option:selected").val() != "-1") {
@@ -307,7 +306,6 @@ $(function() {
     loadProjectTokens(p.name);
     p = $("#headerProject").data("project");
     
-    loadProjectContent("generalSetting");
     
     $(".span13 span").bind("click", function(){
     	loadProjectContent($(this).data("target"));
@@ -334,6 +332,7 @@ $(function() {
     appendTranslationContextFilter();
     appendTranslationTokens();
     buildCreateTokenDialog(p);
+    loadProjectContent("generalSetting");
 });
 
 </script>

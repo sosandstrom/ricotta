@@ -90,7 +90,9 @@
 	function deleteProj(projName) {
 		var confirmDelete = confirm("Are you sure you want to delete project: "+ projName);
 		if(confirmDelete) {
-			refreshPageContent("projects");
+			$("#projectItem"+ trim(projName)).remove();
+			//refreshPageContent("projects");
+			
 			ricottaAPI.deleteProj(projName, function(){}, function(status){
 				if("404" == status) {
 					alert("Project " + projName + " already deleted.");
