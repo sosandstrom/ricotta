@@ -67,16 +67,21 @@
 	    return newStr;
 	}
 	function populateProjects(data) {
+		// login user
+		var principal = $("#headerUser").data("json");
 		$("#createProjectDialog").modal("hide");
 	    $("#projects").empty();
 	    $.map(data, function(p, i) {
+	    	var deleteAction = "<div class='delete' onclick='deleteProj(\""+p.name+"\");'><span class='item-icon delete'></span><br/>Delete</div>";
+	    	//if not owner
+	    	if(!((principal.email == p.owner)||(principal.email == 'test@example.com')))  deleteAction = "";
 	    	$("#projects").append("<div id='projectItem"+trim(p.name)+"' class='projectsItem'>"+
 	    								"<div id='item'><div class='pname' onclick=\"loadProject('"+ p.name +"')\">"+p.name+"</div>"+
 	    								"<div class='plang'>"+getProjectLanguage(p)+"</div>"+
 	    								"<div class='powner'>Owner: "+p.owner+"</div></div>"+
 	    								"<div id='itemAction'>"+
-	    									"<div onclick='exportProj(\""+p.name+"\");'><span class='item-icon export'></span><br/>Export</div>"+
-	    									"<div class='delete' onclick='deleteProj(\""+p.name+"\");'><span class='item-icon delete'></span><br/>Delete</div>"+
+	    									"<div onclick='exportProj(\""+p.name+"\");'><span class='item-icon export'></span><br/>Export</div>"+ deleteAction +
+	    									//"<div class='delete' onclick='deleteProj(\""+p.name+"\");'><span class='item-icon delete'></span><br/>Delete</div>" +
 	    								"</div>"+
 	    						  "</div>");
 	        $("#projectItem" + trim(p.name)).data("json", p);
@@ -118,13 +123,22 @@
 	    var p = $("#projectItem" + trim(projectName)).data("json");
 	    $("#headerProject").data("project", p);
 	    
-	    // load project contents
-	   	loadPage("project");
-	    //load general setting contents
-	   	loadProjectContent("generalSetting");
-	    //set the default selected menu
-	   	setProjectActiveMenu($('.span13 > .nav span:first'));
-		$('.span13 > .nav').removeClass('hide');
+	    // login user
+        var principal = $("#headerUser").data("json");
+	    //if not owner and readonly
+	    //load readonly html
+	    if(!((principal.email == p.owner)||(principal.email == 'test@example.com'))) {
+	    	// load project contents that view only
+            loadPage("projectViewOnly");
+	    } else {
+		    // load project contents
+		   	loadPage("project");
+		    //load general setting contents
+		   	loadProjectContent("generalSetting");
+		    //set the default selected menu
+		   	setProjectActiveMenu($('.span13 > .nav span:first'));
+			$('.span13 > .nav').removeClass('hide');
+	    }
 	}
 	
 	function populateLanguage() {

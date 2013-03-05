@@ -36,7 +36,7 @@
         		<div class="container-fluid">
           			<a class="brand" href="javascript:home();">Ricotta</a>
           			<div class="nav-collapse collapse">
-           				<ul class="nav navbar-text pull-right">
+           				<ul class="nav navbar-text pull-right" id="headerUser">
            					<li><a id="headerUserAction" class="login" href="" >Login</a></li>
            					<li class="dropdown">
 		         				<a class="dropdown-toggle" data-toggle="dropdown"><span class="icon-white icon-user"></span> <span id="headerUsername"></span> <b class="caret"></b></a>
@@ -118,6 +118,8 @@
 					tokenTable.fnDestroy();
 					delete tokenTable;// = undefined;
 				} 
+				$(".projectViewOnly").remove();
+				$(".project").remove();
 				loadPage('projects');
 			}
 			function showToast(s) {
@@ -166,7 +168,7 @@
 			//click on project's name
 			$("#headerProject").click(function() {
 				$("#contents").empty();
-			    $("#ricotta_contents").html("<div style='width:100%;text-align:center;'>Loading...</div>").load("project.html");
+				$("#ricotta_contents").html("<div style='width:100%;text-align:center;'>Loading...</div>").load("project.html");
 			});
 			$("#contexts li").live("click", function(){
 				setActiveMenu($("#contexts"), $(this));

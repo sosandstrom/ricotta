@@ -202,19 +202,19 @@ div.horiziontal-divider {
 .project {
 	padding: 10px 0;
 }
-.project > .row-fluid > div.span2 {
+.project > .row-fluid > div.span2, .projectViewOnly  > .row-fluid > div.span2 {
 	height: 100%;
 	overflow:auto;
 	width: 14%;
 }
 
-.project > .row-fluid > div.span2 > .project-title > ul{
+.project > .row-fluid > div.span2 > .project-title > ul, .projectViewOnly  > .row-fluid > div.span2 > .project-title > ul{
 	padding-left: 4px;
 }
 .span2 .project-title {
 	padding:8px 0px 8px 8px;
 }
-.project > .row-fluid > div.span13 {
+.project > .row-fluid > div.span13, .projectViewOnly  > .row-fluid > div.span13 {
 	background: #fff;
 	margin-left: 17%;
 	width: 81%;

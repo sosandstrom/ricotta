@@ -1,0 +1,76 @@
+<div class="projectViewOnly" style="overflow:auto;margin-top:40px;">
+	<div class="row-fluid">
+        <div class="span2">
+            <div class="well sidebar-nav project-title">
+                <ul class="nav nav-list">
+                    <li style="cursor:pointer;">
+                        <span id="projectname"></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="divider vertical-divider"></div>
+        <div class="span13">
+            <div>
+		        <label class="setting-label">Language</label>
+		        <div class="description">
+		            <table class="table table-striped table-bordered">
+		                <thead>
+		                    <tr id="projLangsHeadTR">
+		                        <th>Language</th>
+		                        <th>Default Language</th>
+		                    </tr>
+		                </thead>
+		                <tbody id="projLangsTBody"></tbody>
+		            </table>
+		        </div>
+		    </div>
+        </div>
+    </div>
+<script type="text/javascript">
+function getDefaultLanguage(langCode) {
+    var defaultLang = "No default language";
+    $.map(globalLang, function(l, i){
+        if(l.code == langCode) {
+            defaultLang = l.name;
+            return false;
+        }
+    });
+    return defaultLang;
+}
+function appendLanguageRow(t) {
+    $("#projLangsTBody").append('<tr id="pl_' + t.langCode + '"></tr>');
+    
+    $("#pl_" + t.langCode).append('<td>' + getLanguageName(t.langCode) + '</td>');
+    $("#pl_" + t.langCode).append('<td>' + getDefaultLanguage(t.defaultLang ? t.defaultLang.name : '') + '</td>');
+}
+
+function buildProjLangsTable() {
+    p = $("#headerProject").data("project");
+    $("#projLangsTBody").empty();
+    // load global langauges globalLang is ready loaded in the projects page
+    $.map(p.projLangs, function(t, index) {
+        appendLanguageRow(t);
+    });
+}
+
+function updateVerticalDivider() {
+    $(".vertical-divider").css("height", $(window).height() + "px");
+    
+    if($("body").height() > $(window).height()) {
+        $(".vertical-divider").css("height", $("body").height() + "px");
+    }
+}
+
+function displayProjectTitle(){
+	p = $("#headerProject").data("project");
+	$("#projectname").text(p.name);
+}
+
+$(function() {
+	displayProjectTitle();
+	updateVerticalDivider();
+	buildProjLangsTable();
+});
+</script>
+</div>
