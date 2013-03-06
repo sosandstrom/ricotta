@@ -118,6 +118,13 @@
 	    });
 		return lang.substring(0, lang.length - 2);//remove the last comma
 	}
+	
+	function loadProjectTokens(pname) {
+	    ricottaAPI.getProjectTokens(pname, function(data){
+	        $("#headerProject").data("project", data);
+	    }, showToast);
+	}
+	
 	function loadProject(projectName) {
 	    // copy json from table to header
 	    var p = $("#projectItem" + trim(projectName)).data("json");
@@ -127,18 +134,20 @@
         var principal = $("#headerUser").data("json");
 	    //if not owner and readonly
 	    //load readonly html
+		loadProjectTokens(projectName);
+		loadPage("project");
+		/*
 	    if(!((principal.email == p.owner)||(principal.email == 'test@example.com'))) {
 	    	// load project contents that view only
             loadPage("projectViewOnly");
 	    } else {
 		    // load project contents
-		   	loadPage("project");
 		    //load general setting contents
 		   	loadProjectContent("generalSetting");
 		    //set the default selected menu
 		   	setProjectActiveMenu($('.span13 > .nav span:first'));
 			$('.span13 > .nav').removeClass('hide');
-	    }
+	    }*/
 	}
 	
 	function populateLanguage() {

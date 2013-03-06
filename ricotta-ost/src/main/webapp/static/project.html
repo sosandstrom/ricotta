@@ -84,7 +84,8 @@
 //this array is used only once. it will be removed after tokens table already generated except the token subset header.
 var tokensArrDataTable, 
 	tokenSubsetHeader, 
-	tokenTable;
+	tokenTable,
+	readonly = false;
 function reloadGeneralSetting() {
 	setProjectActiveMenu($('.span13 > .nav span:first'));
 	$('.span13 > .nav').removeClass('hide');
@@ -130,34 +131,57 @@ function addTokenDataTableArr() {
 }
 
 function addTokenDataTable(p, t) {
-	var selectContext = '<select id="context_' + t.id + '" onChange="setChanged(' + t.id + ');" ><option value="_NO_CONTEXT_">No Context</option>';
+	var selectContext = "";
+	if(!readonly) {
+		selectContext = '<select id="context_' + t.id + '" onChange="setChanged(' + t.id + ');" ><option value="_NO_CONTEXT_">No Context</option>';
+	}
+	else {
+		selectContext = '<select disabled id="context_' + t.id + '><option value="_NO_CONTEXT_">No Context</option>';
+	}
 	$.map(p.contexts, function(c, ci) {
 		selectContext += ('<option value="' + c.name + '" ' + (c.name == t.context ? 'selected="selected" ' : '') +'>' + c.name + '</option>');
     });
-	var arr = [t.name,
-	           '<span id="delete_' + t.id + '" class="icon-trash icon-black" onClick="deleteToken(\''+t.name+'\', ' + t.id + ', $(this));" />', 
-			   '<span id="save_' + t.id + '" class="icon-hdd icon-black" onClick="saveToken(' + t.id + ');" style="display: none; margin-right: 5px;" > Update </span>',
-			   '<input type="text" id="name_' + t.id + '" value="' + t.name + '" onChange="setChanged(' + t.id + ');" />',
-			   '<input type="text" id="description_' + t.id + '" value="' + t.description + '" onChange="setChanged(' + t.id + ');" />',
+	var arr;
+	console.log(readonly);
+	if(!readonly) {
+		arr = [t.name,
+		           '<span id="delete_' + t.id + '" class="icon-trash icon-black" onClick="deleteToken(\''+t.name+'\', ' + t.id + ', $(this));" />', 
+				   '<span id="save_' + t.id + '" class="icon-hdd icon-black" onClick="saveToken(' + t.id + ');" style="display: none; margin-right: 5px;" > Update </span>',
+				   '<input type="text" id="name_' + t.id + '" value="' + t.name + '" onChange="setChanged(' + t.id + ');" />',
+				   '<input type="text" id="description_' + t.id + '" value="' + t.description + '" onChange="setChanged(' + t.id + ');" />',
+				   selectContext];
+	}
+	else {
+		arr = [t.name,
+			   '<span>' +t.name + '</span>',
+			   '<span>' + t.description + '</span>',
 			   selectContext];
+	}
 	$.map(p.subsets, function(s, si) {
 		var checked = "";
 		$.map(t.subsets, function(ts, tsi) {
 			if(ts.id == s.id && ts != 'null') checked = "checked";
 			else checked = "";
 	    });
-        var sToken = '<input '+ checked +' type="checkbox" id="subset_' + t.id + '_' + s + '"' +' name="subsets_' + t.id + '"' +' value="' + s + '"' + ' title="' + t.name + ':' + s + '" onChange="setChanged(' + t.id + ');"/>';
+		var sToken = "";
+		if(!readonly) {
+			sToken = '<input '+ checked +' type="checkbox" id="subset_' + t.id + '_' + s + '"' +' name="subsets_' + t.id + '"' +' value="' + s + '"' + ' title="' + t.name + ':' + s + '" onChange="setChanged(' + t.id + ');"/>';
+		}
+		else {
+			sToken = '<input disabled '+ checked +' type="checkbox" id="subset_' + t.id + '_' + s + '"' +' name="subsets_' + t.id + '"' +' value="' + s + '"' + ' title="' + t.name + ':' + s + '"/>';
+		}
 		arr.push(sToken);
     });
 	return arr;
 }
 
+/*
 function loadProjectTokens(pname) {
     ricottaAPI.getProjectTokens(pname, function(data){
         $("#headerProject").data("project", data);
         addTokenDataTableArr();
     }, showToast);
-}
+}*/
 
 function updateVerticalDivider() {
 	$(".vertical-divider").css("height", $(window).height() + "px");
@@ -214,7 +238,9 @@ function appendTokenSideBar(token, projLangs) {
 	$("#translationToken").append("<li id='trans_token_"+token.id+"' data-context='"+token.context+"'><input onclick=\"loadTranslation('"+token.id+"')\" type='radio' name='token' id='radio"+token.id+"' value='"+token.id+"'>"+
 									   "<label for='radio"+token.id+"'>" + label +"</label>"+
 								   "</li>");
-	
+	if(readonly) {
+		$("#trans_token_"+token.id).find("input[type='radio']").remove();
+	}
 	$("#trans_token_"+token.id).data("uncompletTranslation", getUncompleteTranslation(projLangs, token.completedTranslation));
 }
 
@@ -288,10 +314,6 @@ function createToken() {
       }
 }
 
-function refreshSideBar() {
-	
-}
-
 function buildCreateTokenDialog(p) {
     $.map(p.contexts, function(c, ci) {
         $("#toknContext").append('<option value="' + c.name + '">' + c.name + '</option>');
@@ -300,12 +322,26 @@ function buildCreateTokenDialog(p) {
     	$("#toknSubset").append('<option value="'+ s +'">' + s + '</option>');
     });
 }
+function isReadOnly() {
+	var p = $("#headerProject").data("project");
+	var loginUser = $("#headerUser").data("json");
+	for(var i in p.users) {
+    	var u = p.users[i];
+    	if(u.user == loginUser.email && u.role == 1) {
+    		readonly = true;
+    		return;
+    	}
+    }
+}
+
 $(function() {
     var p = $("#headerProject").data("project");
     $("#projectname").text(p.name);
-    loadProjectTokens(p.name);
-    p = $("#headerProject").data("project");
     
+    isReadOnly();
+    addTokenDataTableArr();
+    //loadProjectTokens(p.name);
+    //p = $("#headerProject").data("project");
     
     $(".span13 span").bind("click", function(){
     	loadProjectContent($(this).data("target"));
@@ -331,8 +367,14 @@ $(function() {
     appendUncompletTranslationFilter(p);
     appendTranslationContextFilter();
     appendTranslationTokens();
-    buildCreateTokenDialog(p);
-    loadProjectContent("generalSetting");
+    if(readonly) {
+    	//clean unuse button
+    	$("#addTranslation").remove();
+    }
+    else {
+		buildCreateTokenDialog(p);
+    }
+	loadProjectContent("generalSetting");
 });
 
 </script>

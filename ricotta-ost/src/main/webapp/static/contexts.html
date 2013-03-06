@@ -205,6 +205,7 @@
 	}
 	
 	$(function() {
+		
 		$("#buttonAddContext").click(function(){
 			$(".alert-error").removeClass("show").addClass("hide");
 			var ctxName = $("#contextName");
@@ -252,6 +253,14 @@
 		});
 	    
 	    buildContextsTable(p);
+	    if(readonly) {
+			$(".contexts .btn").remove();
+			$(".contexts .table th:first-child").next().remove();
+			$(".contexts .table th:first-child").remove();
+			$(".contexts .table td:first-child").next().remove();
+			$(".contexts .table td:first-child").remove();
+			$(".contexts .table input[type='text']").attr("readonly", "true");
+		}
 	    $("#createContextDialog").modal("hide");
 	    $("a.lightbox").lightBox({
 	    	imageLoading: 'img/loading.gif',

@@ -188,6 +188,11 @@
 		
 	
 	$(function() {
+		if(readonly) {
+			$(".tokens .btn").remove();
+			//remove some token column header before render the data
+			$("#tokensHeadTR").find("span.icon-black").parent().remove();
+		}
 		$("#createTokenDialog").modal({show: false});
 	    var p = $("#headerProject").data("project");
 	    appendSubset(p);

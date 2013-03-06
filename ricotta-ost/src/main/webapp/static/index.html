@@ -118,7 +118,6 @@
 					tokenTable.fnDestroy();
 					delete tokenTable;// = undefined;
 				} 
-				$(".projectViewOnly").remove();
 				$(".project").remove();
 				loadPage('projects');
 			}
@@ -145,6 +144,7 @@
 			    $(".dropdown-menu li").live("click", function(){
 			    	var page = $(this).data("target");//get the link page
 			    	setActiveMenu($(".pull-right .dropdown-menu"), $(this));
+			    	$(".project").remove();
 			    	loadPage(page);
 			    });
 			}
@@ -173,12 +173,14 @@
 			$("#contexts li").live("click", function(){
 				setActiveMenu($("#contexts"), $(this));
 				var targetContext = $(this).find("a").data("target");
+				$(".project").remove();
 				onContextChange(targetContext);
 			});
 			
 			$("#languages li").live("click", function() {
 				setActiveMenu($("#languages"), $(this));
 				var targetLanguage = $(this).find("a").data("target");
+				$(".project").remove();
 				onLanguageChange(targetLanguage);
 			});
         </script>

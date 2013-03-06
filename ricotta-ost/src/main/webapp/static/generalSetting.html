@@ -445,5 +445,11 @@
 		buildProjLangsTable();
 		buildProjUserTable(p);
 		loadSubsets(p.name);
+		if(readonly) {
+			$(".description .btn").remove();
+			$(".description .table th:last-child, .description .table td:last-child").remove();
+			$("#projUserTBody > tr > td > select").removeAttr("onchange");
+			$("#projUserTBody > tr > td > select").attr("disabled", "disabled");
+		}
 	});
 </script>
