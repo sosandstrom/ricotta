@@ -423,8 +423,6 @@
 		        		successCallback(data);
 		        	}
 		            hideToast();
-		            $("#headerProject").data("project", data);
-		            $("#projectTabs").show();
 		        },
 		        error: function(req, textStatus, errorThrown) {
 		        	if(typeof failCallback === 'function') {

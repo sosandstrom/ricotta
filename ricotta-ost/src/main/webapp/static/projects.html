@@ -34,8 +34,18 @@
 		</div>
 	</div>
 	
-	<script type="text/javascript">
+<script type="text/javascript">
 	var globalLang;
+	var dataObject, arrayProjects;
+	function initDataObject() {
+		dataObject = {
+			tokensArrDataTable: null, 
+			tokenSubsetHeader: null,
+			currentProject: null,
+			projects: null,
+			tokenTable: null,
+		};
+	}
 	function setDefaultLang() {
 		$("#defaultLang").val("en_GB");
 	}
@@ -67,40 +77,45 @@
 	    return newStr;
 	}
 	function populateProjects(data) {
+		if(typeof dataObject === 'undefined') {
+			initDataObject();
+		}
+		dataObject.projects = [];
 		// login user
 		var principal = $("#headerUser").data("json");
 		$("#createProjectDialog").modal("hide");
 	    $("#projects").empty();
 	    $.map(data, function(p, i) {
-	    	var deleteAction = "<div class='delete' onclick='deleteProj(\""+p.name+"\");'><span class='item-icon delete'></span><br/>Delete</div>";
+	    	var deleteAction = "<div class='delete' onclick='deleteProj(\""+i+"\");'><span class='item-icon delete'></span><br/>Delete</div>";
 	    	//if not owner
 	    	if(!((principal.email == p.owner)||(principal.email == 'test@example.com')))  deleteAction = "";
 	    	$("#projects").append("<div id='projectItem"+trim(p.name)+"' class='projectsItem'>"+
-	    								"<div id='item'><div class='pname' onclick=\"loadProject('"+ p.name +"')\">"+p.name+"</div>"+
+	    								"<div id='item'><div class='pname' onclick=\"loadProject('"+ i +"')\">"+p.name+"</div>"+
 	    								"<div class='plang'>"+getProjectLanguage(p)+"</div>"+
 	    								"<div class='powner'>Owner: "+p.owner+"</div></div>"+
 	    								"<div id='itemAction'>"+
-	    									"<div onclick='exportProj(\""+p.name+"\");'><span class='item-icon export'></span><br/>Export</div>"+ deleteAction +
+	    									"<div onclick='exportProj(\""+i+"\");'><span class='item-icon export'></span><br/>Export</div>"+ deleteAction +
 	    									//"<div class='delete' onclick='deleteProj(\""+p.name+"\");'><span class='item-icon delete'></span><br/>Delete</div>" +
 	    								"</div>"+
 	    						  "</div>");
-	        $("#projectItem" + trim(p.name)).data("json", p);
+	    	dataObject.projects.push(p);
+	    	delete p;
 	    });
 	}
 	
-	function exportProj(projName) {
-		window.location.href= "http://"+ location.host + ricottaAPI.getExportUrl(projName);
+	function exportProj(i) {
+		window.location.href= "http://"+ location.host + ricottaAPI.getExportUrl(dataObject.projects[i].name);
 	}
 	
-	function deleteProj(projName) {
-		var confirmDelete = confirm("Are you sure you want to delete project: "+ projName);
+	function deleteProj(i) {
+		var confirmDelete = confirm("Are you sure you want to delete project: "+ dataObject.projects[i].name);
 		if(confirmDelete) {
-			$("#projectItem"+ trim(projName)).remove();
+			$("#projectItem"+ dataObject.projects[i].name).remove();
 			//refreshPageContent("projects");
 			
-			ricottaAPI.deleteProj(projName, function(){}, function(status){
+			ricottaAPI.deleteProj(dataObject.projects[i].name, function(){}, function(status){
 				if("404" == status) {
-					alert("Project " + projName + " already deleted.");
+					alert("Project " + dataObject.projects[i].name + " already deleted.");
 				}
 			});
 		}
@@ -121,33 +136,18 @@
 	
 	function loadProjectTokens(pname) {
 	    ricottaAPI.getProjectTokens(pname, function(data){
-	        $("#headerProject").data("project", data);
+	    	dataObject.currentProject = data;
 	    }, showToast);
 	}
 	
-	function loadProject(projectName) {
-	    // copy json from table to header
-	    var p = $("#projectItem" + trim(projectName)).data("json");
-	    $("#headerProject").data("project", p);
-	    
-	    // login user
-        var principal = $("#headerUser").data("json");
-	    //if not owner and readonly
-	    //load readonly html
-		loadProjectTokens(projectName);
+	function loadProject(i) {
+		if(typeof dataObject === 'undefined') {
+			initDataObject();
+			dataObject.projects = arrayProjects;
+			delete arrayProjects;
+		}
+		loadProjectTokens(dataObject.projects[i].name);
 		loadPage("project");
-		/*
-	    if(!((principal.email == p.owner)||(principal.email == 'test@example.com'))) {
-	    	// load project contents that view only
-            loadPage("projectViewOnly");
-	    } else {
-		    // load project contents
-		    //load general setting contents
-		   	loadProjectContent("generalSetting");
-		    //set the default selected menu
-		   	setProjectActiveMenu($('.span13 > .nav span:first'));
-			$('.span13 > .nav').removeClass('hide');
-	    }*/
 	}
 	
 	function populateLanguage() {
@@ -177,7 +177,6 @@
 	        }
 		});
 		$("#createProjectDialog").modal({show:false});
-	   
 	    //retrieve all project
 		ricottaAPI.getProjects(populateProjects);
 	            

@@ -105,7 +105,8 @@ function loadPage(page) {
 	showToast("Loading...");
 	$("#contents .show").removeClass("show").addClass("hide");
 	if($("."+page).length == 0) {
-		$.get(page + ".html", function(content) {
+		if(ajaxCalled != null) ajaxCalled.abort();//abort the last called
+		ajaxCalled = $.get(page + ".html", function(content) {
 			$("#contents").append(content);
 			$("."+page).addClass("show");
 			hideToast();
@@ -121,7 +122,8 @@ function loadProjectContent(pageContent) {
 	$("#ajaxLoader").show();
 	$("#projectSetting .show").removeClass("show").addClass("hide");
 	if($("."+pageContent).length == 0) {
-		$.get(pageContent + ".html", function(content) {
+		if(ajaxCalled != null) ajaxCalled.abort(); //abort the last call to avoid the duplicate content
+		ajaxCalled = $.get(pageContent + ".html", function(content) {
 			$("#projectSetting").append(content);
 			$("."+pageContent).addClass("show");
 			//hideToast();

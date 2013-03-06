@@ -25,23 +25,23 @@
 	function deleteToken(name, id, obj) {
 		var confirmDelete = confirm("Are you sure you want to delete token "+ name);
 		if(confirmDelete) {
-			var p = $("#headerProject").data("project");
+			
 			
 			//need to remove from oaData
-			var anSelected = tokenTable.$(obj.parent().parent());//retrieved it tr
+			var anSelected = dataObject.tokenTable.$(obj.parent().parent());//retrieved it tr
 			//we can use this value to remove the token from the current token data table array
 			var deleteToken = $(anSelected[0]).find("td").eq(2).children()[0].value;
-			for(i in tokensArrDataTable) {
-				var tokenDataTable = tokensArrDataTable[i];
+			for(i in dataObject.tokensArrDataTable) {
+				var tokenDataTable = dataObject.tokensArrDataTable[i];
 				if(tokenDataTable[0] === deleteToken) {
-					tokensArrDataTable.splice(i,1);
+					dataObject.tokensArrDataTable.splice(i,1);
 				}
 			}
 			if ( anSelected.length !== 0 ) {
-				tokenTable.fnDeleteRow(anSelected[0], function(){}, true);
+				dataObject.tokenTable.fnDeleteRow(anSelected[0], function(){}, true);
 			}
 			
-			ricottaAPI.deleteToken(id, p.name, function(){
+			ricottaAPI.deleteToken(id, dataObject.currentProject.name, function(){
 				removeTokenFromSideBar(id);
 			}, function(){});
 		}
@@ -49,22 +49,22 @@
 	
 	
 	function refreshToken() {
-		tokenTable = $("#tableToken").dataTable({
+		dataObject.tokenTable = $("#tableToken").dataTable({
   			"bSort": false,
   			"bInfo": true,
-  			"aaData": tokensArrDataTable,
+  			"aaData": dataObject.tokensArrDataTable,
   			"bDeferRender": true,
   			"asStripClasses": null,
   			bAutoWidth:false
   		});
-	    tokenTable.fnSetColumnVis(0, false);
+	    dataObject.tokenTable.fnSetColumnVis(0, false);
 	    $("#tableToken_filter input").keyup(function(){
-	    	tokenTable.fnFilter($(this).val(), 0, false, false);
+	    	dataObject.tokenTable.fnFilter($(this).val(), 0, false, false);
 	    });
 	}
 	
 	function saveToken(id) {
-	    var p = $("#headerProject").data("project");
+	    
 	    
 	    var subsets = $(':checked[name="subsets_' + id + '"]').map(function() {
 	        return this.value;
@@ -77,7 +77,7 @@
 	            subsets: subsets.join(','),
 	            separator: ','
 	        };
-	    ricottaAPI.saveToken(p.name, id, body, function(){
+	    ricottaAPI.saveToken(dataObject.currentProject.name, id, body, function(){
 	    	updateModel(id, body.name, body.description, body.context, subsets, body.separator);
 	        clearChanged(id);
 	    });
@@ -85,8 +85,8 @@
 	
 	function updateModel(id, name, description, context, subsets, separator) {
 	    // find this token in data
-	    var p = $("#headerProject").data("project");
-	    $.map(p.tokens, function(t, i) {
+	    
+	    $.map(dataObject.currentProject.tokens, function(t, i) {
 	        if (t.id == id) {
 	            t.name = name;
 	            t.description = description;
@@ -126,12 +126,12 @@
 	    $("#token_" + t.id).append('<td><input type="text" id="name_' + t.id + '" value="' + t.name + '" onChange="setChanged(' + t.id + ');" /></td>');
 	    $("#token_" + t.id).append('<td><input type="text" id="description_' + t.id + '" value="' + t.description + '" onChange="setChanged(' + t.id + ');" /></td>');
 	    $("#token_" + t.id).append('<td><select id="context_' + t.id + '" onChange="setChanged(' + t.id + ');" ><option value="_NO_CONTEXT_">_NO_CONTEXT_</option></select></td>');
-	    $.map(p.contexts, function(c, ci) {
+	    $.map(dataObject.currentProject.contexts, function(c, ci) {
 	        $("#context_" + t.id).append('<option value="' + c.name + '" ' + 
 	            (c.name == t.context ? 'selected="selected" ' : '') +
 	            '>' + c.name + '</option>');
 	    });
-	    $.map(p.subsets, function(s, si) {
+	    $.map(dataObject.currentProject.subsets, function(s, si) {
 	        $("#token_" + t.id).append('<td data-subset="'+s+'"><input type="checkbox" id="subset_' + t.id + '_' + s + '"' +
 	            ' name="subsets_' + t.id + '"' +
 	            ' value="' + s + '"' + 
@@ -143,22 +143,22 @@
 	}
 	
 	
-	function appendSubset(p) {
-		for(var i in tokenSubsetHeader) {
-			$("#tokensHeadTR").append(tokenSubsetHeader[i]);
+	function appendSubset() {
+		for(var i in dataObject.tokenSubsetHeader) {
+			$("#tokensHeadTR").append(dataObject.tokenSubsetHeader[i]);
 		}
 	}
-	function buildTokensTable(p) {
-		appendSubset(p);
-	    $.map(p.tokens, function(t, index) {
+	function buildTokensTable() {
+		appendSubset();
+	    $.map(dataObject.currentProject.tokens, function(t, index) {
 	    	updateTokenTable(p, t);
 	    });
 	}
 	
 	function removeSubsetColumn(subset) {
 		var index;
-		if(tokenTable != undefined) {
-      		tokenTable.fnDestroy();
+		if(dataObject.tokenTable != undefined) {
+      		dataObject.tokenTable.fnDestroy();
   		}
 		$("#tokensHeadTR th").each(function(i){
 			if($(this).data("subset") == subset) {
@@ -172,17 +172,17 @@
 			$(this).find("td").eq(index).remove();
 		});
 		
-		tokenTable = $("#tableToken").dataTable({
+		dataObject.tokenTable = $("#tableToken").dataTable({
   			"bSort": false,
   			"bInfo": true,
-  			"aaData": tokensArrDataTable,
+  			"aaData": dataObject.tokensArrDataTable,
   			"bDeferRender": true,
   			"asStripClasses": null,
   			bAutoWidth:false
   		});
-	    tokenTable.fnSetColumnVis(0, false);
+	    dataObject.tokenTable.fnSetColumnVis(0, false);
 	    $("#tableToken_filter input").keyup(function(){
-	    	tokenTable.fnFilter($(this).val(), 0, false, false);
+	    	dataObject.tokenTable.fnFilter($(this).val(), 0, false, false);
 	    });
 	}
 		
@@ -194,19 +194,19 @@
 			$("#tokensHeadTR").find("span.icon-black").parent().remove();
 		}
 		$("#createTokenDialog").modal({show: false});
-	    var p = $("#headerProject").data("project");
-	    appendSubset(p);
-	    tokenTable = $("#tableToken").dataTable({
+	    
+	    appendSubset();
+	    dataObject.tokenTable = $("#tableToken").dataTable({
   			"bSort": false,
   			"bInfo": true,
-  			"aaData": tokensArrDataTable,
+  			"aaData": dataObject.tokensArrDataTable,
   			"bDeferRender": true,
   			"asStripClasses": null,
   			bAutoWidth:false
   		});
-	    tokenTable.fnSetColumnVis(0, false);
+	    dataObject.tokenTable.fnSetColumnVis(0, false);
 	    $("#tableToken_filter input").keyup(function(){
-	    	tokenTable.fnFilter($(this).val(), 0, false, false);
+	    	dataObject.tokenTable.fnFilter($(this).val(), 0, false, false);
 	    });
 	});
 	

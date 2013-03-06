@@ -75,12 +75,12 @@ function buildTranslation(p, token) {
 	/*if(token.context) {
 		
 	}*/
-	$.map(p.contexts, function(c, index){
+	$.map(dataObject.currentProject.contexts, function(c, index){
 		if(c.blobKey != "" && null != c.blobKey && c.name == token.context) {
-			buildContextImage(p.name, c.blobKey, c.name);
+			buildContextImage(dataObject.currentProject.name, c.blobKey, c.name);
 		}
 	});
-	$.map(p.projLangs, function(l, index){
+	$.map(dataObject.currentProject.projLangs, function(l, index){
 		//$("#languageWrapper").append();
 		appendLanguage(l, index, token.trans);
 	});
@@ -92,7 +92,7 @@ function showError() {
 	
 }
 function addTranslation() {
-	var p = $("#headerProject").data("project");
+	
 	var tokenId = $("#selectedToken").data("tokenId");
 	var langCode = new Array(), langVal = new Array();
 	$("#languageWrapper #translationBody textarea").each(function(){
@@ -100,7 +100,7 @@ function addTranslation() {
 		langVal.push($(this).val());
 	});
 	
-	ricottaAPI.updateTranslation(langCode, langVal, p.name, tokenId, function(){
+	ricottaAPI.updateTranslation(langCode, langVal, dataObject.currentProject.name, tokenId, function(){
 		$("#successMessage").text("Translation saved...").parent().removeClass("hide");
 	}, function(){});
 	
@@ -110,23 +110,23 @@ function refreshTranslation(btn) {
 	if(btn != undefined && btn.hasClass("btn-disabled")) {
 		return false;
 	}
-	var p = $("#headerProject").data("project");
+	
 	var tokenId = $("#selectedToken").data("tokenId");
 	$("#translationTokenTitle, #translationBody, #context").empty();
-	ricottaAPI.getToken(tokenId, p.name, function(token){buildTranslation(p, token)}, showError);
+	ricottaAPI.getToken(tokenId, dataObject.currentProject.name, function(token){buildTranslation(dataObject.currentProject, token)}, showError);
 }
 $(function() {
 	$("#editTransDialog").modal({show:false});
-    var p = $("#headerProject").data("project");
+    
     //get the token with given token id and build the translation field
     var tokenId = $("#selectedToken").data("tokenId");
     $(".translation").children(":first").attr("class", "translation_token"+tokenId);
-    ricottaAPI.getToken(tokenId, p.name, function(token){buildTranslation(p, token)}, showError);
+    ricottaAPI.getToken(tokenId, dataObject.currentProject.name, function(token){buildTranslation(dataObject.currentProject, token)}, showError);
     /*
     $("#contexts").data("sel", "");
-    $("#languages").data("sel", p.defProjLang);
+    $("#languages").data("sel", dataObject.currentProject.defProjLang);
 
-    buildProjectTiles(p);
+    buildProjectTiles();
     updateTokens();*/
 });
 

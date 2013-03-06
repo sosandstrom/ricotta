@@ -55,13 +55,13 @@
 	}
 	
 	$(function(){
-		var p = $("#headerProject").data("project");
+		
 		$("#createSubsetDialog").modal({show: false});
 		$("#createSubsetDialog").find("a.btn-success").click(function(){
 			//create new subset
-			createNewSubset(p.name);
+			createNewSubset(dataObject.currentProject.name);
 			$("#createSubsetDialog").modal("hide");
 		});
-		loadSubsets(p.name);
+		loadSubsets(dataObject.currentProject.name);
 	});
 </script>

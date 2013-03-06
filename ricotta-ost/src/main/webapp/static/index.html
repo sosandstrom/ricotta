@@ -109,15 +109,17 @@
 			$.ajaxSetup({
 			    cache: false,
 			    data: null,
-			    async: false
+			    async: true
 			});
+			var ajaxCalled = null;
 			function home() {
-				delete tokensArrDataTable; 
-				delete tokenSubsetHeader; 
-				if(typeof tokenTable !== 'undefined' && tokenTable != null) {
-					tokenTable.fnDestroy();
-					delete tokenTable;// = undefined;
-				} 
+				if(typeof dataObject.tokenTable !== 'undefined' && dataObject.tokenTable != null) {
+					dataObject.tokenTable.fnClearTable();
+					dataObject.tokenTable.fnDestroy();
+				}
+				arrayProjects = dataObject.projects;
+				delete dataObject; 
+				
 				$(".project").remove();
 				loadPage('projects');
 			}

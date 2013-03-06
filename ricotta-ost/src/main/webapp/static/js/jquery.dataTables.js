@@ -5527,7 +5527,9 @@
 			}
 			
 			/* End it all */
+			delete oSettings.aoData;
 			oSettings = null;
+			delete oInit.aaData;
 			oInit = null;
 		};
 		

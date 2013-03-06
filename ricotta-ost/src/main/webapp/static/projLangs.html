@@ -43,7 +43,7 @@
 	}
 	
 	function saveProjLang(id) {
-	    var p = $("#headerProject").data("project");
+	    
 	    
 	    var subsets = $(':checked[name="subsets_' + id + '"]').map(function() {
 	        return this.value;
@@ -56,7 +56,7 @@
 	            subsets: subsets.join(','),
 	            separator: ','
 	        };
-	    ricottaAPI.saveToken(p.name, id, body, function(){
+	    ricottaAPI.saveToken(dataObject.currentProject.name, id, body, function(){
 	    	updateModel(id, body.name, body.description, body.context, subsets, body.separator);
 	        clearChanged(id);
 	    });
@@ -65,8 +65,8 @@
 	
 	function updateModel(id, name, description, context, subsets, separator) {
 	    // find this token in data
-	    var p = $("#headerProject").data("project");
-	    $.map(p.projLangs, function(t, i) {
+	    
+	    $.map(dataObject.currentProject.projLangs, function(t, i) {
 	        if (t.langCode == id) {
 	            t.name = name;
 	            t.description = description;
@@ -87,13 +87,13 @@
 	    $("#save_" + id).hide();
 	}
 	
-	function buildCreateProjLangDialog(p) {
-	    $.map(p.contexts, function(c, ci) {
+	function buildCreateProjLangDialog() {
+	    $.map(dataObject.currentProject.contexts, function(c, ci) {
 	        $("#projLangContext").append('<option value="' + c.name + '">' + c.name + '</option>');
 	    });
 	}
 	
-	function buildProjLangsTable(p) {
+	function buildProjLangsTable() {
 	
 	    // build projLangs array
 	    $("#projLangDefault").empty();
@@ -101,7 +101,7 @@
 	    $("#projLangsTBody").empty();
 	    
 	    var pls = new Array();
-	    $.map(p.projLangs, function(t, index) {
+	    $.map(dataObject.currentProject.projLangs, function(t, index) {
 	        pls.push(t.langCode);
 	        // add to dialog select
 	        $("#projLangDefault").append('<option value="' + t.langCode + '" >' + t.langCode + '</option>');
@@ -131,7 +131,7 @@
 	}
 	
 	function createProjLang() {
-		var p = $("#headerProject").data("project");
+		
         var projLangCode = $("#projLangCode"),
             projLangDefault = $("#projLangDefault"),
             allFields = $([]).add(projLangCode, projLangDefault),
@@ -146,11 +146,9 @@
                 defaultLang: projLangDefault.val()
             };
         	
-        	ricottaAPI.addProjectLanguage(p.name, data, function(d){
-                loadProject(p.name);
+        	ricottaAPI.addProjectLanguage(dataObject.currentProject.name, data, function(d){
+                loadProject(dataObject.currentProject.name);
                 refreshPageContent("translations");
-                p = $("#headerProject").data("project");
-                //buildProjLangsTable(p);
         	}, updateTips);
         }
         
@@ -162,9 +160,9 @@
 		$("#createProjLangDialog").find("a.btn-success").click(function(){
 			createProjLang();
 		});
-	    var p = $("#headerProject").data("project");
+	    
 	
-	    buildProjLangsTable(p);
+	    buildProjLangsTable();
 	});
 	
 	</script>

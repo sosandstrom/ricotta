@@ -134,27 +134,27 @@
 	var pls = new Array();
 	
 	function updateUserRole(option, key) {
-		var p = $("#headerProject").data("project");
+		
 		var role = option.find("option:selected").val();
 
-		ricottaAPI.updateUser(p.name, role, key, function() {}, function(){});
+		ricottaAPI.updateUser(dataObject.currentProject.name, role, key, function() {}, function(){});
 	}
-	function buildProjUserTable(p) {
+	function buildProjUserTable() {
 		if(globalRoles == undefined) {
 			ricottaAPI.loadRoles(function(roles) {
 				globalRoles = roles;
 				appendUserRoleOption(roles);
-				appendProjectUser(p);
+				appendProjectUser();
 			});
 		}
 		else {
 			appendUserRoleOption(globalRoles);
-			appendProjectUser(p);
+			appendProjectUser();
 		}
 	}
-	function appendProjectUser(p) {
+	function appendProjectUser() {
 		$("#projUserTBody").empty();
-		$.map(p.users, function(u, i) {
+		$.map(dataObject.currentProject.users, function(u, i) {
 			appendUser(u, i);
 		});
 	}
@@ -165,10 +165,10 @@
 						  .append("<td><span id='delete_" + u.user + "' class='icon-trash icon-black' onClick=\"deleteProUser('" + u.user + "');\">Delete</span></td>");
 	}
 	function deleteProUser(email) {
-		var p = $("#headerProject").data("project");
+		
 		var confirmDelete = confirm("Are you sure you want to delete user: " + email);
 		if(confirmDelete) {
-			ricottaAPI.deleteUser(p.name, email, function(){
+			ricottaAPI.deleteUser(dataObject.currentProject.name, email, function(){
 				//just remove user from the table. no need to reload project
 				$("#projUserTBody tr[data-user='"+email+"']").remove();
 			},function(){});
@@ -194,11 +194,10 @@
 	}
 
 	function clearOldeLangSelect() {
-		p = $("#headerProject").data("project");
 	    // build projLangs array
 	    $("#projLangCode").empty();
 	    $("#projLangDefault option").not(":first").remove();
-	    $.map(p.projLangs, function(t, index) {
+	    $.map(dataObject.currentProject.projLangs, function(t, index) {
 	    	$("#projLangDefault").append('<option value="' + t.langCode + '" >' + t.langCode + '</option>');
 	    });
 	    $.map(globalLang, function(lang, index) {
@@ -209,13 +208,12 @@
         });
 	}
 	function buildProjLangsTable() {
-		p = $("#headerProject").data("project");
 	    // build projLangs array
 	    $("#projLangDefault option").not(":first").remove();
 	    $("#projLangCode").empty();
 	    $("#projLangsTBody").empty();
 	    // load global langauges globalLang is ready loaded in the projects page
-	    appendProjLangTable(p);
+	    appendProjLangTable();
     	$.map(globalLang, function(lang, index) {
             // only list if not already project language
             if (-1 == pls.indexOf(lang.code)) {
@@ -224,13 +222,13 @@
         });
 	}
 	
-	function appendProjLangTable(p) {
+	function appendProjLangTable() {
 		$("#projLangsTBody").empty();
-		addProjectLang(p);
-		appendUncompletTranslationFilter(p);
+		addProjectLang();
+		appendUncompletTranslationFilter();
 	}
-	function addProjectLang(p) {
-    	$.map(p.projLangs, function(t, index) {
+	function addProjectLang() {
+    	$.map(dataObject.currentProject.projLangs, function(t, index) {
     		appendLanguage(t);
 	    });
 	}
@@ -252,7 +250,7 @@
 	}
 	
 	function deleteProjLang(langCode) {
-		var p = $("#headerProject").data("project");
+		
 		var confirmDelete = confirm("Are you sure you want to delete langage: " + getLanguageName(langCode));
 		if(confirmDelete) {
 			//remove from project lang
@@ -264,14 +262,14 @@
 			if(-1 != lIndex) {
 				pls.splice(lIndex, 1);
 			}
-			var langList = $("#headerProject").data("project").projLangs;
+			var langList = dataObject.currentProject.projLangs;
 			//remove from project header as well???
 			for(var i in langList) {
 				if(langList[i].langCode != undefined && langList[i].langCode == langCode) {
-					$("#headerProject").data("project").projLangs.splice(i, 1);
+					dataObject.currentProject.projLangs.splice(i, 1);
 				}
 			}
-			ricottaAPI.deleteProjLang(p.name, langCode, function(){
+			ricottaAPI.deleteProjLang(dataObject.currentProject.name, langCode, function(){
 				//remove the language from table
 				$("#projLangsTBody tr[id='pl_"+langCode+"']").remove();
 				//remove lange from uncomplet translation filter
@@ -291,7 +289,7 @@
 	}
 	
 	function createProjLang() {
-		var p = $("#headerProject").data("project");
+		
 	    var projLangCode = $("#projLangCode"),
 	        projLangDefault = $("#projLangDefault"),
 	        allFields = $([]).add(projLangCode, projLangDefault),
@@ -305,11 +303,11 @@
 	            defaultLang: projLangDefault.val() != -1? projLangDefault.val() : null, 
 	        };
 	    	
-	    	ricottaAPI.addProjectLanguage(p.name, data, function(d){
+	    	ricottaAPI.addProjectLanguage(dataObject.currentProject.name, data, function(d){
 	            //modify the language data to add to the table
 	            var defaultLang = {name: data.defaultLang},
 	                l = {langCode: data.langCode, defaultLang: defaultLang};
-	            $("#headerProject").data("project").projLangs.push(d);
+	            dataObject.currentProject.projLangs.push(d);
 	            appendLanguage(l);
 	            appendUncompletTranslation(l);
 	            $("#createProjLangDialog").modal('hide');
@@ -321,7 +319,7 @@
 	    }
 	}
 	function addProjUser() {
-		var p = $("#headerProject").data("project");
+		
 		var userEmail = $("#projUserEmail"), 
 			allFields = $([]).add(userEmail),
 			tips = $("#addProjUserDialog .validateTips");
@@ -334,7 +332,7 @@
 		var bValid = true;
 		bValid = bValid && checkEmpty(allFields) && validateEmail(email);
 		if(bValid) {
-			ricottaAPI.addProjectUser(p.name, userEmail.val(), $("#projUserRole option:selected").val(), function(d){
+			ricottaAPI.addProjectUser(dataObject.currentProject.name, userEmail.val(), $("#projUserRole option:selected").val(), function(d){
 				var newIndex = $("#projUserTBody tr").length + 1;
 				appendUser(d, newIndex);
 				$("#addProjUserDialog").modal("hide");
@@ -354,24 +352,24 @@
 			$("#toknSubset").append('<option value="'+ newSubset.name +'">' + newSubset.name + '</option>');
 			appendSubsetTable(newSubset);
 			//add the new subset to p object?
-			$("#headerProject").data("project").subsets.push(newSubset.name);
-			if(typeof tokenTable != 'undefined' && tokenTable != null) {
-				tokenTable.fnDestroy();
+			dataObject.currentProject.subsets.push(newSubset.name);
+			if(typeof dataObject.tokenTable != 'undefined' && dataObject.tokenTable != null) {
+				dataObject.tokenTable.fnDestroy();
 			}
 			//var sToken = '<th data-subset="'+newSubset.name+'" title="' + newSubset.name + '"><input type="checkbox" onClick="" /></th>';
 			var sToken = '<th data-subset="' + newSubset.name + '" title="' + newSubset.name + '">' + newSubset.name + '</th>';
 			 $("#tokensHeadTR").append(sToken);
-			tokenSubsetHeader.push(sToken);
+			dataObject.tokenSubsetHeader.push(sToken);
 			
-			for(var i in tokensArrDataTable) {
-    	 		var rowData = tokensArrDataTable[i],
+			for(var i in dataObject.tokensArrDataTable) {
+    	 		var rowData = dataObject.tokensArrDataTable[i],
     	 			tokenName = rowData[0],//token name
     	 			tokenId = $(rowData[1]).attr("id").substring(7); 
     	 		rowData.push('<input type="checkbox" id="subset_' + tokenId + '_' + newSubset.name + '"' +' name="subsets_' + tokenId + '"' +' value="' + newSubset.name + '"' + ' title="' + tokenName + ':' + newSubset.name + '" onChange="setChanged(' + tokenId + ');"/>');
     	 		//wrap the select option into a div and get its contents to relcace the old one
-    	 		tokensArrDataTable[i] = rowData;
+    	 		dataObject.tokensArrDataTable[i] = rowData;
     	 	}
-			if(typeof refreshToken === 'function' && typeof tokenTable != 'undefined' && tokenTable != null) {
+			if(typeof refreshToken === 'function' && typeof dataObject.tokenTable != 'undefined' && dataObject.tokenTable != null) {
 				refreshToken();
 			}
 			$("#createSubsetDialog").modal("hide");
@@ -393,13 +391,13 @@
 		$("#subsetbody").append("<tr id='subset_"+s.name+"'><td>"+s.name+"</td><td>"+s.description+"</td><td><span onclick='deleteSubset(\""+s.keyString+"\", \""+s.name+"\");' class='icon-trash icon-black'>Delete</span></td>");
 	}
 	function deleteSubset(keyString, s) {
-		var p = $("#headerProject").data("project");
+		
 		var confirmDelete = confirm("Are you sure you want to delete subset: " + s);
 		if(confirmDelete) {
-			ricottaAPI.deleteSubset(p.name, keyString, function(){
+			ricottaAPI.deleteSubset(dataObject.currentProject.name, keyString, function(){
 				//remove selected subset from the datatable array.
 				//just pick up one element from the datatable array then find the index of the selected subset
-	   	 		var rowData = tokensArrDataTable[0],
+	   	 		var rowData = dataObject.tokensArrDataTable[0],
 	   	 			tokenName = rowData[0],//token name
 	   	 			tokenId = $(rowData[1]).attr("id").substring(7),
 	   	 			index;
@@ -410,15 +408,15 @@
 					}
 				}
 				
-	   	 		for(var ii in tokensArrDataTable) {
-	   	 			tokensArrDataTable[ii].splice(index, 1);
+	   	 		for(var ii in dataObject.tokensArrDataTable) {
+	   	 			dataObject.tokensArrDataTable[ii].splice(index, 1);
 	   	 		}
 	   	 		if(typeof removeSubsetColumn === 'function') {
 	   	 			removeSubsetColumn(s);
 	   	 		}
-	   	 		for(var st in tokenSubsetHeader) {
-	   	 			if($(tokenSubsetHeader[st]).data("subset") == s) {
-						tokenSubsetHeader.splice(st, 1);
+	   	 		for(var st in dataObject.tokenSubsetHeader) {
+	   	 			if($(dataObject.tokenSubsetHeader[st]).data("subset") == s) {
+						dataObject.tokenSubsetHeader.splice(st, 1);
 	   	 			}
 	   	 		}
 	   	 		//remove the subset from its table
@@ -428,8 +426,8 @@
 	}
 	//
 	$(function(){
-		var p = $("#headerProject").data("project");
-		$("#projectName").val(p.name);
+		
+		$("#projectName").val(dataObject.currentProject.name);
 		$("#createProjLangDialog").modal({show: false});
 		$("#createProjLangDialog").find("a.btn-success").click(function(){
 			createProjLang();
@@ -439,12 +437,12 @@
 		});
 		$("#createSubsetDialog").find("a.btn-success").click(function(){
 			//create new subset
-			createNewSubset(p.name);
+			createNewSubset(dataObject.currentProject.name);
 			
 		});
 		buildProjLangsTable();
-		buildProjUserTable(p);
-		loadSubsets(p.name);
+		buildProjUserTable();
+		loadSubsets(dataObject.currentProject.name);
 		if(readonly) {
 			$(".description .btn").remove();
 			$(".description .table th:last-child, .description .table td:last-child").remove();

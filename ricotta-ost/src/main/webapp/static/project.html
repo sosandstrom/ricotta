@@ -82,10 +82,8 @@
 </div>
 <script type="text/javascript">
 //this array is used only once. it will be removed after tokens table already generated except the token subset header.
-var tokensArrDataTable, 
-	tokenSubsetHeader, 
-	tokenTable,
-	readonly = false;
+
+var readonly = false;
 function reloadGeneralSetting() {
 	setProjectActiveMenu($('.span13 > .nav span:first'));
 	$('.span13 > .nav').removeClass('hide');
@@ -116,21 +114,20 @@ function tokenFiltered() {
 	}
 }
 function addTokenDataTableArr() {
-	var p = $("#headerProject").data("project");
-	tokensArrDataTable = [];
-	tokenSubsetHeader = [];
 	
-	$.map(p.tokens, function(t, i){
-		tokensArrDataTable.push(addTokenDataTable(p, t));
+	dataObject.tokensArrDataTable = [];
+	dataObject.tokenSubsetHeader = [];
+	
+	$.map(dataObject.currentProject.tokens, function(t, i){
+		dataObject.tokensArrDataTable.push(addTokenDataTable(t));
 	});
-	$.map(p.subsets, function(s, si) {
-        //var sToken = '<th data-subset="'+s+'" title="' + s + '"><input type="checkbox" onClick="" /></th>';
+	$.map(dataObject.currentProject.subsets, function(s, si) {
         var sToken = '<th data-subset="'+s+'" title="' + s + '">' + s + '</th>';
-		tokenSubsetHeader.push(sToken);
+		dataObject.tokenSubsetHeader.push(sToken);
 	});
 }
 
-function addTokenDataTable(p, t) {
+function addTokenDataTable(t) {
 	var selectContext = "";
 	if(!readonly) {
 		selectContext = '<select id="context_' + t.id + '" onChange="setChanged(' + t.id + ');" ><option value="_NO_CONTEXT_">No Context</option>';
@@ -138,11 +135,10 @@ function addTokenDataTable(p, t) {
 	else {
 		selectContext = '<select disabled id="context_' + t.id + '><option value="_NO_CONTEXT_">No Context</option>';
 	}
-	$.map(p.contexts, function(c, ci) {
+	$.map(dataObject.currentProject.contexts, function(c, ci) {
 		selectContext += ('<option value="' + c.name + '" ' + (c.name == t.context ? 'selected="selected" ' : '') +'>' + c.name + '</option>');
     });
 	var arr;
-	console.log(readonly);
 	if(!readonly) {
 		arr = [t.name,
 		           '<span id="delete_' + t.id + '" class="icon-trash icon-black" onClick="deleteToken(\''+t.name+'\', ' + t.id + ', $(this));" />', 
@@ -157,7 +153,7 @@ function addTokenDataTable(p, t) {
 			   '<span>' + t.description + '</span>',
 			   selectContext];
 	}
-	$.map(p.subsets, function(s, si) {
+	$.map(dataObject.currentProject.subsets, function(s, si) {
 		var checked = "";
 		$.map(t.subsets, function(ts, tsi) {
 			if(ts.id == s.id && ts != 'null') checked = "checked";
@@ -174,14 +170,6 @@ function addTokenDataTable(p, t) {
     });
 	return arr;
 }
-
-/*
-function loadProjectTokens(pname) {
-    ricottaAPI.getProjectTokens(pname, function(data){
-        $("#headerProject").data("project", data);
-        addTokenDataTableArr();
-    }, showToast);
-}*/
 
 function updateVerticalDivider() {
 	$(".vertical-divider").css("height", $(window).height() + "px");
@@ -201,10 +189,10 @@ function setOverMenu() {
 function setCurrentMenuState() {
 	$(".span13 > .nav > div span.selected").removeClass("selected-over");
 }
-function appendUncompletTranslationFilter(p) {
+function appendUncompletTranslationFilter() {
 	$("#completionFilter").empty();
 	$("#completionFilter").append("<option value='-1'>Show all</option><option value='0'>Show all uncomplete</option>");
-	$.map(p.projLangs, function(l, i) {
+	$.map(dataObject.currentProject.projLangs, function(l, i) {
 		appendUncompletTranslation(l);
 	});
 }
@@ -213,9 +201,9 @@ function appendUncompletTranslation(l) {
 }
 function appendTranslationContextFilter() {
 	$("#contextFilter").empty();
-	var p = $("#headerProject").data("project");
+	
 	$("#contextFilter").append("<option value='-1'>Show all</option>");
-	$.map(p.contexts, function(context, i){
+	$.map(dataObject.currentProject.contexts, function(context, i){
 		appendContextFilter(context);
 	});
 }
@@ -226,9 +214,9 @@ function appendContextFilter(context) {
 
 function appendTranslationTokens() {
 	$("#translationToken").empty();
-	var p = $("#headerProject").data("project");
-	$.map(p.tokens, function(token, i) {
-		appendTokenSideBar(token, p.projLangs);
+	
+	$.map(dataObject.currentProject.tokens, function(token, i) {
+		appendTokenSideBar(token, dataObject.currentProject.projLangs);
 	});
 }
 
@@ -270,7 +258,7 @@ function loadTranslation(tokenId) {
 	}
 }
 function createToken() {
-	var p = $("#headerProject").data("project");
+	
 	$("#createTokenDialog .validateTips").text("");
       var toknName = $("#toknName"),
           toknDescription = $("#toknDescription"),
@@ -295,38 +283,38 @@ function createToken() {
               subsets: subsets,
           };
       	
-      	ricottaAPI.createToken(p.name, data, function(newToken){
+      	ricottaAPI.createToken(dataObject.currentProject.name, data, function(newToken){
 			//if tokens page is already loaded, update its table only. 
 			//otherwise, push the new token data to pre-generated datatable
      		var newTokenDataTable = addTokenDataTable(p, newToken);
       		if($(".tokens").length > 0) {
-	      		if(typeof tokenTable !== 'undefined') {
-	      			tokenTable.dataTable().fnAddData(newTokenDataTable);
+	      		if(typeof dataObject.tokenTable !== 'undefined') {
+	      			dataObject.tokenTable.dataTable().fnAddData(newTokenDataTable);
 	      		}
       		}
       		else {
-	     		tokensArrDataTable.push(newTokenDataTable);
+	     		dataObject.tokensArrDataTable.push(newTokenDataTable);
       		}
-      		appendTokenSideBar(newToken, p.projLangs);
+      		appendTokenSideBar(newToken, dataObject.currentProject.projLangs);
       		
       	}, updateTips);
 	      $("#createTokenDialog").modal("hide");
       }
 }
 
-function buildCreateTokenDialog(p) {
-    $.map(p.contexts, function(c, ci) {
+function buildCreateTokenDialog() {
+    $.map(dataObject.currentProject.contexts, function(c, ci) {
         $("#toknContext").append('<option value="' + c.name + '">' + c.name + '</option>');
     });
-    $.map(p.subsets, function(s, i){
+    $.map(dataObject.currentProject.subsets, function(s, i){
     	$("#toknSubset").append('<option value="'+ s +'">' + s + '</option>');
     });
 }
 function isReadOnly() {
-	var p = $("#headerProject").data("project");
+	
 	var loginUser = $("#headerUser").data("json");
-	for(var i in p.users) {
-    	var u = p.users[i];
+	for(var i in dataObject.currentProject.users) {
+    	var u = dataObject.currentProject.users[i];
     	if(u.user == loginUser.email && u.role == 1) {
     		readonly = true;
     		return;
@@ -335,13 +323,10 @@ function isReadOnly() {
 }
 
 $(function() {
-    var p = $("#headerProject").data("project");
-    $("#projectname").text(p.name);
+    $("#projectname").text(dataObject.currentProject.name);
     
     isReadOnly();
     addTokenDataTableArr();
-    //loadProjectTokens(p.name);
-    //p = $("#headerProject").data("project");
     
     $(".span13 span").bind("click", function(){
     	loadProjectContent($(this).data("target"));
@@ -364,7 +349,7 @@ $(function() {
     $("#createTokenDialog").find("a.btn-success").click(function(){
 		createToken();
 	});
-    appendUncompletTranslationFilter(p);
+    appendUncompletTranslationFilter();
     appendTranslationContextFilter();
     appendTranslationTokens();
     if(readonly) {
@@ -372,7 +357,7 @@ $(function() {
     	$("#addTranslation").remove();
     }
     else {
-		buildCreateTokenDialog(p);
+		buildCreateTokenDialog();
     }
 	loadProjectContent("generalSetting");
 });

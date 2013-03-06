@@ -20,8 +20,8 @@
 	
 	function updateUser(id, role) {
 	    // find this user in data
-	    var p = $("#headerProject").data("project");
-	    $.map(p.users, function(t, i) {
+	    
+	    $.map(dataObject.currentProject.users, function(t, i) {
 	        if (t.keyString == id) {
 	            t.role = role;
 	            return;
@@ -32,12 +32,12 @@
 	
 	function saveUser(id) {
 	    showToast('Saving user role...');
-	    var p = $("#headerProject").data("project");
+	    
 	    
 	    var body = {
 	            role: $("#role_" + id).val()
 	        };
-	    ricottaAPI.saveUser(p.name, id, body, function(d){
+	    ricottaAPI.saveUser(dataObject.currentProject.name, id, body, function(d){
 	    	updateUser(id, body.role);
 	        clearChanged(id);
 	        hideToast();
@@ -55,7 +55,7 @@
 	}
 	
 	function buildUsersTable(p,roles) {
-	    $.map(p.users, function(t, index) {
+	    $.map(dataObject.currentProject.users, function(t, index) {
 	        var id = t.keyString; //user.replace(/[@.]/gi, '_');
 	        $("#usersBody").append('<tr id="user_' + id + '"></tr>');
 	        
@@ -80,7 +80,7 @@
 	$(function() {
 	    var roles = [];
 	    ricottaAPI.loadRoles(function(data){roles = data;}, showToast);
-	    var p = $("#headerProject").data("project");
+	    
 	    buildUsersTable(p, roles);
 	});
 	

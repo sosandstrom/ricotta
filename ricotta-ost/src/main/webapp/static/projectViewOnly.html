@@ -46,10 +46,9 @@ function appendLanguageRow(t) {
 }
 
 function buildProjLangsTable() {
-    p = $("#headerProject").data("project");
     $("#projLangsTBody").empty();
     // load global langauges globalLang is ready loaded in the projects page
-    $.map(p.projLangs, function(t, index) {
+    $.map(dataObject.currentProject.projLangs, function(t, index) {
         appendLanguageRow(t);
     });
 }
@@ -63,8 +62,7 @@ function updateVerticalDivider() {
 }
 
 function displayProjectTitle(){
-	p = $("#headerProject").data("project");
-	$("#projectname").text(p.name);
+	$("#projectname").text(dataObject.currentProject.name);
 }
 
 $(function() {

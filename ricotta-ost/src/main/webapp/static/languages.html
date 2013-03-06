@@ -46,8 +46,8 @@
 	    $("#languagesBody").empty();
 	    $.map(data, function(p, i) {
 	        $("#languagesBody")
-	            .append("<tr><td>" + p.code + "</td>" +
-	                "<td>" + p.name + "</td>" +
+	            .append("<tr><td>" + dataObject.currentProject.code + "</td>" +
+	                "<td>" + dataObject.currentProject.name + "</td>" +
 	                "</tr>");
 	    });
 	}
