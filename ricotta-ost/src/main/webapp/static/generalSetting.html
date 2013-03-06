@@ -257,12 +257,15 @@
 		if(confirmDelete) {
 			//remove from project lang
 			var lIndex = pls.indexOf(langCode);
+			if (1 == pls.length) {
+			    alert("Project language cannot be empty.");
+			    return;	
+			}
 			if(-1 != lIndex) {
 				pls.splice(lIndex, 1);
 			}
 			var langList = $("#headerProject").data("project").projLangs;
 			//remove from project header as well???
-		
 			for(var i in langList) {
 				if(langList[i].langCode != undefined && langList[i].langCode == langCode) {
 					$("#headerProject").data("project").projLangs.splice(i, 1);
