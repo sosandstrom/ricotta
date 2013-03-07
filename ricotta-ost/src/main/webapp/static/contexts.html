@@ -202,7 +202,6 @@
 	}
 	
 	$(function() {
-		
 		$("#buttonAddContext").click(function(){
 			$(".alert-error").removeClass("show").addClass("hide");
 			var ctxName = $("#contextName");
@@ -212,7 +211,7 @@
 	        allFields.removeClass("input_error");
 		});
 	    $("#createContextDialog").modal({show: false});
-	    
+
 	    $(".btn-success").click(function(){
 	    	 var ctxName = $("#contextName"),
 	          ctxDescription = $("#contextDescription"),
@@ -289,9 +288,10 @@
     	};
     	ricottaAPI.createContext(dataObject.currentProject.name, data, function(context){
     		dataObject.currentProject.contexts.push(context);
+    		buildCreateTokenDialog();
     		//retrieve the select option from array
     		//add new context and override the old one
-    		if(typeof dataObject.tokenTable != 'undefined') {
+    		if(typeof dataObject.tokenTable != 'undefined' && dataObject.tokenTable != null) {
     			for(var i in dataObject.tokenTable.fnGetData()){
 					var selectOption = $(dataObject.tokenTable.fnGetData()[i][5]).append("<option value='"+context.name+"'>"+context.name+"</option>");
 	    	 		//wrap the select option into a div and get its contents to relcace the old one

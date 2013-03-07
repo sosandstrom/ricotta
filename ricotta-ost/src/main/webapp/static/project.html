@@ -303,6 +303,8 @@ function createToken() {
 }
 
 function buildCreateTokenDialog() {
+	$("#toknContext").empty();
+	$("#toknSubset").empty();
     $.map(dataObject.currentProject.contexts, function(c, ci) {
         $("#toknContext").append('<option value="' + c.name + '">' + c.name + '</option>');
     });
