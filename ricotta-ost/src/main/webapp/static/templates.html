@@ -1,6 +1,6 @@
 <div class="templates">
 	<div> <h1>Templates </h1></div>
-	<a id="createTemplate" data-toggle="modal" href="#createTemplateDialog" class="btn btn-primary">+ Template</a>
+	<a id="createTemplate" data-toggle="modal" href="#createTemplateDialog" class="btn btn-primary" onclick="clearLastText();">+ Template</a>
 	<div class="templateWrapper">
 		<table  class="table table-bordered">
 			<thead>
@@ -17,6 +17,9 @@
 			<h3 id="modalHeader">Add New Template</h3>
 		</div>
 		<div class="modal-body">
+			<div class="alert alert-error hide">  
+  				<p class="validateTips"></p>
+			</div>
 			<div class="box">
 				<label class="modal-label"for="templateName">Name</label>
 				<input class="modal-input" type="text" id="templateName" value="">
@@ -44,12 +47,14 @@
 </div>
 <script type="text/javascript">
 	function buildTemplateTable(templates) {
+		$("#templatesTBody").empty();
 		$.map(templates, function(t){
 			updateTemplateTable(t);
 		});
 		$("#createTemplateDialog").modal("hide");
 	}
 	function updateTemplateTable(t) {
+		
 		$("#templatesTBody").append("<tr id='template"+t.name+"'><td onClick=\"editTemplate('" + t.name + "');\">"+t.name+"</td><td>" +t.description+"</td></tr>");
 		$("#template"+t.name).data("json", t);
 	}
@@ -61,16 +66,24 @@
 		
 		$("#modalHeader").text("Add New Template");
 		$("a.btn-success").click(function(){
-			//save the updated template
-			var data = {
-				"name": $("#templateName").val(),
-				"description": $("#templateDescription").val(),
-				"body": $("#templateBody").val(),
-			};
-			ricottaAPI.createTemplate(data, loadTemplates);
+			if(validName($("#templateName").val())) {
+				//save the updated template
+				var data = {
+					"name": $("#templateName").val(),
+					"description": $("#templateDescription").val(),
+					"body": $("#templateBody").val(),
+				};
+				ricottaAPI.createTemplate(data, loadTemplates);
+			}
+			else {
+				$("#createTemplateDialog .validateTips").text("Template's name shouldn't contains illegal character include space.");
+				//updateTips();
+				$("#createTemplateDialog .validateTips").parent().addClass("show");
+			}
 		});
 	}
 	function editTemplate(templateName) {
+		$("#createTemplateDialog").hide();
 		var t = $("#template"+templateName).data("json");
 		$("#modalHeader").text("Update Template");
 		$("#templateName").val(t.name);
@@ -89,7 +102,7 @@
 		});
 	}
 	function loadTemplates() {
-		$("#templatesTBody").empty();
+		$("#templatesTBody tr").remove();
 		ricottaAPI.getTemplates(function(t){
 			buildTemplateTable(t);
 		});

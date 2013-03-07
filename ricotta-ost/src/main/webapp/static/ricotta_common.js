@@ -30,6 +30,11 @@ function getShort(s, len) {
     return s.substring(0,len-3) + '...';
 }
 
+function validName(st) {
+	var reg = /^[a-zA-Z0-9-_]*$/;
+	return reg.test(st);
+}
+
 function updateTips(t) {
     var tips = $(".validateTips");
         tips.html(t);
@@ -148,6 +153,8 @@ function clearLastText() {
 	$(".modal-body input[type='email']").removeClass("input_error");
 	$(".modal-body input[type='email']").val("");
 	$(".modal-body input[type='file']").val("");
+	$(".modal-body textarea").removeClass("input_error");
+	$(".modal-body textarea").val("");
 }
 
 /**
