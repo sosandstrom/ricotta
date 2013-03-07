@@ -373,4 +373,12 @@ public class RestController {
         uberDao.deleteProjLanguage(ProjectHandlerInterceptor.NAME_TRUNK, projName, langCode);
         return new ResponseEntity<String>(HttpStatus.OK);
     }
+
+    @RequestMapping(value = "me/v10/logout", method = RequestMethod.GET)
+    public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        request.getSession().invalidate();
+        // String logoutUrl = UserServiceFactory.getUserService().createLogoutURL("/index.html");
+        // response.sendRedirect(logoutUrl);
+    }
+
 }

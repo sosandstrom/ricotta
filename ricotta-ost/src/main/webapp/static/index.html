@@ -163,6 +163,24 @@
 			    //$("#ricotta_contents").append('<img src="/RicottaOverview.2.png" alt="Ricotta Overview" />');
 			    
 			}
+			
+			
+			$(".dropdown-menu #headerUserAction").click(function(event) {
+				//pause fire click event
+				event.preventDefault();
+				$('.projects').remove();
+				var that = this;
+				$.ajax({
+                    type: "GET",
+                    url: "/api/me/v10/logout",
+                    success: function(data) {
+                    	//continue fire click event
+                    	document.location.href=$(that).attr('href');;
+                    }
+                });
+			});
+			
+			
 			//click on home link
 			$("#headerHome").click(function() {
 			    document.location = "index.html";
