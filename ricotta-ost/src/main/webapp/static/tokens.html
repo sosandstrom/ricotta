@@ -208,6 +208,9 @@
 	    $("#tableToken_filter input").keyup(function(){
 	    	dataObject.tokenTable.fnFilter($(this).val(), 0, false, false);
 	    });
+	    $("#tableToken td:first-child").css("width", "60px");
+	    $("#tableToken td:first-child").next().css("width", "60px");
+	    //$("#tableToken td:first-child").next().next().css("width", "60px");
 	});
 	
 	</script>
