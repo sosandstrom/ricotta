@@ -54,6 +54,9 @@
 					<h3>Create Subset</h3>
 				</div>
 				<div class="modal-body">
+				    <div class="alert alert-error hide">
+                        <p class="validateTips"></p>
+                    </div>
 					<div>
 						<label class="modal-label" for="subsetName">Name</label>
 						<input class="modal-input" type="text" id="subsetName" value="">
@@ -341,39 +344,52 @@
 	}
 	//Subset
 	function createNewSubset(projName) {
-		var subsetName = $("#subsetName").val();
-		var data = {
-			"name": $("#subsetName").val(),
-			"description": $("#subsetDescription").val()
-		};
-		ricottaAPI.createSubset(projName, data, function(newSubset) {
-			//loadProjectTokens(projName);
-			//add new subset
-			$("#toknSubset").append('<option value="'+ newSubset.name +'">' + newSubset.name + '</option>');
-			appendSubsetTable(newSubset);
-			//add the new subset to p object?
-			dataObject.currentProject.subsets.push(newSubset.name);
-			if(typeof dataObject.tokenTable != 'undefined' && dataObject.tokenTable != null) {
-				dataObject.tokenTable.fnDestroy();
-			}
-			//var sToken = '<th data-subset="'+newSubset.name+'" title="' + newSubset.name + '"><input type="checkbox" onClick="" /></th>';
-			var sToken = '<th data-subset="' + newSubset.name + '" title="' + newSubset.name + '">' + newSubset.name + '</th>';
-			 $("#tokensHeadTR").append(sToken);
-			dataObject.tokenSubsetHeader.push(sToken);
-			
-			for(var i in dataObject.tokensArrDataTable) {
-    	 		var rowData = dataObject.tokensArrDataTable[i],
-    	 			tokenName = rowData[0],//token name
-    	 			tokenId = $(rowData[1]).attr("id").substring(7); 
-    	 		rowData.push('<input type="checkbox" id="subset_' + tokenId + '_' + newSubset.name + '"' +' name="subsets_' + tokenId + '"' +' value="' + newSubset.name + '"' + ' title="' + tokenName + ':' + newSubset.name + '" onChange="setChanged(' + tokenId + ');"/>');
-    	 		//wrap the select option into a div and get its contents to relcace the old one
-    	 		dataObject.tokensArrDataTable[i] = rowData;
-    	 	}
-			if(typeof refreshToken === 'function' && typeof dataObject.tokenTable != 'undefined' && dataObject.tokenTable != null) {
-				refreshToken();
-			}
-			$("#createSubsetDialog").modal("hide");
-		});
+		var subsetName = $("#subsetName"), 
+        allFields = $([]).add(subsetName),
+        tips = $("#createSubsetDialog .validateTips");
+		
+		var bValid = true;
+        bValid = bValid && checkEmpty(allFields);
+        
+        if (bValid){
+        
+			var subsetName = $("#subsetName").val();
+			var data = {
+				"name": $("#subsetName").val(),
+				"description": $("#subsetDescription").val()
+			};
+			ricottaAPI.createSubset(projName, data, function(newSubset) {
+				//loadProjectTokens(projName);
+				//add new subset
+				$("#toknSubset").append('<option value="'+ newSubset.name +'">' + newSubset.name + '</option>');
+				appendSubsetTable(newSubset);
+				//add the new subset to p object?
+				dataObject.currentProject.subsets.push(newSubset.name);
+				if(typeof dataObject.tokenTable != 'undefined' && dataObject.tokenTable != null) {
+					dataObject.tokenTable.fnDestroy();
+				}
+				//var sToken = '<th data-subset="'+newSubset.name+'" title="' + newSubset.name + '"><input type="checkbox" onClick="" /></th>';
+				var sToken = '<th data-subset="' + newSubset.name + '" title="' + newSubset.name + '">' + newSubset.name + '</th>';
+				 $("#tokensHeadTR").append(sToken);
+				dataObject.tokenSubsetHeader.push(sToken);
+				
+				for(var i in dataObject.tokensArrDataTable) {
+	    	 		var rowData = dataObject.tokensArrDataTable[i],
+	    	 			tokenName = rowData[0],//token name
+	    	 			tokenId = $(rowData[1]).attr("id").substring(7); 
+	    	 		rowData.push('<input type="checkbox" id="subset_' + tokenId + '_' + newSubset.name + '"' +' name="subsets_' + tokenId + '"' +' value="' + newSubset.name + '"' + ' title="' + tokenName + ':' + newSubset.name + '" onChange="setChanged(' + tokenId + ');"/>');
+	    	 		//wrap the select option into a div and get its contents to relcace the old one
+	    	 		dataObject.tokensArrDataTable[i] = rowData;
+	    	 	}
+				if(typeof refreshToken === 'function' && typeof dataObject.tokenTable != 'undefined' && dataObject.tokenTable != null) {
+					refreshToken();
+				}
+				$("#createSubsetDialog").modal("hide");
+			});
+        } else {
+           tips.text("Subset Name is empty.");
+           updateTips();
+        }
 	}
 	
 	function loadSubsets(projName) {
