@@ -59,6 +59,7 @@
 		$("#template"+t.name).data("json", t);
 	}
 	function createTemplate() {
+		$("#templateName").removeAttr("readonly");
 		$("#templateName").val("");
 		$("#templateDescription").val("");
 		$("#templateMIME").val("");
@@ -86,6 +87,7 @@
 		$("#createTemplateDialog").hide();
 		var t = $("#template"+templateName).data("json");
 		$("#modalHeader").text("Update Template");
+		$("#templateName").attr("readonly", "true");
 		$("#templateName").val(t.name);
 		$("#templateDescription").val(t.description);
 		$("#templateMIME").val(t.mimeType);
