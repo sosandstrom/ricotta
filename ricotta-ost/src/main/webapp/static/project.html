@@ -286,7 +286,7 @@ function createToken() {
       	ricottaAPI.createToken(dataObject.currentProject.name, data, function(newToken){
 			//if tokens page is already loaded, update its table only. 
 			//otherwise, push the new token data to pre-generated datatable
-     		var newTokenDataTable = addTokenDataTable(dataObject.currentProject, newToken);
+     		var newTokenDataTable = addTokenDataTable(newToken);
       		if($(".tokens").length > 0) {
 	      		if(typeof dataObject.tokenTable !== 'undefined') {
 	      			dataObject.tokenTable.dataTable().fnAddData(newTokenDataTable);
