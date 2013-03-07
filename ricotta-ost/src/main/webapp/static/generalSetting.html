@@ -376,7 +376,7 @@
 				for(var i in dataObject.tokensArrDataTable) {
 	    	 		var rowData = dataObject.tokensArrDataTable[i],
 	    	 			tokenName = rowData[0],//token name
-	    	 			tokenId = $(rowData[1]).attr("id").substring(7); 
+	    	 			tokenId = $(rowData[1]).find("span").attr("id").substring(7); 
 	    	 		rowData.push('<input type="checkbox" id="subset_' + tokenId + '_' + newSubset.name + '"' +' name="subsets_' + tokenId + '"' +' value="' + newSubset.name + '"' + ' title="' + tokenName + ':' + newSubset.name + '" onChange="setChanged(' + tokenId + ');"/>');
 	    	 		//wrap the select option into a div and get its contents to relcace the old one
 	    	 		dataObject.tokensArrDataTable[i] = rowData;
@@ -420,7 +420,7 @@
 				//just pick up one element from the datatable array then find the index of the selected subset
 	   	 		var rowData = dataObject.tokensArrDataTable[0],
 	   	 			tokenName = rowData[0],//token name
-	   	 			tokenId = $(rowData[1]).attr("id").substring(7),
+	   	 			tokenId = $(rowData[1]).find("span").attr("id").substring(7),
 	   	 			index;
 				for(var i in rowData) {
 					var elmId = $(rowData[i]).attr("id");
