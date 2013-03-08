@@ -158,14 +158,18 @@
 	function appendProjectUser() {
 		$("#projUserTBody").empty();
 		$.map(dataObject.currentProject.users, function(u, i) {
-			appendUser(u, i);
+			appendUser(u, i, $("#headerUser").data("json"));
 		});
 	}
-	function appendUser(u, i) {
+	function appendUser(u, i, currentUser) {
+		var deleteTd = "";
+		if(u.user != currentUser.email && u.role != 31) {
+			deleteTd = "<span id='delete_" + u.user + "' class='icon-trash icon-black' onClick=\"deleteProUser('" + u.user + "');\">Delete</span>";
+		}
 		$("#projUserTBody").append("<tr data-user='"+u.user+"'id='role_"+i+"'></tr>");
 		$("#role_"+i).append("<td>"+u.user+"</td>")
 						  .append("<td><select onchange=\"updateUserRole($(this), '"+u.keyString+"');\">"+getUserRole(u.role)+"</select></td>")
-						  .append("<td><span id='delete_" + u.user + "' class='icon-trash icon-black' onClick=\"deleteProUser('" + u.user + "');\">Delete</span></td>");
+						  .append("<td>"+deleteTd+"</td>");
 	}
 	function deleteProUser(email) {
 		
@@ -445,6 +449,16 @@
 			}, function(){});
 		}
 	}
+	function isSubsetAvailable(name) {
+		var a = true;
+		$.map(dataObject.currentProject.subsets, function(s) {
+			if(s == name) {
+				a = false;
+				return;
+			}
+		});
+		return a;
+	}
 	//
 	$(function(){
 		
@@ -458,7 +472,14 @@
 		});
 		$("#createSubsetDialog").find("a.btn-success").click(function(){
 			//create new subset
-			createNewSubset(dataObject.currentProject.name);
+			//check  if the subset name is already exist in the current project, if not save new
+			if(isSubsetAvailable($("#subsetName").val())) {
+				createNewSubset(dataObject.currentProject.name);
+			}
+			else {
+				$("#createSubsetDialog .validateTips").text("Subset with name " + $("#subsetName").val() + " already exist.");
+				$("#createSubsetDialog .validateTips").parent().addClass("show")
+			}
 			
 		});
 		buildProjLangsTable();
