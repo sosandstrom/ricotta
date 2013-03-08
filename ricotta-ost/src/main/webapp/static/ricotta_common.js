@@ -155,6 +155,8 @@ function clearLastText() {
 	$(".modal-body input[type='file']").val("");
 	$(".modal-body textarea").removeClass("input_error");
 	$(".modal-body textarea").val("");
+	//deselect from select option
+	$(".modal-body select option").attr("selected", false);
 }
 
 /**
