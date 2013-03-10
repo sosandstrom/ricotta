@@ -63,6 +63,7 @@
 	function loadGlobalLanguage() {
 		ricottaAPI.loadLanguages(function(data){
 	    	globalLang = data;
+	    	delete data;
 	    });
 	}
 	/**
@@ -74,6 +75,7 @@
 		for(var i in splitStr){
 			newStr += splitStr[i];
 		}
+		delete splitStr;
 	    return newStr;
 	}
 	function populateProjects(data) {
@@ -100,7 +102,9 @@
 	    						  "</div>");
 	    	dataObject.projects.push(p);
 	    	delete p;
+	    	delete principal;
 	    });
+	    delete data;
 	}
 	
 	function exportProj(i) {
@@ -137,6 +141,7 @@
 	function loadProjectTokens(pname) {
 	    ricottaAPI.getProjectTokens(pname, function(data){
 	    	dataObject.currentProject = data;
+	    	delete data;
 	    }, showToast);
 	}
 	
@@ -154,6 +159,7 @@
 		loadGlobalLanguage();
 		$.map(globalLang, function(l, i){
 			$("#defaultLang").append("<option value='"+ l.code +"'>" + l.name + "</option>");
+			delete l;
 		});
 	}
 	
@@ -171,15 +177,21 @@
 	        if (bValid) {
 	        	var projectName = projName.val();
 	        	var defaultLang = $("#defaultLang option:selected").val();
-	        	ricottaAPI.createProject(projectName, defaultLang, populateProjects, function(err){
-	        		updateTips(err);
-	        	});
+	        	ricottaAPI.createProject(projectName, defaultLang, 
+	        		function(){
+	        			delete projectName;
+	        			delete defaultLang;
+	        			populateProjects();
+	        		}, 
+	        		function(err){
+	        			updateTips(err);
+	        		}
+	        	);
 	        }
 		});
 		$("#createProjectDialog").modal({show:false});
 	    //retrieve all project
 		ricottaAPI.getProjects(populateProjects);
-	            
 	});
 	
 	</script>

@@ -41,34 +41,14 @@
            					<li class="dropdown">
 		         				<a class="dropdown-toggle" data-toggle="dropdown"><span class="icon-white icon-user"></span> <span id="headerUsername"></span> <b class="caret"></b></a>
 		         				<ul class="dropdown-menu">
+		         					<li class="active" data-target="projects"><a>Projects</a></li>
+									<li data-target="templates"><a>Templates</a></li>
+									<li data-target="languages"><a>Languages</a></li>
 		         					<li class="divider"></li>
 			         				<li><a id="headerUserAction" href="" >Logout</a></li>
 		         				</ul>
            					</li>
            				</ul>
-            			<ul class="nav">
-              				<li id="headerHome" class="hide"><a href="index.html">Home</a></li>
-              				<li id="headerProject" class="hide" data-target="projects"><a>Projects</a></li>
-              				<li id="headerView" class="hide"><a>View</a></li>
-              				<li id="translationsOptions" class="hide">
-              					<ul class="nav">
-		              				<li id="headerContext" class="dropdown">
-		              					<a class="dropdown-toggle" data-toggle="dropdown" href="#">Contexts <b class="caret"></b></a>
-		              					<ul class="dropdown-menu" id="contexts">
-		              						<li class="active"><a data-target='' >All tokens</a></li>
-		              						<li class="divider"></li>
-		              					</ul>
-		              				</li>
-		              				<li id="headerLanguage" class="dropdown">
-		              					<a class="dropdown-toggle" data-toggle="dropdown" href="#">Languages <b class="caret"></b></a>
-		              					<ul class="dropdown-menu" id="languages">
-		              						<li class="active"><a data-target=''>Default</a></li>
-		              						<li class='divider'></li>
-		              					</ul>
-		              				</li>
-              					</ul>
-              				</li>
-            			</ul>
           			</div>
         		</div>
       		</div>
@@ -113,7 +93,7 @@
 			});
 			var ajaxCalled = null;
 			function home() {
-				if(typeof dataObject.tokenTable !== 'undefined' && dataObject.tokenTable != null) {
+				if(dataObject.tokenTable != null) {
 					dataObject.tokenTable.fnClearTable();
 					dataObject.tokenTable.fnDestroy();
 				}
@@ -141,6 +121,7 @@
 			    $("#headerUsername").text(data.email);
 			    $(".dropdown-menu #headerUserAction").attr("href", data.url);
 			    hideToast();
+			    delete data;
 			    $("#ricotta_contents").html("<div style='width:100%;text-align:center;'>Loading...</div>").load("home.html");
 			    $(".pull-right #headerUserAction:first").hide();
 			    $(".dropdown-menu li").live("click", function(){
@@ -169,13 +150,12 @@
 				//pause fire click event
 				event.preventDefault();
 				$('.projects').remove();
-				var that = this;
 				$.ajax({
                     type: "GET",
                     url: "/api/me/v10/logout",
                     success: function(data) {
                     	//continue fire click event
-                    	document.location.href=$(that).attr('href');;
+                    	document.location.href=$(this).attr('href');
                     }
                 });
 			});
@@ -190,19 +170,7 @@
 				$("#contents").empty();
 				$("#ricotta_contents").html("<div style='width:100%;text-align:center;'>Loading...</div>").load("project.html");
 			});
-			$("#contexts li").live("click", function(){
-				setActiveMenu($("#contexts"), $(this));
-				var targetContext = $(this).find("a").data("target");
-				$(".project").remove();
-				onContextChange(targetContext);
-			});
 			
-			$("#languages li").live("click", function() {
-				setActiveMenu($("#languages"), $(this));
-				var targetLanguage = $(this).find("a").data("target");
-				$(".project").remove();
-				onLanguageChange(targetLanguage);
-			});
         </script>
     </body>
 </html>

@@ -44,14 +44,14 @@
 	
 	function populateLanguages(data) {
 	    $("#languagesBody").empty();
-	    $.map(data, function(p, i) {
+	    $.map(data, function(l, i) {
 	        $("#languagesBody")
-	            .append("<tr><td>" + dataObject.currentProject.code + "</td>" +
-	                "<td>" + dataObject.currentProject.name + "</td>" +
+	            .append("<tr><td>" + l.code + "</td>" +
+	                "<td>" + l.name + "</td>" +
 	                "</tr>");
 	    });
 	}
-	
+
 	function loadLanguages() {
 		$("#createLanguageDialog").modal("hide");
 		ricottaAPI.loadLanguages(function(languages) {

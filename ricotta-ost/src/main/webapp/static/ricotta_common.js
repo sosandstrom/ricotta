@@ -114,6 +114,9 @@ function loadPage(page) {
 		ajaxCalled = $.get(page + ".html", function(content) {
 			$("#contents").append(content);
 			$("."+page).addClass("show");
+			content = null;
+			ajaxCalled = null;
+			delete content;
 			hideToast();
 		});
 	}
@@ -131,6 +134,9 @@ function loadProjectContent(pageContent) {
 		ajaxCalled = $.get(pageContent + ".html", function(content) {
 			$("#projectSetting").append(content);
 			$("."+pageContent).addClass("show");
+			content = null;
+			delete content;
+			ajaxCalled = null;
 			//hideToast();
 			$("#ajaxLoader").hide();
 		});

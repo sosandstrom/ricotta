@@ -1026,6 +1026,7 @@
 		 */
 		function _fnClearTable( oSettings )
 		{
+			oInit.aaData.splice(0, oInit.aaData.length);
 			oSettings.aoData.splice( 0, oSettings.aoData.length );
 			oSettings.aiDisplayMaster.splice( 0, oSettings.aiDisplayMaster.length );
 			oSettings.aiDisplay.splice( 0, oSettings.aiDisplay.length );
@@ -2821,7 +2822,7 @@
 		/**
 		 * Recalculate the end point based on the start point
 		 *  @param {object} oSettings dataTables settings object
-		 *  @memberof DataTable#oApi
+		 *  @memberof DataTablef#oApi
 		 */
 		function _fnCalculateEnd( oSettings )
 		{
@@ -5529,6 +5530,9 @@
 			/* End it all */
 			delete oSettings.aoData;
 			oSettings = null;
+			oInit.aaData.splice(0, oInit.aaData.length);
+			oInit.aaData = null;
+			delete oInit.aaData;
 			oInit = null;
 		};
 		

@@ -90,7 +90,6 @@ function reloadGeneralSetting() {
 	loadProjectContent('generalSetting');
 }
 function tokenFiltered() {
-	var d = new Date();
 	$("#translationToken li").hide();
 	var filtered = false;
 	if($("#contextFilter option:selected").val() != "-1") {
@@ -108,10 +107,10 @@ function tokenFiltered() {
 		});
 	}
 	
-	var d = new Date();
 	if(!filtered) {
 		$("#translationToken li").show();
 	}
+	delete incompleteTransFilter;
 }
 function addTokenDataTableArr() {
 	
@@ -124,6 +123,7 @@ function addTokenDataTableArr() {
 	$.map(dataObject.currentProject.subsets, function(s, si) {
         var sToken = '<th data-subset="'+s+'" title="' + s + '">' + s + '</th>';
 		dataObject.tokenSubsetHeader.push(sToken);
+		delete sToken;
 	});
 }
 
@@ -146,12 +146,14 @@ function addTokenDataTable(t) {
 				   '<input type="text" id="name_' + t.id + '" value="' + t.name + '" onChange="setChanged(' + t.id + ');" />',
 				   '<input type="text" id="description_' + t.id + '" value="' + t.description + '" onChange="setChanged(' + t.id + ');" />',
 				   selectContext];
+		delete selectContext;
 	}
 	else {
 		arr = [t.name,
 			   '<span>' +t.name + '</span>',
 			   '<span>' + t.description + '</span>',
 			   selectContext];
+		delete selectContext;
 	}
 	$.map(dataObject.currentProject.subsets, function(s, si) {
 		var checked = "";
@@ -166,6 +168,7 @@ function addTokenDataTable(t) {
 		else {
 			sToken = '<input disabled '+ checked +' type="checkbox" id="subset_' + t.id + '_' + s + '"' +' name="subsets_' + t.id + '"' +' value="' + s + '"' + ' title="' + t.name + ':' + s + '"/>';
 		}
+		delete sToken;
 		arr.push(sToken);
     });
 	return arr;
@@ -194,6 +197,7 @@ function appendUncompletTranslationFilter() {
 	$("#completionFilter").append("<option value='-1'>Show all</option><option value='0'>Show all uncomplete</option>");
 	$.map(dataObject.currentProject.projLangs, function(l, i) {
 		appendUncompletTranslation(l);
+		delete l;
 	});
 }
 function appendUncompletTranslation(l) {
@@ -205,6 +209,7 @@ function appendTranslationContextFilter() {
 	$("#contextFilter").append("<option value='-1'>Show all</option>");
 	$.map(dataObject.currentProject.contexts, function(context, i){
 		appendContextFilter(context);
+		delete context;
 	});
 }
 //this function can be called from the context page to append new context
@@ -217,6 +222,7 @@ function appendTranslationTokens() {
 	
 	$.map(dataObject.currentProject.tokens, function(token, i) {
 		appendTokenSideBar(token, dataObject.currentProject.projLangs);
+		delete token;
 	});
 }
 
@@ -284,6 +290,7 @@ function createToken() {
           };
       	
       	ricottaAPI.createToken(dataObject.currentProject.name, data, function(newToken){
+      		delete data;
 			//if tokens page is already loaded, update its table only. 
 			//otherwise, push the new token data to pre-generated datatable
      		var newTokenDataTable = addTokenDataTable(newToken);
