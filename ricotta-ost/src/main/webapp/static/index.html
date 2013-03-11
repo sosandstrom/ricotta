@@ -34,7 +34,7 @@
     	<div class="navbar navbar-inverse navbar-fixed-top">
 			<div class="navbar-inner">
         		<div class="container-fluid">
-          			<a class="brand" href="javascript:home();">Ricotta</a>
+          			<a class="brand" href="javascript:home();"><img title="" src="img/Ricotta_assets/ricotta_white.png"></a>
           			<div class="nav-collapse collapse">
            				<ul class="nav navbar-text pull-right" id="headerUser">
            					<li><a id="headerUserAction" class="login" href="" >Login</a></li>
@@ -57,15 +57,41 @@
 	    	<div id="ricotta_contents">
 	    		<div id="toast"></div>
 	    		<div id="welcome">
-		    		<div>
-		    			Ricotta is a translation management tool, with complimentary build tools, to efficiently manage localised resources in your software project.
-		    			Manage translation of apps, websites and documents better.
-		    		</div>
-		    		<div id="footer">
-		    			<p>
-		    				a powerful solution for managing localization from start to finish.
-		    			</p>
-		    		</div>
+		    		
+		    		
+                        <br><br><br><br>
+                        <div style="text-align: center;">
+                        
+                        <table align="center">
+                            <tbody>
+                                <tr><td colspan="9"><img title="" src="img/Ricotta_assets/ricotta_black.png"></td></tr>
+                                <tr>
+                                    <td style="padding:50px"><img title="" src="img/Ricotta_assets/icon_setup.png"><br><br><b>Setup a project</b></td>
+                                    <td style="padding:50px"><img title="" src="img/Ricotta_assets/arrow.png"></td>
+                                    <td style="padding:50px"><img title="" src="img/Ricotta_assets/icon_translate.png"><br><br><b>Translate</b></td>
+                                    <td style="padding:50px"><img src="img/Ricotta_assets/arrow.png" title=""></td>
+                                    <td style="padding:50px"><img src="img/Ricotta_assets/icon_export.png" title=""><br><br><b>Export to the desired platform</b></td>
+                                </tr>
+                                <tr><td colspan="9"><img src="img/Ricotta_assets/abinbev_logo.png"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    
+                    <!-- 
+                    
+                    <div>
+                        Ricotta is a translation management tool, with complimentary build tools, to efficiently manage localised resources in your software project.
+                        Manage translation of apps, websites and documents better.
+                    </div>
+                    <div id="footer">
+                        <p>
+                            a powerful solution for managing localization from start to finish.
+                        </p>
+                    </div>
+                    
+                    -->
+		    		
 	    		</div>
 	    	</div>
 			
@@ -147,6 +173,7 @@
 			
 			
 			$(".dropdown-menu #headerUserAction").click(function(event) {
+				var logoutHref = $(this).attr('href');
 				//pause fire click event
 				event.preventDefault();
 				$('.projects').remove();
@@ -155,7 +182,8 @@
                     url: "/api/me/v10/logout",
                     success: function(data) {
                     	//continue fire click event
-                    	document.location.href=$(this).attr('href');
+                    	document.location.href=logoutHref;
+                    	delete logoutHref;
                     }
                 });
 			});

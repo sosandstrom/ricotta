@@ -54,7 +54,7 @@ thead { background: #eeeeee; }
 }
 #ricotta_contents {
 	min-height: 100px;
-	margin-top: 41px;
+	margin-top: 68px;
 }
 #toast{
 	width: 100%;
@@ -86,8 +86,9 @@ table#tokens td {
 }
 
 #ricotta_contents #welcome {
-	top: 50%;
-	position: absolute;
+	/*top: 50%;*/
+	/*position: absolute;*/
+	width: 100%;
 }
 #ricotta_contents #welcome #footer {
 	margin-top: 20%;
