@@ -88,7 +88,7 @@
 		$("#createProjectDialog").modal("hide");
 	    $("#projects").empty();
 	    $.map(data, function(p, i) {
-	    	var deleteAction = "<div class='delete' onclick='deleteProj(\""+i+"\");'><span class='item-icon delete'></span><br/>Delete</div>";
+	    	var deleteAction = "<div class='delete' onclick='deleteProj(\""+i+"\", \""+ p.name +"\");'><span class='item-icon delete'></span><br/>Delete</div>";
 	    	//if not owner
 	    	if(!((principal.email == p.owner)||(principal.email == 'test@example.com')))  deleteAction = "";
 	    	$("#projects").append("<div id='projectItem"+trim(p.name)+"' class='projectsItem'>"+
@@ -111,19 +111,20 @@
 		window.location.href= "http://"+ location.host + ricottaAPI.getExportUrl(dataObject.projects[i].name);
 	}
 	
-	function deleteProj(i) {
-		var confirmDelete = confirm("Are you sure you want to delete project: "+ dataObject.projects[i].name);
-		if(confirmDelete) {
-			$("#projectItem"+ dataObject.projects[i].name).remove();
-			//refreshPageContent("projects");
-			
-			ricottaAPI.deleteProj(dataObject.projects[i].name, function(){}, function(status){
-				if("404" == status) {
-					alert("Project " + dataObject.projects[i].name + " already deleted.");
-				}
-			});
-		}
-	}
+    function deleteProj(i, name) {
+        var pname = typeof dataObject != "undefined"? dataObject.projects[i].name : name; 
+        var confirmDelete = confirm("Are you sure you want to delete project: "+ pname);
+        if(confirmDelete) {
+            $("#projectItem"+ pname).remove();
+            //refreshPageContent("projects");
+            
+            ricottaAPI.deleteProj(pname, function(){}, function(status){
+                if("404" == status) {
+                    alert("Project " + pname + " already deleted.");
+                }
+            });
+        }
+    }
 	/**
 	 * Return the languages of project in strings
 	 */
