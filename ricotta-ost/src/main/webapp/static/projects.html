@@ -178,10 +178,10 @@
 	        	var projectName = projName.val();
 	        	var defaultLang = $("#defaultLang option:selected").val();
 	        	ricottaAPI.createProject(projectName, defaultLang, 
-	        		function(){
+	        		function(p){
 	        			delete projectName;
 	        			delete defaultLang;
-	        			populateProjects();
+	        			populateProjects(p);
 	        		}, 
 	        		function(err){
 	        			updateTips(err);
