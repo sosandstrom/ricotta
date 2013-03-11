@@ -27,7 +27,7 @@
 					</div>
 				</div>
 				<div class="translation-footer">
-					<a id="addTranslation" class="btn btn-small btn-primary" data-toggle="modal" href="#createTokenDialog" onclick="clearLastText();">+ Token</a>
+					<a id="addTranslation" class="btn btn-small btn-primary" data-toggle="modal" href="#createTokenDialog" onclick="clearLastText();">+ String</a>
 				</div>
 			</div>
 		</div>
@@ -36,7 +36,7 @@
 			<div class="nav">
 				<div class="menu"><span class="selected" data-target="generalSetting">General</span></div>
 				<div class="menu"><span data-target="contexts">Manage Contexts</span></div>
-				<div class="menu"><span data-target="tokens">Manage Tokens</span></div>
+				<div class="menu"><span data-target="tokens">Manage Strings</span></div>
 			</div>
 			<div id="projectSetting">
 				<div id="ajaxLoader" style="height:70px;width:70px;margin: 25% auto auto;display:none;"><img src="img/ajaxloader.gif"/></div>
@@ -47,7 +47,7 @@
 	<div id="createTokenDialog" class="modal hide fade in" style="display: none;">
 		<div class="modal-header">
 			<a class="close" data-dismiss="modal">×</a>
-			<h3>Create new token</h3>
+			<h3>Create new string</h3>
 		</div> 
 		<div class="modal-body">
 			<div class="alert alert-error hide">  
@@ -55,7 +55,7 @@
 			</div>
 		    <form>
 		        <div>
-		            <label class="modal-label" for="toknName">Token name</label>
+		            <label class="modal-label" for="toknName">String name</label>
 		            <input class="modal-input" type="text" id="toknName" name="toknName"/><br/>
 		        </div>
 		        <div class="divider horiziontal-divider"></div>
