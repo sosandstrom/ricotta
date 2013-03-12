@@ -171,24 +171,33 @@
 	        allFields = $([]).add(projName),
 	        tips = $(".validateTips");
 		$("#createProjectDialog").find("a.btn-success").click(function() {
-			var bValid = true;
-	        allFields.removeClass("ui-state-error");
-	        bValid = bValid && checkEmpty(allFields) && checkLength(projName, "project name", 4, 16);
+			
+			// project name cannot have special characters
+			if (validName($("#projName").val())) {
+	            var bValid = true;
+	            allFields.removeClass("ui-state-error");
+	            bValid = bValid && checkEmpty(allFields) && checkLength(projName, "project name", 4, 16);
 
-	        if (bValid) {
-	        	var projectName = projName.val();
-	        	var defaultLang = $("#defaultLang option:selected").val();
-	        	ricottaAPI.createProject(projectName, defaultLang, 
-	        		function(p){
-	        			delete projectName;
-	        			delete defaultLang;
-	        			populateProjects(p);
-	        		}, 
-	        		function(err){
-	        			updateTips(err);
-	        		}
-	        	);
+	            if (bValid) {
+	                var projectName = projName.val();
+	                var defaultLang = $("#defaultLang option:selected").val();
+	                ricottaAPI.createProject(projectName, defaultLang, 
+	                    function(p){
+	                        delete projectName;
+	                        delete defaultLang;
+	                        populateProjects(p);
+	                    }, 
+	                    function(err){
+	                        updateTips(err);
+	                    }
+	                );
+	            }
+			} else {
+				tips.text("Project's name shouldn't contains illegal character include space.");
+	            //updateTips();
+	            tips.parent().addClass("show");
 	        }
+
 		});
 		$("#createProjectDialog").modal({show:false});
 	    //retrieve all project
