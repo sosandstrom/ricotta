@@ -11,6 +11,7 @@
 	<security:http use-expressions="true" entry-point-ref="gaeEntryPoint">
 		<security:intercept-url pattern="/" filters="none" />
 		<security:intercept-url pattern="/index.html" filters="none" />
+		<security:intercept-url pattern="/info.html" filters="none" />
 		<security:intercept-url pattern="/commercial_license.html" filters="none" />
 		<security:intercept-url pattern="/logout.html" filters="none" />
 		<security:intercept-url pattern="/loggedout.html" filters="none" />

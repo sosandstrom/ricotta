@@ -1,0 +1,157 @@
+<div class="info">
+    <div>
+                        <br><br>
+                        <table align="center">
+                            <tbody>
+                            
+                                <tr>
+                                    <td colspan="2"><b>About Ricotta</b></td>
+                                </tr>
+                            
+                                <tr>
+                                
+                                    <td style="vertical-align: top; padding-right:50px;">
+                                        <xmp>
+Ricotta is a web based translation 
+management tool, with complimentary build 
+tools, to efficiently manage localized resources 
+in your software project.
+                                        </xmp>
+                                    </td>
+                                    
+                                    <td style="vertical-align: top; padding-right:50px;">
+                                        <xmp>
+4 easy steps 
+   .   Login to ricotta using Google account
+   .   Setup project, languages of the project, 
+       contexts (screens), tokens
+   .   Provide translation for all the strings
+   .   Download the translation for your 
+       specific templates(i.e: Android, iOS) 
+       using the Maven Plugin. (Link)
+                                        </xmp> 
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td colspan="2"><b>Some important definitions</b></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td style="vertical-align: top; padding-right:50px;">
+                                        <xmp>
+Context
+A context is a screen or visual unit where a string 
+belongs.  A context can have many strings.
+                                              
+String
+A string is a text element that is subject for 
+translation. One or more strings can belong to the 
+same context. 
+                                        </xmp>
+                                    </td>
+                                    
+                                    <td style="vertical-align: top; padding-right:50px;">
+                                        <xmp>
+Subset
+A subset corresponds to a target platform. By 
+creating a subset you can choose which strings that 
+should be included for a specific platform. For example 
+if you are developing for both the Android and iOS 
+platforms you should have two subsets, one for the 
+strings Android will use, and the other for iOS strings.
+</xmp>
+                                        </td>
+                                    </tr>
+                                
+                                <tr>
+                                    <td colspan="2"><b>Ricotta User and Authentication</b></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td style="vertical-align: top; padding-right:50px;">
+                                        <xmp>
+There are 4 different roles of Ricotta users
+                                            
+a) Viewer: Only view the project as read only
+b) Translator: Could also translate a project that 
+he/she is assigned to
+                                        </xmp>
+                                    </td>
+                                    
+                                    <td style="vertical-align: top; padding-right:50px;">
+                                        <xmp>
+c) Developer: Could also export the projects, add language etc…
+d) Owner: Could also delete the project
+Ricotta is integrated with Google sign in service (link), 
+therefore, to use Ricotta all you need to have is a Google account. 
+                                        </xmp>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td colspan="2"><b>Downloading Translation</b></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td colspan="2" style="vertical-align: top;">
+<xmp>
+There are 2 ways to download your message properties:
+ 
+1. Manually Download
+You can manually download the message by going to the ricotta 
+url on a web browser. The user sets up the project’s name, 
+language code, template name and the subset´s name before 
+downloading.
+ 
+Ex: http://ricotta-abi.appspot.com/proj/ABI/branch/trunk/lang/en/templ/properties_java/subset/Android/
+
+2. Using Maven Plug-in 
+You can use the maven command mvn ricotta:download to 
+download your message properties, but you need to add 
+the maven plugin (link) in to your project's pom.xml.
+
+Ex:
+<plugin>
+    <groupId>com.wadpam.ricotta</groupId>
+    <artifactId>ricotta-maven-plugin</artifactId>
+    <version>18</version>
+    <configuration>
+        <projectName>ABI</projectName>
+        <destination>${project.basedir}/src/main/webapp/WEB-INF</destination>
+        <resourceItems>
+            <resourceItem>
+                <languageCode>en</languageCode>
+                <templateName>properties_java</templateName>
+                <filePath>messages_en_us.properties</filePath>
+                <artifactName>Android</artifactName>
+            </resourceItem>
+            <resourceItem>
+                <languageCode>fr</languageCode>
+                <templateName>properties_java</templateName>
+                <filePath>messages_fr.properties</filePath>
+                <artifactName>Android</artifactName>
+            </resourceItem>
+        </resourceItems>
+    </configuration>
+</plugin>
+
+<projectName> The project's name as created in Ricotta
+<destination> The location to store the downloaded files
+<resourceItems> Contains many resources items, one for each language.
+<resourceItem> Each resourceItem contains the configuration for a single language to be downloaded.
+<languageCode> Language to be downloaded e.g. en for English.
+<templateName> Template of how the message properties will look. It can be configured in the template page of the Ricotta app.
+<filePath> The path where the message properties will be stored.
+<artifactName> Name of the subset to be downloaded.
+
+</xmp>
+                                    
+                                    </td>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+    </div>
+
+</div>
