@@ -30,7 +30,7 @@
 		    </form>
 		</div>
 		<div class="modal-footer">
-			<a class="btn btn-success btn-create">Save</a>
+			<a class="btn btn-success btn-create">Save<img id="loading" class="hide" src="img/ajax-loader-save.gif" style="float:right; vertical-align:middle; margin-right:5px; margin-top: 2px;"/></a>
 		</div>
 	</div>
 	
@@ -181,11 +181,18 @@
 	            if (bValid) {
 	                var projectName = projName.val();
 	                var defaultLang = $("#defaultLang option:selected").val();
+	                
+	                // start, update progress...
+	                $("#loading").show();
+	                
 	                ricottaAPI.createProject(projectName, defaultLang, 
 	                    function(p){
 	                        delete projectName;
 	                        delete defaultLang;
 	                        populateProjects(p);
+	                        
+	                        // done, remove progress...
+	                        $("#loading").hide();
 	                    }, 
 	                    function(err){
 	                        updateTips(err);
