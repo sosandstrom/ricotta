@@ -160,15 +160,20 @@
 			});
 			var ajaxCalled = null;
 			function home() {
-				if(dataObject.tokenTable != null) {
-					dataObject.tokenTable.fnClearTable();
-					dataObject.tokenTable.fnDestroy();
+				if(typeof dataObject !== 'undefined') {
+					if(dataObject.tokenTable != null) {
+						dataObject.tokenTable.fnClearTable();
+						dataObject.tokenTable.fnDestroy();
+					}
+					arrayProjects = dataObject.projects;
+					delete dataObject; 
+					
+					$(".project").remove();
+					loadPage('projects');
 				}
-				arrayProjects = dataObject.projects;
-				delete dataObject; 
-				
-				$(".project").remove();
-				loadPage('projects');
+				else {
+					document.location = "index.html";
+				}
 			}
 			function showToast(s) {
 			    $("#toast").text(s).show();
