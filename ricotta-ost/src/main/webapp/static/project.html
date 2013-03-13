@@ -84,6 +84,8 @@
 //this array is used only once. it will be removed after tokens table already generated except the token subset header.
 
 var readonly = false;
+var translator = false;
+
 function reloadGeneralSetting() {
 	setProjectActiveMenu($('.span13 > .nav span:first'));
 	$('.span13 > .nav').removeClass('hide');
@@ -129,7 +131,7 @@ function addTokenDataTableArr() {
 
 function addTokenDataTable(t) {
 	var selectContext = "";
-	if(!readonly) {
+	if(!readonly && !translator) {
 		selectContext = '<select id="context_' + t.id + '" onChange="setChanged(' + t.id + ');" ><option value="_NO_CONTEXT_">No Context</option>';
 	}
 	else {
@@ -139,7 +141,7 @@ function addTokenDataTable(t) {
 		selectContext += ('<option value="' + c.name + '" ' + (c.name == t.context ? 'selected="selected" ' : '') +'>' + c.name + '</option>');
     });
 	var arr;
-	if(!readonly) {
+	if(!readonly && !translator) {
 		arr = [t.name,
 		           '<div style="width:60px;"><span id="delete_' + t.id + '" class="icon-trash icon-black" onClick="deleteToken(\''+t.name+'\', ' + t.id + ', $(this));" > Delete </span></div>', 
 				   '<div style="width:60px;"><span id="save_' + t.id + '" class="icon-hdd icon-black" onClick="saveToken(' + t.id + ');" style="display: none; margin-right: 5px;" > Update </span></div>',
@@ -162,7 +164,7 @@ function addTokenDataTable(t) {
 			else checked = "";
 	    });
 		var sToken = "";
-		if(!readonly) {
+		if(!readonly && !translator) {
 			sToken = '<input '+ checked +' type="checkbox" id="subset_' + t.id + '_' + s + '"' +' name="subsets_' + t.id + '"' +' value="' + s + '"' + ' title="' + t.name + ':' + s + '" onChange="setChanged(' + t.id + ');"/>';
 		}
 		else {
@@ -331,10 +333,24 @@ function isReadOnly() {
     }
 }
 
+function isTranslator() {
+    
+    var loginUser = $("#headerUser").data("json");
+    for(var i in dataObject.currentProject.users) {
+        var u = dataObject.currentProject.users[i];
+        if(u.user == loginUser.email && u.role == 3) {
+        	translator = true;
+            return;
+        }
+    }
+}
+
 $(function() {
     $("#projectname").text(dataObject.currentProject.name);
     
     isReadOnly();
+    isTranslator();
+    
     addTokenDataTableArr();
     
     $(".span13 span").bind("click", function(){
@@ -361,7 +377,7 @@ $(function() {
     appendUncompletTranslationFilter();
     appendTranslationContextFilter();
     appendTranslationTokens();
-    if(readonly) {
+    if(readonly || translator) {
     	//clean unuse button
     	$("#addTranslation").remove();
     }

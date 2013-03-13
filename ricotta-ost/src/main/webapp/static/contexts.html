@@ -249,7 +249,7 @@
 		});
 	    
 	    buildContextsTable();
-	    if(readonly) {
+	    if(readonly || translator) {
 			$(".contexts .btn").remove();
 			$(".contexts .table th:first-child").next().remove();
 			$(".contexts .table th:first-child").remove();

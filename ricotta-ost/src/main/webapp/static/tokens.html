@@ -194,7 +194,7 @@
 		
 	
 	$(function() {
-		if(readonly) {
+		if(readonly || translator) {
 			$(".tokens .btn").remove();
 			//remove some token column header before render the data
 			$("#tokensHeadTR").find("span.icon-black").parent().remove();

@@ -409,7 +409,7 @@
 	//This will be called for both first time init + create new
 	function appendSubsetTable(s) {
 		var deleteContent = "<td><span onclick='deleteSubset(\""+s.keyString+"\", \""+s.name+"\");' class='icon-trash icon-black'>Delete</span></td>";
-		if (readonly) {
+		if (readonly || translator) {
 			deleteContent = "";
 		}
 		$("#subsetbody").append("<tr id='subset_"+s.name+"'><td>"+s.name+"</td><td>"+s.description+"</td>" + 
@@ -485,7 +485,7 @@
 		buildProjLangsTable();
 		buildProjUserTable();
 		loadSubsets(dataObject.currentProject.name);
-		if(readonly) {
+		if(readonly || translator) {
 			$(".description .btn").remove();
 			$(".description .table th:last-child, .description .table td:last-child").remove();
 			$("#projUserTBody > tr > td > select").removeAttr("onchange");
