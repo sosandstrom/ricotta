@@ -341,7 +341,7 @@
 		if(bValid) {
 			ricottaAPI.addProjectUser(dataObject.currentProject.name, userEmail.val(), $("#projUserRole option:selected").val(), function(d){
 				var newIndex = $("#projUserTBody tr").length + 1;
-				appendUser(d, newIndex);
+				appendUser(d, newIndex, $("#headerUser").data("json"));
 				$("#addProjUserDialog").modal("hide");
 			}, updateTips);
 		}
