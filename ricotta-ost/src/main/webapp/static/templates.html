@@ -84,7 +84,12 @@
 		});
 	}
 	function editTemplate(templateName) {
+		//hide old error message
+		$("#createTemplateDialog .validateTips").parent().removeClass("show");
+		$("#createTemplateDialog .validateTips").parent().addClass("hide");
+		
 		$("#createTemplateDialog").hide();
+		
 		var t = $("#template"+templateName).data("json");
 		$("#modalHeader").text("Update Template");
 		$("#templateName").attr("readonly", "true");
