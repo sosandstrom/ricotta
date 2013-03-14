@@ -160,8 +160,10 @@ function addTokenDataTable(t) {
 	$.map(dataObject.currentProject.subsets, function(s, si) {
 		var checked = "";
 		$.map(t.subsets, function(ts, tsi) {
-			if(ts.id == s.id && ts != 'null') checked = "checked";
-			else checked = "";
+            if(ts != 'null' && s == ts) { 
+                checked = "checked";
+                return;
+            }
 	    });
 		var sToken = "";
 		if(!readonly && !translator) {

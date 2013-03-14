@@ -1026,7 +1026,9 @@
 		 */
 		function _fnClearTable( oSettings )
 		{
-			oInit.aaData.splice(0, oInit.aaData.length);
+			if(oInit != undefined) {
+				oInit.aaData.splice(0, oInit.aaData.length);
+			}
 			oSettings.aoData.splice( 0, oSettings.aoData.length );
 			oSettings.aiDisplayMaster.splice( 0, oSettings.aiDisplayMaster.length );
 			oSettings.aiDisplay.splice( 0, oSettings.aiDisplay.length );
@@ -5530,10 +5532,12 @@
 			/* End it all */
 			delete oSettings.aoData;
 			oSettings = null;
-			oInit.aaData.splice(0, oInit.aaData.length);
-			oInit.aaData = null;
-			delete oInit.aaData;
-			oInit = null;
+			if(oInit != undefined) {
+				oInit.aaData.splice(0, oInit.aaData.length);
+				oInit.aaData = null;
+				delete oInit.aaData;
+				oInit = null;
+			}
 		};
 		
 		
