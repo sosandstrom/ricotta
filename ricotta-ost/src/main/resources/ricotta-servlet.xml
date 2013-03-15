@@ -28,7 +28,7 @@
 
 	<mvc:annotation-driven conversion-service="conversionService"/>
 	
-	<!-- As auto-wiring does not work well in GAE, define controllers manually: -->
+        <!-- As auto-wiring does not work well in GAE, define controllers manually: -->
         
         <bean id="adminTaskController" class="com.wadpam.ricotta.web.admin.AdminTaskController">
             <property name="adminTaskBean" ref="uberDao" />

@@ -107,6 +107,7 @@ public class ProjectHandlerInterceptor extends HandlerInterceptorAdapter {
             // generate request, new format?
             matcher = REGEXP_GENERATE.matcher(requestURI);
             hasAccess = matcher.find();
+            LOG.debug("generateURI {} hasAccess {}", requestURI, hasAccess);
         }
 
         // try /proj/{projname} first

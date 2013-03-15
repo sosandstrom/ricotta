@@ -23,9 +23,11 @@ import com.google.appengine.api.datastore.Key;
 import com.wadpam.ricotta.domain.ProjLang;
 import com.wadpam.ricotta.model.TransModel;
 import com.wadpam.ricotta.velocity.Encoder;
+import java.io.IOException;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@RequestMapping(value="{projName}/branch/{branchName}/lang/{langCode}/templ/{templName}")
+@RequestMapping(value="{projName}/branch/{branchName}/lang/{langCode}")
 public class GenerateController extends AbstractDaoController {
     static final Logger LOG = LoggerFactory.getLogger(GenerateController.class);
     
@@ -43,20 +45,43 @@ public class GenerateController extends AbstractDaoController {
         Velocity.init(p);
     }    
 
-    @RequestMapping(value = {"", "index.html"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"templ/{templName}", "templ/{templName}/index.html"}, method = RequestMethod.GET)
     public String getTempl(HttpServletRequest request, HttpServletResponse response) throws ResourceNotFoundException,
             ParseErrorException, Exception {
         return renderTemplBySubset(request, response);
     }
 
-    @RequestMapping(value = {"subset/{subsetName}","subset/{subsetName}/index.html"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"templ/{templName}/subset/{subsetName}","templ/{templName}/subset/{subsetName}/index.html"}, method = RequestMethod.GET)
     public String getTemplSubset(HttpServletRequest request, HttpServletResponse response) throws ResourceNotFoundException,
             ParseErrorException, Exception {
         return renderTemplBySubset(request, response);
     }
+    
+    /**
+     * File-Upload your template to merge with Ricotta data model.
+     * @param request
+     * @param response
+     * @param template the file input field should be named 'template'
+     * @return null
+     * @throws IOException
+     * @throws ResourceNotFoundException
+     * @throws ParseErrorException
+     * @throws Exception 
+     */
+    @RequestMapping(value = {"templ/my"}, method = RequestMethod.POST)
+    public String postTempl(HttpServletRequest request, HttpServletResponse response,
+            @RequestParam("template") String templateText) 
+            throws IOException, ResourceNotFoundException, ParseErrorException, Exception {
+        
+            Template templ = new Template();
+            templ.setData(templateText);
+            VelocityContext model = buildModel(request);
 
-    protected String renderTemplBySubset(HttpServletRequest request, HttpServletResponse response)
-            throws ResourceNotFoundException, ParseErrorException, Exception {
+            renderTemplate(templ, model, response);
+        return null;
+    }
+    
+    protected VelocityContext buildModel(HttpServletRequest request) {
         final VelocityContext model = new VelocityContext();
         model.put("encoder", new Encoder());
         final Key projKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_PROJKEY);
@@ -80,6 +105,14 @@ public class GenerateController extends AbstractDaoController {
         model.put("template", templKey);
         // legacy
         model.put("mall", templKey);
+        
+        return model;
+    }
+
+    protected String renderTemplBySubset(HttpServletRequest request, HttpServletResponse response)
+            throws ResourceNotFoundException, ParseErrorException, Exception {
+        final VelocityContext model = buildModel(request);
+        final Key templKey = (Key) request.getAttribute(ProjectHandlerInterceptor.KEY_TEMPLKEY);
 
         renderTemplate(templKey.getName(), model, response);
         return null;
@@ -96,6 +129,17 @@ public class GenerateController extends AbstractDaoController {
         response.setContentType(contentType); // mall.getMimeType());
         final PrintWriter writer = response.getWriter();
         Template template = Velocity.getTemplate(templName);
+        template.merge(model, writer);
+        writer.close();
+        response.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    protected static void renderTemplate(Template template, VelocityContext model, 
+            HttpServletResponse response)
+            throws ResourceNotFoundException, ParseErrorException, Exception {
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/plain; charset=UTF-8");
+        final PrintWriter writer = response.getWriter();
         template.merge(model, writer);
         writer.close();
         response.setStatus(HttpServletResponse.SC_OK);
