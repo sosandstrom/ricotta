@@ -581,6 +581,43 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         }
     }
 
+    public Tokn TokenExistsBySubsets(String projectName, String branchName, String tokenName, String subsets, Long tokenId) {
+        Tokn tokn = null;
+
+        final String separator = ",";
+        final String[] subs = subsets.isEmpty() ? null : subsets.split(separator);
+        
+        // Generate branch key as parent key
+        Key projKey = projDao.findByPrimaryKey(projectName).getPrimaryKey();
+        Key branchKey = branchDao.findByPrimaryKey(projKey, branchName).getPrimaryKey();
+
+        CheckTokenInSubsets:
+        for(String sub : subs) {
+            // Subset -> SubsetTokn -> Token
+            // Get Subset primary key first
+            Subset subset = subsetDao.findByPrimaryKey(branchKey, sub);
+            Key subsetPrimaryKey = subset.getPrimaryKey();
+            
+            // Get SubsetTokens by subset primary key
+            List<SubsetTokn> subsetTokens = subsetToknDao.findBySubset(subsetPrimaryKey);
+            
+            for(SubsetTokn subsetToken : subsetTokens) {
+                tokn = toknDao.findByPrimaryKey(branchKey, subsetToken.getSimpleKey());
+
+                if ((tokenId == null && tokenName.equals(tokn.getName()))
+                        || (tokenId != tokn.getId() && tokenName.equals(tokn.getName()))) {
+                    // Conflict Token name in same Subset
+                    break CheckTokenInSubsets;
+                }
+                else {
+                    tokn = null;
+                }
+            }
+        }
+        
+        return tokn;
+    }
+
     public Tokn10 createToken(String projectName, String branchName, String name, String description, String context) {
         Tokn10 t10 = null;
         final Key projKey = projDao.createKey(projectName);

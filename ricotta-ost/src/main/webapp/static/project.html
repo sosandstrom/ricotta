@@ -307,9 +307,10 @@ function createToken() {
 	     		dataObject.tokensArrDataTable.push(newTokenDataTable);
       		}
       		appendTokenSideBar(newToken, dataObject.currentProject.projLangs);
-      		
+      		$("#createTokenDialog").modal("hide");
+      		cleanTokenTips();
       	}, updateTips);
-	      $("#createTokenDialog").modal("hide");
+	      //$("#createTokenDialog").modal("hide");
       }
 }
 

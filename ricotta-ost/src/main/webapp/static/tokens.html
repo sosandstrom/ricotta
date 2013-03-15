@@ -1,4 +1,9 @@
 <div class="tokens">
+
+        <div class="alert alert-error hide">  
+            <p class="validateTokenTips"></p>
+        </div>
+        
 		<table  class="table table-striped table-bordered" id="tableToken">
 	        <thead>
 			<tr id="tokensHeadTR">
@@ -64,6 +69,21 @@
 	    $("<div style='max-width:100%;overflow:auto;'>").append($(".dataTable")).insertAfter($("#tableToken_wrapper .row-fluid:first"));
 	}
 	
+
+	function cleanTokenTips() {
+	    var tips = $(".validateTokenTips");
+	    tips.html("");
+	    tips.parent().removeClass("show");
+	    tips.parent().addClass("hide");
+	}
+	
+   function updateTokenTips(t) {
+        var tips = $(".validateTokenTips");
+        tips.html(t);
+        tips.parent().removeClass("hide");
+        tips.parent().addClass("show");
+    }
+	
 	function saveToken(id) {
 	    
 	    
@@ -81,7 +101,8 @@
 	    ricottaAPI.saveToken(dataObject.currentProject.name, id, body, function(){
 	    	updateModel(id, body.name, body.description, body.context, subsets, body.separator);
 	        clearChanged(id);
-	    });
+	        cleanTokenTips();
+	    }, updateTokenTips);
 	}
 	
 	function updateModel(id, name, description, context, subsets, separator) {

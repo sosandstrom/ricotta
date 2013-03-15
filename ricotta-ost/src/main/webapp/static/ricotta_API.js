@@ -455,7 +455,7 @@
 		 * @param tokenId the token id to be update
 		 * @param data 
 		 */
-		saveToken: function(projName, tokenId, data, callback) {
+		saveToken: function(projName, tokenId, data, successCallback, failCallback) {
 			var that = this;
 			$.ajax({
                 async: false,
@@ -465,11 +465,19 @@
                 data: data
             })
             .done(function(data){
-            	if(typeof callback === 'function') {
-            		callback();
+            	if(typeof successCallback === 'function') {
+            		successCallback(data);
             	}
             })
-            .fail(function() {});
+            .fail(function(jqXHR, textStatus, errorThrown) {
+         	   if(typeof failCallback === 'function') {
+        		   if (jqXHR.status == 409) {
+        			   failCallback('name already taken');
+        		   } else {
+        			   failCallback(textStatus);
+        		   }
+        	   }
+            });
 		},
 		/**
 		 * Create token for a given project
@@ -492,12 +500,12 @@
             		successCallback(data);
             	}
             })
-           .fail(function() {
+           .fail(function(jqXHR, textStatus, errorThrown) {
         	   if(typeof failCallback === 'function') {
-        		   if (this.status == 409) {
+        		   if (jqXHR.status == 409) {
         			   failCallback('name already taken');
         		   } else {
-        			   failCallback(this.statusText);
+        			   failCallback(textStatus);
         		   }
         	   }
            });

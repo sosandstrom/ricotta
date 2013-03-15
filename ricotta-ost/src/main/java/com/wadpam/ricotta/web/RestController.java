@@ -168,6 +168,12 @@ public class RestController {
     @RequestMapping(value = "project/v10/{projectName}/token", method = RequestMethod.POST, params = {"name", "description"})
     public ResponseEntity<Tokn10> createToken(@PathVariable String projectName, @RequestParam String name,
             @RequestParam String description, @RequestParam String context, @RequestParam(required = false) String subsets) {
+
+        // allow different values for "same" token but for different subsets
+        if (null != uberDao.TokenExistsBySubsets(projectName, ProjectHandlerInterceptor.NAME_TRUNK, name, subsets, null)) {
+            return new ResponseEntity(HttpStatus.CONFLICT);
+        }
+
         Tokn10 body = uberDao.createToken(projectName, ProjectHandlerInterceptor.NAME_TRUNK, name, description, context);
         if (null != subsets) {
             body = updateTokn(projectName, body.getId(), body.getName(), body.getDescription(), context, subsets, ",");
@@ -262,6 +268,12 @@ public class RestController {
     public ResponseEntity<Tokn10> updateToken(@PathVariable String projectName, @PathVariable Long tokenId,
             @RequestParam String name, @RequestParam String description, @RequestParam String context,
             @RequestParam String subsets, @RequestParam(value = "separator", defaultValue = ",") String separator) {
+
+        // allow different values for "same" token but for different subsets
+        if (null != uberDao.TokenExistsBySubsets(projectName, ProjectHandlerInterceptor.NAME_TRUNK, name, subsets, tokenId)) {
+            return new ResponseEntity(HttpStatus.CONFLICT);
+        }
+
         final Tokn10 body = this.updateTokn(projectName, tokenId, name, description, context, subsets, separator);
         if (null == body) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
