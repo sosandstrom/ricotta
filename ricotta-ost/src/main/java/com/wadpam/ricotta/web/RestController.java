@@ -61,6 +61,8 @@ public class RestController {
     protected ProjDao              projDao;
 
     private final BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
+    
+    private String logoUrl;
 
     @RequestMapping(value = "blob/v10/{projName}", method = RequestMethod.GET)
     public ResponseEntity<Blob10> getUploadUrl(HttpServletRequest request, HttpServletResponse response,
@@ -391,6 +393,14 @@ public class RestController {
         request.getSession().invalidate();
         // String logoutUrl = UserServiceFactory.getUserService().createLogoutURL("/index.html");
         // response.sendRedirect(logoutUrl);
+    }
+
+    public String getLogoUrl() {
+        return logoUrl;
+    }
+
+    public void setLogoUrl(String logoUrl) {
+        this.logoUrl = logoUrl;
     }
 
 }

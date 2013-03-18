@@ -38,6 +38,7 @@
         <spring.version>3.1.0.RELEASE</spring.version>
         <downloadSources>true</downloadSources>
         <logging.level>ALL</logging.level>
+        <logo.url>/img/Ricotta_assets/ricotta_logo.png</logo.url>
     </properties>
 
     <profiles>
@@ -322,6 +323,25 @@
                 </executions>
             </plugin>
 
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>write-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <outputFile>
+                                ${project.build.outputDirectory}/application.properties
+                            </outputFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>       
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>

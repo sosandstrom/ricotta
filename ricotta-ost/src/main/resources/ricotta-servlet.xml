@@ -9,6 +9,7 @@
                 http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
        ">
+        <context:property-placeholder location="classpath:/application.properties" />
 
 	<bean id="uberDao" class="com.wadpam.ricotta.dao.UberDaoBean"
 		init-method="init" depends-on="dataResourceLoader">
@@ -92,6 +93,7 @@
         
 	<bean id="restController" class="com.wadpam.ricotta.web.RestController">
 		<property name="uberDao" ref="uberDao" />
+                <property name="logoUrl" value="${logo.url}" />
 	</bean>
         
 	<bean id="docController" class="com.wadpam.ricotta.web.DocumentController" />
