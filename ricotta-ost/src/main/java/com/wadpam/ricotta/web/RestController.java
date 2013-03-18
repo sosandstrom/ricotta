@@ -172,7 +172,8 @@ public class RestController {
             @RequestParam String description, @RequestParam String context, @RequestParam(required = false) String subsets) {
 
         // allow different values for "same" token but for different subsets
-        if (null != uberDao.TokenExistsBySubsets(projectName, ProjectHandlerInterceptor.NAME_TRUNK, name, subsets, null)) {
+        if (!"null".equals(subsets)
+                && (null != uberDao.TokenExistsBySubsets(projectName, ProjectHandlerInterceptor.NAME_TRUNK, name, subsets, null))) {
             return new ResponseEntity(HttpStatus.CONFLICT);
         }
 
@@ -272,7 +273,9 @@ public class RestController {
             @RequestParam String subsets, @RequestParam(value = "separator", defaultValue = ",") String separator) {
 
         // allow different values for "same" token but for different subsets
-        if (null != uberDao.TokenExistsBySubsets(projectName, ProjectHandlerInterceptor.NAME_TRUNK, name, subsets, tokenId)) {
+        if (!"".equals(subsets)
+                && (null != uberDao.TokenExistsBySubsets(projectName, ProjectHandlerInterceptor.NAME_TRUNK, name, subsets,
+                        tokenId))) {
             return new ResponseEntity(HttpStatus.CONFLICT);
         }
 
