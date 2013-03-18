@@ -12,6 +12,7 @@
 		<security:intercept-url pattern="/" filters="none" />
 		<security:intercept-url pattern="/index.html" filters="none" />
 		<security:intercept-url pattern="/info.html" filters="none" />
+		<security:intercept-url pattern="/logo.html" filters="none" />
 		<security:intercept-url pattern="/commercial_license.html" filters="none" />
 		<security:intercept-url pattern="/logout.html" filters="none" />
 		<security:intercept-url pattern="/loggedout.html" filters="none" />
@@ -19,6 +20,7 @@
 		<security:intercept-url pattern="/static/**" filters="none" />
 		<security:intercept-url pattern="/api/doc/**" filters="none" />
 		<security:intercept-url pattern="/api/me/v10" filters="none" />
+		<security:intercept-url pattern="/api/logo/v10" filters="none" />
                 <!-- for AdminTaskController, security is handled by J2EE in web.xml -->
 		<security:intercept-url pattern="/api/_admin/task/**" filters="none" />
 		<!-- For screenshot calls to be served by BlobStoreService: -->

@@ -1,0 +1,21 @@
+<div class="logo">
+    <!-- replace logo here -->
+    <div id="logo"> </div>
+    
+     <script type="text/javascript">
+     
+     $(document).ready(function() {
+         //load logo
+         ricottaAPI.loadLogo(function(data){logoFound(data);}, logoNotFound);
+     });
+     
+     function logoFound(img){
+         $("#logo").html(img);
+     }
+     
+     function logoNotFound(error){
+         $("#logo").html("<p> logo cannot be loaded. </p>");
+     }
+     
+     </script>
+</div>

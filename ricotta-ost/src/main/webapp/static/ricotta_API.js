@@ -645,7 +645,25 @@
 					}
 				}
 			});
-		},
+		}, 
+		loadLogo: function(successCallback, failCallback) {
+			var that =  this;
+			$.ajax({
+				url: that.backendUrl + "logo/v10",
+				type: "GET",
+				dataType: "text",
+				success: function(img) {
+					if(typeof successCallback === 'function') {
+						successCallback(img);
+					}
+				},
+				error: function(jqXR, testStatus, errorThrown) {
+					if(typeof failCallback === 'function') {
+						failCallback(jqXR);
+					}
+				}
+			});
+		}, 
 		deleteSubset: function(projName, keyString, successCallback, failCallback) {
 			var that = this;
 			$.ajax({

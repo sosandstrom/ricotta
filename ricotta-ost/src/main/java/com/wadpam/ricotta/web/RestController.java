@@ -398,6 +398,13 @@ public class RestController {
         // response.sendRedirect(logoutUrl);
     }
 
+    @RequestMapping(value = "logo/v10", method = RequestMethod.GET)
+    public ResponseEntity<String> logo(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        final String body = String.format("<img src='%s' />", getLogoUrl());
+        return new ResponseEntity<String>(body, HttpStatus.OK);
+
+    }
+
     public String getLogoUrl() {
         return logoUrl;
     }

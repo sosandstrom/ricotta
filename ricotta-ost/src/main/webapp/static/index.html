@@ -109,7 +109,7 @@
                                 </tr>
                                 
                                 <tr>
-                                    <td style="padding:50px; text-align:right;" colspan="3"><img src="img/Ricotta_assets/abinbev_logo.png"></td>
+                                    <td style="padding:50px; text-align:right;" colspan="3" id="logoContent"></td>
                                     <td style="padding:50px; text-align:right;" colspan="2">For more info press <a onclick="$('#ricotta_contents').load('info.html');">here<a></a></td>
                                 </tr>
                                 
@@ -186,6 +186,9 @@
 			$(document).ready(function() {
 			    showToast("Checking login status...");
 			    ricottaAPI.me(success, fail);
+			    
+			    //load logo
+			    $("#logoContent").html("<div>Loading logo...</div>").load("logo.html");
 			});
 			
 			function success(data) {
