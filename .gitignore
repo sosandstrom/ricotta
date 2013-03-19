@@ -1,3 +1,6 @@
 target
-*.releaseBackup
 release.properties
+*.releaseBackup
+.settings
+.classpath
+.project
