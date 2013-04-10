@@ -273,11 +273,11 @@ public class RestController {
             @RequestParam String subsets, @RequestParam(value = "separator", defaultValue = ",") String separator) {
 
         // allow different values for "same" token but for different subsets
-        if (!"".equals(subsets)
-                && (null != uberDao.TokenExistsBySubsets(projectName, ProjectHandlerInterceptor.NAME_TRUNK, name, subsets,
-                        tokenId))) {
-            return new ResponseEntity(HttpStatus.CONFLICT);
-        }
+//        if (!"".equals(subsets)
+//                && (null != uberDao.TokenExistsBySubsets(projectName, ProjectHandlerInterceptor.NAME_TRUNK, name, subsets,
+//                        tokenId))) {
+//            return new ResponseEntity(HttpStatus.CONFLICT);
+//        }
 
         final Tokn10 body = this.updateTokn(projectName, tokenId, name, description, context, subsets, separator);
         if (null == body) {
