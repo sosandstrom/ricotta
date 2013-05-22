@@ -46,7 +46,7 @@ public interface UberDao {
 
     Object createSubset(Object branch, String name, String description);
 
-    Object createTrans(Object projLangKey, Long toknId, String value);
+    Object createTrans(Object projLangKey, Long toknId, String value, String updatedBy);
 
     Object createSubsetTokn(Object subsetKey, Long toknId);
 

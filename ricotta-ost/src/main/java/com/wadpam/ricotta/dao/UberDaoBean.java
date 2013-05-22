@@ -41,6 +41,9 @@ import org.xml.sax.SAXException;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.wadpam.ricotta.domain.Branch;
 import com.wadpam.ricotta.domain.Ctxt;
 import com.wadpam.ricotta.domain.Lang;
@@ -64,6 +67,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
     public static final String NO_CONTEXT_NAME = "_NO_CONTEXT_";
 
     static final Logger        LOG             = LoggerFactory.getLogger(UberDaoBean.class);
+    static final UserService userService = UserServiceFactory.getUserService();
 
     public void init() {
         populate();
@@ -266,6 +270,10 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
             for(Trans t : trans) {
                 if (tokenId == t.getToken().longValue()) {
                     tokn10.getTrans().put(projLang.getLangCode(), t.getLocal());
+                    if (null != t.getUpdatedDate()) {
+                        tokn10.getUpdatedDate().put(projLang.getLangCode(), t.getUpdatedDate().getTime());
+                    }
+                    tokn10.getUpdatedBy().put(projLang.getLangCode(), t.getUpdatedBy());
                     tokn10.getcompletedTranslation().add(projLang.getLangCode());
                 }
             }
@@ -473,6 +481,8 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
     public List<String> updateTrans(Key projLangKey, Tokn token, Trans t, String name, String value, boolean delete) {
         final String langCode = projLangKey.getName();
         List<String> returnValue = new ArrayList<String>();
+        final User user = userService.getCurrentUser();
+        final String updatedBy = null != user ? user.getEmail() : "[ANONYMOUS]";
         if (null != t) {
             if (null == token) {
                 token = toknDao.findByPrimaryKey(projLangKey.getParent(), t.getToken());
@@ -481,6 +491,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
                 if (false == value.equals(t.getLocal())) {
                     final String u = String.format("U %s %s=%s, was %s", langCode, token.getName(), value, t.getLocal());
                     t.setLocal(value);
+                    t.setUpdatedBy(updatedBy);
                     transDao.update(t);
                     returnValue.add(u);
                     LOG.debug(u);
@@ -500,6 +511,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
                 t.setProjLang(projLangKey);
                 t.setToken(token.getId());
                 t.setLocal(value);
+                t.setUpdatedBy(updatedBy);
                 transDao.persist(t);
                 final String c = String.format("A %s %s=%s", langCode, token.getName(), value);
                 returnValue.add(c);
@@ -568,7 +580,7 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
             Trans t = transDao.findByPrimaryKey(projLangKey, from.getId());
             if (null != t) {
                 final Object toPL = projLangDao.createKey(branchKey, pl.getLangCode());
-                createTrans(toPL, toKey.getId(), t.getLocal());
+                createTrans(toPL, toKey.getId(), t.getLocal(), t.getUpdatedBy());
             }
         }
     }
@@ -738,11 +750,11 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         subsetToknDao.persist(android.getPrimaryKey(), 1L);
 
         // Trans
-        transDao.persist(plEN.getPrimaryKey(), appTitle.getId(), "Ricotta");
-        transDao.persist(plGB.getPrimaryKey(), tokenProject.getId(), "Project");
-        transDao.persist(plSV.getPrimaryKey(), tokenProject.getId(), "Projekt");
+        transDao.persist(plEN.getPrimaryKey(), appTitle.getId(), "Ricotta", "<init>");
+        transDao.persist(plGB.getPrimaryKey(), tokenProject.getId(), "Project", "<init>");
+        transDao.persist(plSV.getPrimaryKey(), tokenProject.getId(), "Projekt", "<init>");
         transDao.persist(plEN.getPrimaryKey(), tokenLong.getId(),
-                "Ricotta is a Translations management</br>tool with complimentary build tools.");
+                "Ricotta is a Translations management</br>tool with complimentary build tools.", "<init>");
 
     }
 
@@ -865,8 +877,8 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
     }
 
     @Override
-    public Object createTrans(Object projLangKey, Long toknId, String value) {
-        final Trans t = transDao.persist((Key) projLangKey, toknId, value);
+    public Object createTrans(Object projLangKey, Long toknId, String value, String updatedBy) {
+        final Trans t = transDao.persist((Key) projLangKey, toknId, value, updatedBy);
         return t.getPrimaryKey();
     }
 

@@ -21,6 +21,8 @@ public class Tokn10 {
     private String                    description;
     private String                    context;
     private final Map<String, String> trans                = new HashMap<String, String>();
+    private final Map<String, String> updatedBy            = new HashMap<String, String>();
+    private final Map<String, Long> updatedDate            = new HashMap<String, Long>();
     private final Set<String>         subsets              = new TreeSet<String>();
     // list of translated language
     private final List<String>        completedTranslation = new ArrayList<String>();
@@ -69,6 +71,14 @@ public class Tokn10 {
 
     public Set<String> getSubsets() {
         return subsets;
+    }
+
+    public Map<String, String> getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public Map<String, Long> getUpdatedDate() {
+        return updatedDate;
     }
 
     /**

@@ -33,10 +33,13 @@ import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.wadpam.ricotta.importexport.RicottaImportHandler;
 import com.wadpam.ricotta.importexport.TokensImportHandler;
 import com.wadpam.ricotta.velocity.Encoder;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Created by Ola on Nov 12, 2010
@@ -159,8 +162,11 @@ public class IndexController extends AbstractDaoController {
     protected void importXML(InputStream in, String projName, String branchName) throws ParserConfigurationException,
             SAXException, IOException {
         SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+        final UserService userService = UserServiceFactory.getUserService();
+        final User user = userService.getCurrentUser();
+        final String updatedBy = null != user ? user.getEmail() : "[ANONYMOUS]";
 
-        DefaultHandler dh = new TokensImportHandler(uberDao, projName, branchName);
+        DefaultHandler dh = new TokensImportHandler(uberDao, projName, branchName, updatedBy);
         parser.parse(in, dh);
     }
 

@@ -18,6 +18,8 @@ public class Trans extends AEDCreatedUpdatedEntity<Long> {
     Long                      token;
 
     String                    local;
+    
+    String                    updatedBy;
 
     @Override
     public String toString() {
@@ -61,6 +63,14 @@ public class Trans extends AEDCreatedUpdatedEntity<Long> {
 
     public void setProjLang(Key projLang) {
         this.projLang = projLang;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
     }
 
 }

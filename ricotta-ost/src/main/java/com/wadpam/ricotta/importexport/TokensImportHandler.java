@@ -33,6 +33,7 @@ public class TokensImportHandler extends DefaultHandler {
     private final UberDao             uberDao;
     private final String              projName;
     private final String              branchName;
+    private final String updatedBy;
     private boolean                   active    = false;
 
     private final Map<String, Object> langs     = new HashMap<String, Object>();
@@ -45,10 +46,12 @@ public class TokensImportHandler extends DefaultHandler {
     private Long                      toknId    = null;
     private String                    templName = null, templDescription = null;
 
-    public TokensImportHandler(UberDao uberDao, String projName, String branchName) {
+    public TokensImportHandler(UberDao uberDao, String projName, String branchName,
+            String updatedBy) {
         this.uberDao = uberDao;
         this.projName = projName;
         this.branchName = branchName;
+        this.updatedBy = updatedBy;
     }
 
     @Override
@@ -134,7 +137,7 @@ public class TokensImportHandler extends DefaultHandler {
             }
         }
         else if (TRANS.equals(qName)) {
-            uberDao.createTrans(projLangKey, toknId, cdata.toString());
+            uberDao.createTrans(projLangKey, toknId, cdata.toString(), updatedBy);
         }
         else if (TOKENS.equals(qName)) {
             active = false;
