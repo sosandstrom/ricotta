@@ -38,10 +38,34 @@ function editTranslation(id) {
     $("#editTransDialog").modal("show");
 }
 
-function appendLanguage(obj, index, trans) {
-	var transVal = trans[obj.langCode] != undefined? trans[obj.langCode] : "";
-	$("#languageWrapper > #translationBody").append("<fieldset><label for='trans_"+obj.langCode+"'>"+obj.langCode+"</label>"+
-													"<textarea onchange='enableCancel();' rows='6' data-langcode='"+obj.langCode+"'type='text' id='trans_" +obj.langCode+ "'>"+ transVal +"</textarea> </fieldset>");
+function formatDate(seconds){
+        if(seconds == '' || typeof(seconds) == 'undefined'){
+                return '';
+        }
+        var now = new Date(seconds);
+        var day = now.getDate();
+        var month = now.getMonth();
+        var year = now.getFullYear();
+        
+        month++;
+
+        if(day < 10){
+                day = "0"+day;
+        }
+        if(month < 10){
+                month = "0"+month;
+        }
+
+        return day+'/'+month+'/'+year;
+}
+
+function appendLanguage(obj, index, trans, updatedDate, updatedBy) {
+	var transVal = trans[obj.langCode] != undefined ? trans[obj.langCode] : "";
+	var updatedDateVal = formatDate(updatedDate[obj.langCode] != undefined ? updatedDate[obj.langCode] : 0);
+	var updatedByVal = updatedBy[obj.langCode] != undefined ? "&lt;" + updatedBy[obj.langCode] + "&gt;" : "";
+	$("#languageWrapper > #translationBody").append("<fieldset><label for='trans_"+obj.langCode+"'><strong>"+obj.langCode+"</strong><p/>" +
+                "Last updated:<br/>" + updatedDateVal + "<br/>" + updatedByVal + "</label>"+
+                    "<textarea onchange='enableCancel();' rows='6' data-langcode='"+obj.langCode+"'type='text' id='trans_" +obj.langCode+ "'>"+ transVal +"</textarea> </fieldset>");
 	
 }
 
@@ -82,7 +106,7 @@ function buildTranslation(p, token) {
 	});
 	$.map(dataObject.currentProject.projLangs, function(l, index){
 		//$("#languageWrapper").append();
-		appendLanguage(l, index, token.trans);
+		appendLanguage(l, index, token.trans, token.updatedDate, token.updatedBy);
 	});
 	
 	$("#languageWrapper > #translationBody").append("<div id='translationAction'><span><a onclick='addTranslation();' class='btn btn-primary'>Save</a></span><span><a onclick='refreshTranslation($(this));' class='btn btn-disabled' id='cancelTranslation' disabled='disabled'>Cancel</a></span></div>");

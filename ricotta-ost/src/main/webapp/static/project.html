@@ -23,7 +23,7 @@
 						<select id="completionFilter" onchange="tokenFiltered();"></select>
 					</div>
 					<div class="token-wrapper">
-						<ul id="translationToken"></ul>
+						<ul id="translationToken" class="nav nav-list"></ul>
 					</div>
 				</div>
 				<div class="translation-footer">
@@ -232,9 +232,7 @@ function appendTranslationTokens() {
 
 function appendTokenSideBar(token, projLangs) {
 	var uncompleteTrans = token.completeTranslation;
-	var label = token.name;
-	$("#translationToken").append("<li id='trans_token_"+token.id+"' data-context='"+token.context+"'><input onclick=\"loadTranslation('"+token.id+"')\" type='radio' name='token' id='radio"+token.id+"' value='"+token.id+"'>"+
-									   "<label for='radio"+token.id+"'>" + label +"</label>"+
+	$("#translationToken").append("<li id='trans_token_"+token.id+"' data-context='"+token.context+"'><a href='#' onclick=\"loadTranslation('"+token.id+"')\" tabindex='-1' name='token' id='radio"+token.id+"' >"+token.name+"</a>"+
 								   "</li>");
 	if(readonly) {
 		$("#trans_token_"+token.id).find("input[type='radio']").remove();
