@@ -600,21 +600,18 @@ public class UberDaoBean extends AbstractDaoController implements UberDao, Admin
         final String[] subs = subsets.isEmpty() ? null : subsets.split(separator);
         
         // Generate branch key as parent key
-        Key projKey = projDao.findByPrimaryKey(projectName).getPrimaryKey();
-        Key branchKey = branchDao.findByPrimaryKey(projKey, branchName).getPrimaryKey();
+        Key projKey = projDao.createKey(projectName);
+        Key branchKey = branchDao.createKey(projKey, branchName);
 
         CheckTokenInSubsets:
         for(String sub : subs) {
             // Subset -> SubsetTokn -> Token
-            // Get Subset primary key first
-            Subset subset = subsetDao.findByPrimaryKey(branchKey, sub);
-            Key subsetPrimaryKey = subset.getPrimaryKey();
+            Key subsetPrimaryKey = subsetDao.createKey(branchKey, sub);
             
             // Get SubsetTokens by subset primary key
-            List<SubsetTokn> subsetTokens = subsetToknDao.findBySubset(subsetPrimaryKey);
-            
-            for(SubsetTokn subsetToken : subsetTokens) {
-                tokn = toknDao.findByPrimaryKey(branchKey, subsetToken.getSimpleKey());
+            List<Long> subsetTokenKeys = subsetToknDao.findKeysBySubset(subsetPrimaryKey);
+            for (Long subsetTokenId : subsetTokenKeys) {
+                tokn = toknDao.findByPrimaryKey(branchKey, subsetTokenId);
 
                 if ((tokenId == null && tokenName.equals(tokn.getName()))
                         || (tokenId != tokn.getId() && tokenName.equals(tokn.getName()))) {
