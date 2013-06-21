@@ -321,11 +321,12 @@ public class RestController {
             @RequestParam(value = "value[]") String[] value, @PathVariable String projectName, @PathVariable Long tokenId) {
         for(int i = 0; i < langCode.length; i++) {
             try {
-                updateTranslation(projectName, tokenId, langCode[i], URLDecoder.decode(value[i], "utf-8"));
+                value[i] = URLDecoder.decode(value[i], "utf-8");
             }
             catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
+            updateTranslation(projectName, tokenId, langCode[i], value[i]);
         }
         return new ResponseEntity<Tokn10>(HttpStatus.OK);
     }
