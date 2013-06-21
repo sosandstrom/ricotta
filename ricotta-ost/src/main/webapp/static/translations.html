@@ -121,8 +121,8 @@ function addTranslation() {
 	var langCode = new Array(), langVal = new Array();
 	$("#languageWrapper #translationBody textarea").each(function(){
 		langCode.push($(this).data("langcode"));
-		// encode string with comma
-		langVal.push(window.btoa($(this).val()));
+		// encode string with speical characters, for example: comma
+		langVal.push(encodeURIComponent($(this).val()));
 	});
 	
 	ricottaAPI.updateTranslation(langCode, langVal, dataObject.currentProject.name, tokenId, function(){
