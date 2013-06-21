@@ -13,6 +13,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.geronimo.mail.util.Base64;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
@@ -318,7 +319,7 @@ public class RestController {
     public ResponseEntity<Tokn10> updateTranslation(@RequestParam(value = "langCode[]") String[] langCode,
             @RequestParam(value = "value[]") String[] value, @PathVariable String projectName, @PathVariable Long tokenId) {
         for(int i = 0; i < langCode.length; i++) {
-            updateTranslation(projectName, tokenId, langCode[i], value[i]);
+            updateTranslation(projectName, tokenId, langCode[i], new String(Base64.decode(value[i])));
         }
         return new ResponseEntity<Tokn10>(HttpStatus.OK);
     }
