@@ -101,12 +101,23 @@ function tokenFiltered() {
 	
 	var incompleteTransFilter = $("#completionFilter option:selected").val();
 	if(incompleteTransFilter != "-1") {
-		filtered = true;
+		$("#translationToken li").hide();
+		if(incompleteTransFilter == 0) {
+			incompleteTransFilter = Number(incompleteTransFilter);
+		}
 		$("#translationToken li").each(function(){
-			if($.inArray(incompleteTransFilter, $(this).data("uncompletTranslation")) < 0) {
-				$("#translationToken li[data-uncompletTranslation='"+$("#completionFilter option:selected").val()+"']").show();
+			if($.inArray(incompleteTransFilter, $(this).data("uncompletTranslation")) > -1) {
+				if(filtered) {
+					if($(this).data("context") == $("#contextFilter option:selected").val()) {
+						$(this).show();
+					}
+				}
+				else {
+					$(this).show();
+				}
 			}
 		});
+		filtered = true;
 	}
 	
 	if(!filtered) {
@@ -232,18 +243,21 @@ function appendTranslationTokens() {
 
 function appendTokenSideBar(token, projLangs) {
 	var uncompleteTrans = token.completeTranslation;
-	$("#translationToken").append("<li id='trans_token_"+token.id+"' data-context='"+token.context+"'><a href='#' onclick=\"loadTranslation('"+token.id+"')\" tabindex='-1' name='token' id='radio"+token.id+"' >"+token.name+"</a>"+
-								   "</li>");
+	$("#translationToken").append("<li id='trans_token_"+token.id+"' data-context='"+token.context+"'>" +
+									"<a href='#' onclick=\"loadTranslation('"+token.id+"')\" tabindex='-1' name='token' id='radio"+token.id+"' >"+token.name+"</a>"+
+								  "</li>");
 	if(readonly) {
 		$("#trans_token_"+token.id).find("input[type='radio']").remove();
 	}
+	
 	$("#trans_token_"+token.id).data("uncompletTranslation", getUncompleteTranslation(projLangs, token.completedTranslation));
 }
 
 function getUncompleteTranslation(projLangs, completedTranslation) {
-	var unCompleteTranslation = $([]).add(0);
+	var unCompleteTranslation = $([]);
 	$.map(projLangs, function(l, i){
 		if(completedTranslation.indexOf(l.langCode) < 0) {
+			unCompleteTranslation.push(0);
 			unCompleteTranslation.push(l.langCode);
 		}
 	});
