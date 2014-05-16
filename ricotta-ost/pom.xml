@@ -31,7 +31,7 @@
 
     <!-- Specify hard-coded project properties here -->
     <properties>
-        <gae.version>1.8.5</gae.version>
+        <gae.version>1.7.7</gae.version>
         <gae.application.id>ricotta-open</gae.application.id>
         <gae.application.version>lab</gae.application.version>
         <mardao.version>1.33</mardao.version>
