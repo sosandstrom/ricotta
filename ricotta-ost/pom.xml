@@ -31,10 +31,10 @@
 
     <!-- Specify hard-coded project properties here -->
     <properties>
-        <gae.version>1.7.0</gae.version>
+        <gae.version>1.8.5</gae.version>
         <gae.application.id>ricotta-open</gae.application.id>
         <gae.application.version>lab</gae.application.version>
-        <mardao.version>1.36</mardao.version>
+        <mardao.version>1.33</mardao.version>
         <spring.version>3.1.0.RELEASE</spring.version>
         <downloadSources>true</downloadSources>
         <logging.level>ALL</logging.level>
@@ -236,10 +236,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
+                <version>3.1</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
                 <executions>
                     <!-- extra compile step of domain classes before generator processing -->
@@ -364,7 +364,7 @@
             <plugin>
                 <groupId>net.kindleit</groupId>
                 <artifactId>maven-gae-plugin</artifactId>
-                <version>0.9.2</version>
+                <version>0.9.6</version>
                 <configuration>
                     <port>8282</port>
                     <monitorPort>8287</monitorPort>
@@ -496,6 +496,7 @@
             <name>Maven Google App Engine Repository</name>
             <url>http://maven-gae-plugin.googlecode.com/svn/repository/</url>
         </pluginRepository>
+        
     </pluginRepositories>
-
+	
 </project>
